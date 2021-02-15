@@ -41,8 +41,10 @@ namespace Roguelike
 
             if (moveDirection != Direction.NONE)
                 return true;
-            else
-                return base.ProcessKeyboard(info);
+            
+            // Process more player-related hotkeys
+
+            return base.ProcessKeyboard(info);
         }
 
     }

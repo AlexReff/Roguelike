@@ -13,3 +13,52 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin fonts/Aesomatica.font
+/copy:fonts/Aesomatica.font
+
+#begin fonts/Aesomatica-16x16.png
+/copy:fonts/Aesomatica-16x16.png
+
+#begin fonts/Anno.font
+/copy:fonts/Anno.font
+
+#begin fonts/Anno-16x16.png
+/copy:fonts/Anno-16x16.png
+
+#begin fonts/Isenhertz.font
+/copy:fonts/Isenhertz.font
+
+#begin fonts/Isenhertz-16x16.png
+/copy:fonts/Isenhertz-16x16.png
+
+#begin fonts/Martin.font
+/copy:fonts/Martin.font
+
+#begin fonts/Martin-16x16.png
+/copy:fonts/Martin-16x16.png
+
+#begin fonts/Moons.font
+/copy:fonts/Moons.font
+
+#begin fonts/Moons-square-16x16.png
+/copy:fonts/Moons-square-16x16.png
+
+#begin fonts/Phoebus.font
+/copy:fonts/Phoebus.font
+
+#begin fonts/Phoebus-16x16.png
+/copy:fonts/Phoebus-16x16.png
+
+#begin fonts/Roboto.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/Roboto.spritefont
+
+#begin fonts/Tigrex3d.font
+/copy:fonts/Tigrex3d.font
+
+#begin fonts/Tigrex3d.png
+/copy:fonts/Tigrex3d.png
+

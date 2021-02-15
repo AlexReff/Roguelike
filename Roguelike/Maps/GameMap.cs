@@ -13,7 +13,7 @@ namespace Roguelike
         PLAYER
     }
 
-    internal class SCMap : BasicMap
+    internal class GameMap : BasicMap
     {
         // Handles the changing of tile/entity visiblity as appropriate based on Map.FOV.
         public FOVVisibilityHandler FovVisibilityHandler { get; }
@@ -26,7 +26,7 @@ namespace Roguelike
             set => base.ControlledGameObject = value;
         }
 
-        public SCMap(int width, int height)
+        public GameMap(int width, int height)
             // Allow multiple items on the same location only on the items layer.  This example uses 8-way movement, so Chebyshev distance is selected.
             : base(width, height, Enum.GetNames(typeof(MapLayer)).Length - 1, Distance.CHEBYSHEV, entityLayersSupportingMultipleItems: LayerMasker.DEFAULT.Mask((int)MapLayer.ITEMS))
         {

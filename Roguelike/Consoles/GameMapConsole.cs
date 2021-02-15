@@ -3,22 +3,24 @@ using GoRogue.GameFramework;
 using GoRogue.MapGeneration;
 using GoRogue.MapViews;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using SadConsole;
 using XnaRect = Microsoft.Xna.Framework.Rectangle;
 
 namespace Roguelike
 {
-    internal class MapScreen : ContainerConsole
+    internal class GameMapConsole : ContainerConsole
     {
-        public SCMap Map { get; }
+        public GameMap Map { get; }
         public ScrollingConsole MapRenderer { get; }
         //Generate a map and display it.  Could just as easily pass it into
-        public MapScreen(int mapWidth, int mapHeight, int viewportWidth, int viewportHeight)
+        public GameMapConsole(int mapWidth, int mapHeight, int viewportWidth, int viewportHeight, Point position, Font font)
         {
             Map = GenerateDungeon(mapWidth, mapHeight);
 
             // Get a console that's set up to render the map, and add it as a child of this container so it renders
-            MapRenderer = Map.CreateRenderer(new XnaRect(0, 0, viewportWidth, viewportHeight), SadConsole.Global.FontDefault);
+            MapRenderer = Map.CreateRenderer(new XnaRect(0, 0, viewportWidth, viewportHeight), font /*SadConsole.Global.FontDefault /*SadConsole.Global.Fonts["Anno"].GetFont(Font.FontSizes.One)*/);
+            MapRenderer.Position = position;
             Children.Add(MapRenderer);
             Map.ControlledGameObject.IsFocused = true; // Set player to receive input, since in this example the player handles movement
 
@@ -32,6 +34,11 @@ namespace Roguelike
             MapRenderer.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
         }
 
+        public void SetFont(Font font)
+        {
+            MapRenderer.Font = font;
+        }
+
         private void ControlledGameObjectChanged(object s, ControlledGameObjectChangedArgs e)
         {
             if (e.OldObject != null)
@@ -40,14 +47,14 @@ namespace Roguelike
             ((BasicMap)s).ControlledGameObject.Moved += Player_Moved;
         }
 
-        private static SCMap GenerateDungeon(int width, int height)
+        private static GameMap GenerateDungeon(int width, int height)
         {
             // Same size as screen, but we set up to center the camera on the player so expanding beyond this should work fine with no other changes.
-            var map = new SCMap(width, height);
+            var map = new GameMap(width, height);
 
             // Generate map via GoRogue, and update the real map with appropriate terrain.
             var tempMap = new ArrayMap<bool>(map.Width, map.Height);
-            QuickGenerators.GenerateDungeonMazeMap(tempMap, minRooms: 10, maxRooms: 20, roomMinSize: 5, roomMaxSize: 11);
+            QuickGenerators.GenerateDungeonMazeMap(tempMap, minRooms: 10, maxRooms: 20, roomMinSize: 8, roomMaxSize: 16);
             map.ApplyTerrainOverlay(tempMap, SpawnTerrain);
 
             Coord posToSpawn;
