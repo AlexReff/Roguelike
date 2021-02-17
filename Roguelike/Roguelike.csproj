@@ -30,4 +30,7 @@
     <PackageReference Include="SadConsole" Version="8.99.3" />
     <PackageReference Include="SadConsole.GoRogueHelpers" Version="1.0.1" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\obj\DesktopGL\Content\fonts\" />
+  </ItemGroup>
 </Project>

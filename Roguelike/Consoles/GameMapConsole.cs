@@ -11,18 +11,21 @@ namespace Roguelike
 {
     internal class GameMapConsole : ContainerConsole
     {
+        private static readonly char[] FloorCharacters = { (char) 0, (char)39, (char)44, (char)46 };
         public GameMap Map { get; }
         public ScrollingConsole MapRenderer { get; }
         //Generate a map and display it.  Could just as easily pass it into
-        public GameMapConsole(int mapWidth, int mapHeight, int viewportWidth, int viewportHeight, Point position, Font font)
+        public GameMapConsole(int mapWidth, int mapHeight, int viewportWidth, int viewportHeight, Font font)
         {
+            Width = viewportWidth;
+            Height = viewportHeight;
             Map = GenerateDungeon(mapWidth, mapHeight);
 
             // Get a console that's set up to render the map, and add it as a child of this container so it renders
             MapRenderer = Map.CreateRenderer(new XnaRect(0, 0, viewportWidth, viewportHeight), font /*SadConsole.Global.FontDefault /*SadConsole.Global.Fonts["Anno"].GetFont(Font.FontSizes.One)*/);
-            MapRenderer.Position = position;
+            //MapRenderer.Position = position;
             Children.Add(MapRenderer);
-            Map.ControlledGameObject.IsFocused = true; // Set player to receive input, since in this example the player handles movement
+            //Map.ControlledGameObject.IsFocused = true; // Set player to receive input, since in this example the player handles movement
 
             // Set up to recalculate FOV and set camera position appropriately when the player moves.  Also make sure we hook the new
             // Player if that object is reassigned.
@@ -76,18 +79,20 @@ namespace Roguelike
 
         private void Player_Moved(object sender, ItemMovedEventArgs<IGameObject> e)
         {
-            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.SQUARE);
+            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE);
             MapRenderer.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
         }
 
         private static IGameObject SpawnTerrain(Coord position, bool mapGenValue)
         {
+            GoRogue.Random.SadConsoleRandomGenerator rnd = new GoRogue.Random.SadConsoleRandomGenerator();
+            var floorChar = (int)System.Math.Floor(rnd.NextDouble() * FloorCharacters.Length);
             // Floor or wall.  This could use the Factory system, or instantiate Floor and Wall classes, or something else if you prefer;
             // this simplistic if-else is just used for example
             if (mapGenValue) // Floor
-                return new BasicTerrain(Color.White, Color.Black, '.', position, isWalkable: true, isTransparent: true);
+                return new BasicTerrain(Color.LightGray, Color.Black, FloorCharacters[floorChar], position, isWalkable: true, isTransparent: true);
             else             // Wall
-                return new BasicTerrain(Color.White, Color.Black, '#', position, isWalkable: false, isTransparent: false);
+                return new BasicTerrain(Color.White, Color.Black, (char) 219, position, isWalkable: false, isTransparent: false);
         }
     }
 }

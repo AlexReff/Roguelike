@@ -4,33 +4,14 @@ using System.Text;
 
 namespace Roguelike.Helpers
 {
-    enum DebugSource
+    class PlayerMessageManager
     {
-        User,
-        Player,
-        System,
-    }
-
-    class DebugMessage
-    {
-        public string Message { get; set; }
-        public DebugSource Source { get; set; }
-
-        public DebugMessage(string msg, DebugSource src)
-        {
-            Message = msg;
-            Source = src;
-        }
-    }
-
-    class DebugManager
-    {
-        private static readonly DebugManager instance = new DebugManager();
+        private static readonly PlayerMessageManager instance = new PlayerMessageManager();
 
         // Explicit static constructor to tell C# compiler not to mark type as beforefieldinit
-        static DebugManager() { }
+        static PlayerMessageManager() { }
 
-        public static DebugManager Instance
+        public static PlayerMessageManager Instance
         {
             get
             {
@@ -42,17 +23,18 @@ namespace Roguelike.Helpers
 
         public Queue<string> Messages { get; private set; }
 
-        private DebugManager()
+        private PlayerMessageManager()
         {
             Messages = new Queue<string>();
             _subscribers = new Dictionary<string, Action<string>>();
         }
 
-        public void AddMessage(DebugMessage msg)
+        public void AddMessage(string msg)
         {
-            msg.Message = msg.Message.Replace("\r", "").Replace("\n", "").Replace(Environment.NewLine, "");
-            Messages.Enqueue(msg.Message);
-            NotifySubscribers(msg.Message);
+            msg = msg.Replace("\r", "").Replace("\n", "").Replace(Environment.NewLine, "");
+            Messages.Enqueue(msg);
+            NotifySubscribers(msg);
+            DebugManager.Instance.AddMessage(new DebugMessage(msg, DebugSource.Player));
         }
 
         public void Subscribe(string id, Action<string> callback)

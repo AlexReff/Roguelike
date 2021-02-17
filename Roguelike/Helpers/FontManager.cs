@@ -58,11 +58,13 @@ namespace Roguelike.Helpers
                             {
                                 var fontMaster = SadConsole.Global.LoadFont(localPath);
                                 Fonts.Add(localPath, fontMaster);
-                                DebugManager.Instance.AddMessage("Added font: " + localPath);
+                                var fontParts = localPath.Split("/");
+                                var fontNameParts = fontParts[fontParts.Length - 1].Split(".");
+                                DebugManager.Instance.AddMessage(new DebugMessage("Added font: " + fontNameParts[0], DebugSource.Backend));
                             }
                             catch (Exception ex)
                             {
-                                DebugManager.Instance.AddMessage("Failed to add font: " + localPath);
+                                DebugManager.Instance.AddMessage(new DebugMessage("Failed to add font: " + localPath, DebugSource.Backend));
                             }
                         }
                     }
