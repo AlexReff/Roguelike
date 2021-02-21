@@ -9,12 +9,20 @@ using System.Text.Json;
 
 namespace Roguelike
 {
-    public class MyGame : Game
+    internal class MyGame : Game
     {
+        // private readonly string GameFont = "Anno"; //not bad, a little blocky
+        private readonly string GameFont = "Martin"; //good but needs 'solid' glyph updated
+        //private readonly string GameFont = "Isenhertz"; //possible candidate, needs some remapping, not usable for text
+        //private readonly string GameFont = "Phoebus"; //decent, needs glyph filled-in full opacity
+        //private readonly string GameFont = "Tigrex3d"; //ok, needs some remappings
+
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private UIManager uiManager;
+        public static UIManager UIManager { get; private set; }
+        public static CommandManager CommandManager { get; private set; }
+        public static World World { get; private set; }
 
         public MyGame()
         {
@@ -26,7 +34,7 @@ namespace Roguelike
         protected override void Initialize()
         {
             // Setup the engine and create the main window.
-            SadConsole.Game.Create("Content\\Fonts\\Martin.font", UIManager.GameWidth, UIManager.GameHeight, InitGame);
+            SadConsole.Game.Create($"Content\\Fonts\\{GameFont}.font", UIManager.GameWidth, UIManager.GameHeight);
             //SadConsole.Game.Create(GameWidth, GameHeight, InitGame);
 
             // Hook the start event so we can add consoles to the system.
@@ -78,29 +86,10 @@ namespace Roguelike
         private void Init()
         {
             FontManager.Instance.LoadFonts();
-            //MainScreen = new MainConsole(GameWidth, GameHeight, SadConsole.Global.FontDefault);
-            uiManager = new UIManager();
 
-
-            //SadConsole.Global.FontDefault = SadConsole.Global.Fonts["Martin"].GetFont(SadConsole.Font.FontSizes.One);
-
-            //RootDynamicConsole.Resize(Global.WindowWidth / RootDynamicConsole.Font.Size.X, Global.WindowHeight / RootDynamicConsole.Font.Size.Y, false);
-            //SadConsole.Game.Instance.
-            //MainScreen.SetFont(SadConsole.Global.Fonts["Tigrex3d"].GetFont(SadConsole.Font.FontSizes.One));
-
-            //MapScreen = new GameMapConsole(MapWidth, MapHeight, MapScreenWidth, MapScreenHeight, MapScreenPosition);
-
-            //SadConsole.Global.CurrentScreen = MapScreen;
-            // SadConsole.Global.CurrentScreen
-
-            //SadConsole.Global.CurrentScreen = MainScreen;
-            //MainScreen.Children.Add(MapScreen);
-        }
-
-        private void InitGame(Game game)
-        {
-            //FontManager.Instance.LoadFonts();
-            //SadConsole.Global.FontDefault = SadConsole.Global.Fonts["Anno"].GetFont(SadConsole.Font.FontSizes.One);
+            UIManager = new UIManager();
+            CommandManager = new CommandManager();
+            World = new World();
         }
 
         private void Destroyed()

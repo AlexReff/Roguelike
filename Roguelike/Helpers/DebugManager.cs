@@ -50,9 +50,17 @@ namespace Roguelike.Helpers
 
         public void AddMessage(DebugMessage msg)
         {
-            msg.Message = msg.Message.Replace("\r", "").Replace("\n", "").Replace(Environment.NewLine, "");
-            Messages.Enqueue(msg.Message);
-            NotifySubscribers(msg.Message);
+            AddMessage(msg.Message);
+            //msg.Message = msg.Message.Replace("\r", "").Replace("\n", "").Replace(Environment.NewLine, "");
+            //Messages.Enqueue(msg.Message);
+            //NotifySubscribers(msg.Message);
+        }
+
+        public void AddMessage(string msg)
+        {
+            msg = msg.Replace("\r", "").Replace("\n", "").Replace(Environment.NewLine, "");
+            Messages.Enqueue(msg);
+            NotifySubscribers(msg);
         }
 
         public void Subscribe(string id, Action<string> callback)

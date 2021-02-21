@@ -4,6 +4,25 @@ using System.Text;
 
 namespace Roguelike.Helpers
 {
+    enum MessageCategory
+    {
+        Movement,
+        Combat,
+        Status,
+    }
+
+    class PlayerMessage
+    {
+        public string Message { get; set; }
+        public MessageCategory Category { get; set; }
+
+        public PlayerMessage(string msg, MessageCategory cat)
+        {
+            Message = msg;
+            Category = cat;
+        }
+    }
+
     class PlayerMessageManager
     {
         private static readonly PlayerMessageManager instance = new PlayerMessageManager();
@@ -29,12 +48,17 @@ namespace Roguelike.Helpers
             _subscribers = new Dictionary<string, Action<string>>();
         }
 
+        public void AddMessage(PlayerMessage msg)
+        {
+            //TODO: Add any coloring/formatting per msg category
+            AddMessage(msg.Message);
+        }
+
         public void AddMessage(string msg)
         {
             msg = msg.Replace("\r", "").Replace("\n", "").Replace(Environment.NewLine, "");
             Messages.Enqueue(msg);
             NotifySubscribers(msg);
-            DebugManager.Instance.AddMessage(new DebugMessage(msg, DebugSource.Player));
         }
 
         public void Subscribe(string id, Action<string> callback)

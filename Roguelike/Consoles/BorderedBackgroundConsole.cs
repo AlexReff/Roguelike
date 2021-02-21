@@ -1,38 +1,39 @@
 ﻿using Microsoft.Xna.Framework;
 using SadConsole;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Roguelike.Consoles
 {
-    public class BorderedBackgroundConsole : ContainerConsole
+    internal class BorderedBackgroundConsole : ContainerConsole
     {
-        private Console BackgroundConsole;
-        private Console BorderConsole;
+        private SadConsole.Console DrawConsole;
 
         private Color BackgroundColor;
         private Color BorderColor;
 
-        public BorderedBackgroundConsole(int width, int height, Color backgroundColor, Color? borderColor)
+        private string Title;
+
+        public BorderedBackgroundConsole(int width, int height, string title, Color backgroundColor, Color? borderColor)
         {
             IsVisible = true;
-            //Position = position;
             Width = width;
             Height = height;
+            Title = title;
+            BackgroundColor = backgroundColor;
 
             var bgRect = new Rectangle(0, 0, width, height);
             var bgWidth = width;
             var bgHeight = height;
-            //var bgPos = new Point(0, 0);
+
+            DrawConsole = new SadConsole.Console(width, height);
+            DrawConsole.Position = new Point(0, 0);
 
             if (borderColor != null && borderColor.HasValue)
             {
                 BorderColor = borderColor.Value;
-                BorderConsole = new Console(width, height);
-                BorderConsole.Fill(bgRect, Color.Black, BorderColor, 0, 0);
-                BorderConsole.Position = new Point(0, 0);
-
-                Children.Add(BorderConsole);
+                DrawConsole.Fill(bgRect, Color.White, BorderColor, 0, 0);
 
                 // Inset the background rect
                 bgRect = new Rectangle(1, 1, width - 2, height - 2);
@@ -40,20 +41,16 @@ namespace Roguelike.Consoles
                 bgHeight = bgHeight - 1;
             }
 
-            BackgroundColor = backgroundColor;
+            DrawConsole.Fill(bgRect, Color.White, BackgroundColor, 0, 0);
 
-            BackgroundConsole = new Console(bgWidth, bgHeight);
-            BackgroundConsole.Fill(bgRect, Color.Black, BackgroundColor, 0, 0);
+            if (!string.IsNullOrEmpty(Title))
+            {
+                int widthCenterPoint = (int)Math.Floor(width / 2.0);
+                int center = widthCenterPoint - (int)Math.Floor(Title.Length / 2.0);
+                DrawConsole.Print(center, 0, Title, new Color(94, 194, 121), new Color(81, 89, 152));
+            }
 
-            //BackgroundConsole.Position = bgPos;
-
-            Children.Add(BackgroundConsole);
+            Children.Add(DrawConsole);
         }
-
-        //public void SetFont(Font font)
-        //{
-        //    BackgroundConsole.Font = font;
-        //    BorderConsole.Font = font;
-        //}
     }
 }

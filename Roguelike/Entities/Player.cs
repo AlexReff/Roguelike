@@ -5,9 +5,9 @@ using Microsoft.Xna.Framework.Input;
 using Roguelike.Helpers;
 using SadConsole;
 
-namespace Roguelike
+namespace Roguelike.Entities
 {
-    internal class Player : BasicEntity
+    internal class Player : Actor
     {
         //private static readonly Dictionary<Keys, Direction> s_movementDirectionMapping = new Dictionary<Keys, Direction>
         //{
@@ -23,7 +23,10 @@ namespace Roguelike
         public int FOVRadius;
 
         public Player(Coord position)
-            : base(Color.DarkGreen, Color.Black, (char) 1 /*'@'*/, position, (int)MapLayer.PLAYER, isWalkable: false, isTransparent: true) => FOVRadius = 10;
+            : base(Color.DarkGreen, Color.Black, (char)1 /*'@'*/, position, (int)MapLayer.PLAYER, isWalkable: false, isTransparent: true)
+        {
+            FOVRadius = 10;
+        }
 
 
         //public override bool ProcessKeyboard(SadConsole.Input.Keyboard info)

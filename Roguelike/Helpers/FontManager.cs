@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace Roguelike.Helpers
 {
-    public class FontManager
+    internal class FontManager
     {
         private static readonly FontManager instance = new FontManager();
 
@@ -48,7 +48,7 @@ namespace Roguelike.Helpers
                 if (file.ToLower().EndsWith(".font"))
                 {
                     var jsonDat = File.ReadAllText(file);
-                    FontFileJson parsedModel = JsonSerializer.Deserialize<FontFileJson>(jsonDat);
+                    FontFileJsonModel parsedModel = JsonSerializer.Deserialize<FontFileJsonModel>(jsonDat);
                     if (parsedModel != null && !string.IsNullOrWhiteSpace(parsedModel.Name) && !string.IsNullOrWhiteSpace(parsedModel.FilePath))
                     {
                         var localPath = file.Replace(currentDirectory, "").Replace("\\", "/").Substring(1);
@@ -60,11 +60,11 @@ namespace Roguelike.Helpers
                                 Fonts.Add(localPath, fontMaster);
                                 var fontParts = localPath.Split("/");
                                 var fontNameParts = fontParts[fontParts.Length - 1].Split(".");
-                                DebugManager.Instance.AddMessage(new DebugMessage("Added font: " + fontNameParts[0], DebugSource.Backend));
+                                DebugManager.Instance.AddMessage(new DebugMessage("Added font: " + fontNameParts[0], DebugSource.System));
                             }
                             catch (Exception ex)
                             {
-                                DebugManager.Instance.AddMessage(new DebugMessage("Failed to add font: " + localPath, DebugSource.Backend));
+                                DebugManager.Instance.AddMessage(new DebugMessage("Failed to add font: " + localPath, DebugSource.System));
                             }
                         }
                     }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Roguelike.Models
 {
-    class FontFileJson
+    class FontFileJsonModel
     {
         public string Name { get; set; } //: "Aesomatica",
         public string FilePath { get; set; } //: "Aesomatica-16x16.png",
