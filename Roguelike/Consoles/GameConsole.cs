@@ -18,8 +18,9 @@ namespace Roguelike.Consoles
         public GameMapConsole MapScreen { get; private set; }
 
         private BorderedBackgroundConsole MapBackground;
-        private DebugConsole DebugScreen;
         private PlayerMessageConsole MessageScreen;
+        private DebugConsole DebugScreen;
+        private CharMapOutputConsole CharMapScreen;
 
         private static readonly int DebugConsoleWidth = UIManager.MapScreenWidth + 2;
 
@@ -33,12 +34,6 @@ namespace Roguelike.Consoles
 
         public GameConsole(int width, int height, Font font) : base(width, height)
         {
-            IsVisible = true;
-            //IsFocused = true;
-            Width = width;
-            Height = height;
-            //UseKeyboard = true;
-
             this.FillWithRandomGarbage();
 
             // Add all screens/elements from background -> foreground
@@ -64,6 +59,11 @@ namespace Roguelike.Consoles
             MessageScreen = new PlayerMessageConsole(30, (int)System.Math.Floor(MapBackground.Height / 2.0), DebugScreenBgColor, DebugScreenBorderColor);
             MessageScreen.Position = msgPos;
             Children.Add(MessageScreen);
+
+            Point chrMapPos = new Point(Width - Font.Columns - CharMapOutputConsole.AdditionalWidth, Height - Font.Rows - CharMapOutputConsole.AdditionalHeight);
+            CharMapScreen = new CharMapOutputConsole(Font.Columns, Font.Rows);
+            CharMapScreen.Position = chrMapPos;
+            Children.Add(CharMapScreen);
         }
 
         public void SetMap(GameMap map)
@@ -71,38 +71,6 @@ namespace Roguelike.Consoles
             MapScreen.SetGameMap(map);
         }
 
-        //public override bool ProcessKeyboard(SadConsole.Input.Keyboard info)
-        //{
-        //    Direction moveDirection = Direction.NONE;
-        //    //Keys keyMatch = 0;
-
-        //    // Simplified way to check if any key we care about is pressed and set movement direction.
-        //    foreach (Keys key in s_movementDirectionMapping.Keys)
-        //    {
-        //        if (info.IsKeyPressed(key))
-        //        {
-        //            moveDirection = s_movementDirectionMapping[key];
-        //            //keyMatch = key;
-        //            break;
-        //        }
-        //    }
-
-        //    if (moveDirection != Direction.NONE)
-        //    {
-        //        MovePlayer(moveDirection);
-        //        return true;
-        //    }
-
-        //    // Process more player-related hotkeys
-
-        //    return base.ProcessKeyboard(info);
-        //}
-
-        //private void MovePlayer(Direction moveDirection)
-        //{
-        //    DebugManager.Instance.AddMessage(new DebugMessage("User Attempted Move: " + moveDirection.ToString(), DebugSource.User));
-        //    MapScreen.Map.ControlledGameObject.Position += moveDirection;
-        //}
         public void CenterOnActor(Actor actor)
         {
             MapScreen.MapRenderer.CenterViewPortOnPoint(actor.Position);

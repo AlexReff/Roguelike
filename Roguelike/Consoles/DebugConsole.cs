@@ -9,7 +9,7 @@ namespace Roguelike.Consoles
     internal class DebugConsole : Console
     {
         private Console BackgroundConsole;
-        private Console OutputConsole;
+        private ScrollingConsole OutputConsole;
 
         private Color BackgroundColor;
         private Color BorderColor;
@@ -20,9 +20,6 @@ namespace Roguelike.Consoles
 
         public DebugConsole(int width, int height, Color backgroundColor, Color borderColor) : base(width, height)
         {
-            Width = width;
-            Height = height;
-            IsVisible = true;
             BackgroundColor = backgroundColor;
             BorderColor = borderColor;
 
@@ -39,7 +36,6 @@ namespace Roguelike.Consoles
 
             _maxLines = Height;
             _lines = new Queue<string>(DebugManager.Instance.Messages);
-            //messages = new List<string>(DebugManager.Instance.Messages);
 
             foreach (var msg in DebugManager.Instance.Messages)
             {
@@ -52,7 +48,6 @@ namespace Roguelike.Consoles
         public void AddMessage(string message)
         {
             _lines.Enqueue(message);
-            // when exceeding the max number of lines remove the oldest one
             if (_lines.Count > _maxLines)
             {
                 _lines.Dequeue();

@@ -9,7 +9,7 @@ namespace Roguelike.Entities
 {
     internal class Actor : BasicEntity
     {
-        private char Glyph;
+        public char Glyph { get; private set; }
 
         public Actor(Color fgColor, Color bgColor, char icon, Coord position, int layer, bool isWalkable, bool isTransparent)
             : base(fgColor, bgColor, icon, position, layer, isWalkable, isTransparent)
