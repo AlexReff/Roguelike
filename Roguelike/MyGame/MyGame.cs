@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework.Input;
 using Roguelike.Consoles;
 using Roguelike.Helpers;
 using Roguelike.Models;
+using Roguelike.Settings;
+using Roguelike.Spells;
 using System.IO;
 using System.Text.Json;
 
@@ -11,30 +13,28 @@ namespace Roguelike
 {
     internal class MyGame : Game
     {
-        // private readonly string GameFont = "Anno"; //not bad, a little blocky
-        private readonly string GameFont = "Martin"; //good but needs 'solid' glyph updated
-        //private readonly string GameFont = "Isenhertz"; //possible candidate, needs some remapping, not usable for text
-        //private readonly string GameFont = "Phoebus"; //decent, needs glyph filled-in full opacity
-        //private readonly string GameFont = "Tigrex3d"; //ok, needs some remappings
-
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        public static GameSettings GameSettings { get; private set; }
         public static UIManager UIManager { get; private set; }
         public static CommandManager CommandManager { get; private set; }
         public static World World { get; private set; }
+        public static SpellManager SpellManager { get; private set; }
 
         public MyGame()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            GameSettings = new GameSettings();
         }
 
         protected override void Initialize()
         {
             // Setup the engine and create the main window.
-            SadConsole.Game.Create($"Content\\Fonts\\{GameFont}.font", UIManager.GameWidth, UIManager.GameHeight);
+            SadConsole.Game.Create($"Content\\Fonts\\{GameSettings.GameFont}.font", GameSettings.GameWidth, GameSettings.GameHeight);
             //SadConsole.Game.Create(GameWidth, GameHeight, InitGame);
 
             // Hook the start event so we can add consoles to the system.
@@ -70,26 +70,27 @@ namespace Roguelike
             base.Update(gameTime);
         }
 
-        protected override void Draw(GameTime gameTime)
-        {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+        //protected override void Draw(GameTime gameTime)
+        //{
+        //    GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
-            //_spriteBatch.Begin();
-            //_spriteBatch.DrawString(Roboto, "TESTING", new Vector2(10, 10), Color.White);
+        //    // TODO: Add your drawing code here
+        //    //_spriteBatch.Begin();
+        //    //_spriteBatch.DrawString(Roboto, "TESTING", new Vector2(10, 10), Color.White);
 
-            //_spriteBatch.End();
+        //    //_spriteBatch.End();
 
-            base.Draw(gameTime);
-        }
+        //    base.Draw(gameTime);
+        //}
 
         private void Init()
         {
             FontManager.Instance.LoadFonts();
 
-            UIManager = new UIManager();
             CommandManager = new CommandManager();
+            UIManager = new UIManager();
             World = new World();
+            SpellManager = new SpellManager();
         }
 
         private void Destroyed()

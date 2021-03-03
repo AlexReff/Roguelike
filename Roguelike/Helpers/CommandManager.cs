@@ -18,11 +18,10 @@ namespace Roguelike.Helpers
         /// Resolves a move request in a specified direction
         /// </summary>
         /// <param name="direction"></param>
-        public void MovePlayer(Direction direction)
+        public bool MovePlayer(Direction direction)
         {
             DebugManager.Instance.AddMessage(new DebugMessage($"Command MovePlayer: {direction}", DebugSource.System));
-            //MyGame.World.Player.MoveBy(moveDirection);
-            MoveActorBy(MyGame.World.Player, direction);
+            return MoveActorBy(MyGame.World.Player, direction);
         }
 
         public bool MoveActorBy(Actor actor, Direction direction)
@@ -31,9 +30,10 @@ namespace Roguelike.Helpers
             return actor.MoveBy(direction);
         }
 
-        //public void CenterOnActor(Actor actor)
-        //{
-        //    //MapScreen.MapRenderer.CenterViewPortOnPoint(actor.Position);
-        //}
+        public void CenterOnActor(Actor actor)
+        {
+            DebugManager.Instance.AddMessage(new DebugMessage($"Command CenterOnActor: {actor.Name}", DebugSource.System));
+            MyGame.World.CurrentMap.CenterOnActor(actor);
+        }
     }
 }

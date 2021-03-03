@@ -5,13 +5,15 @@ using GoRogue;
 using GoRogue.MapGeneration;
 using GoRogue.MapViews;
 using Microsoft.Xna.Framework;
+using Roguelike.Consoles;
 using Roguelike.Entities;
+using Roguelike.Maps;
 using SadConsole;
 using SadConsole.Entities;
 
 namespace Roguelike
 {
-    internal enum MapLayer
+    public enum MapLayer
     {
         TERRAIN,
         ITEMS,
@@ -19,7 +21,7 @@ namespace Roguelike
         PLAYER
     }
 
-    internal class GameMap : BasicMap
+    public class GameMap : BasicMap
     {
         // Handles the changing of tile/entity visiblity as appropriate based on Map.FOV.
         public FOVVisibilityHandler FovVisibilityHandler { get; }
@@ -37,7 +39,7 @@ namespace Roguelike
             : base(width, height, Enum.GetNames(typeof(MapLayer)).Length - 1, Distance.CHEBYSHEV, entityLayersSupportingMultipleItems: LayerMasker.DEFAULT.Mask(new[] { (int)MapLayer.ITEMS, (int)MapLayer.MONSTERS }))
         {
             ControlledGameObjectChanged += ControlledGameObjectTypeCheck<Player>; // Make sure we don't accidentally assign anything that isn't a Player type to ControlledGameObject
-            FovVisibilityHandler = new DefaultFOVVisibilityHandler(this, ColorAnsi.BlackBright);
+            FovVisibilityHandler = new PlayerFOVVisibilityHandler(this, ColorAnsi.BlackBright); //new DefaultFOVVisibilityHandler(this, ColorAnsi.BlackBright);
         }
 
         // IsTileWalkable checks
@@ -64,6 +66,12 @@ namespace Roguelike
         public IEnumerable<T> GetEntitiesAt<T>(Point location) where T : Entity
         {
             return Entities.GetItems(location).OfType<T>();
+        }
+
+        public void CenterOnActor(Actor actor)
+        {
+            if (this.Renderers.Count > 0 && this.Renderers[0] is GameConsole)
+                ((GameConsole)this.Renderers[0]).CenterOnActor(actor);
         }
     }
 }

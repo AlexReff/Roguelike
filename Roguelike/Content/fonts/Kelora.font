@@ -1,0 +1,10 @@
+﻿{
+  "Name": "Kelora",
+  "FilePath": "Kelora-16x16-diagonal.png",
+  "GlyphHeight": 16,
+  "GlyphPadding": 0,
+  "GlyphWidth": 16,
+  "SolidGlyphIndex": 219,
+  "Columns": 16,
+  "IsSadExtended": false
+}

@@ -1,0 +1,10 @@
+﻿{
+  "Name": "Cooz",
+  "FilePath": "Cooz-curses-14x16.png",
+  "GlyphHeight": 16,
+  "GlyphPadding": 0,
+  "GlyphWidth": 14,
+  "SolidGlyphIndex": 219,
+  "Columns": 16,
+  "IsSadExtended": false
+}

@@ -9,6 +9,7 @@ namespace Roguelike.Helpers
         Movement,
         Combat,
         Status,
+        Notification,
     }
 
     class PlayerMessage

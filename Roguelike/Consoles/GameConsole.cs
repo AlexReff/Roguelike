@@ -16,21 +16,15 @@ namespace Roguelike.Consoles
     class GameConsole : Console
     {
         public GameMapConsole MapScreen { get; private set; }
+        public GameMenuConsole ControlsConsole { get; private set; }
 
         private BorderedBackgroundConsole MapBackground;
         private PlayerMessageConsole MessageScreen;
         private DebugConsole DebugScreen;
         private CharMapOutputConsole CharMapScreen;
 
-        private static readonly int DebugConsoleWidth = UIManager.MapScreenWidth + 2;
-
         private static Point MapScreenBgPosition = new Point(0, 0);
         private static Point MapScreenPosition = new Point(MapScreenBgPosition.X + 1, MapScreenBgPosition.Y + 1);
-
-        private Color MapScreenBorderColor = Color.DarkSeaGreen;
-        private Color MapScreenBgColor = Color.Black;
-        private Color DebugScreenBorderColor = Color.CadetBlue;
-        private Color DebugScreenBgColor = Color.Black;
 
         public GameConsole(int width, int height, Font font) : base(width, height)
         {
@@ -39,27 +33,35 @@ namespace Roguelike.Consoles
             // Add all screens/elements from background -> foreground
 
             // Add border+background behind GameMap
-            MapBackground = new BorderedBackgroundConsole(UIManager.MapScreenWidth + 2, UIManager.MapScreenHeight + 2, "Map", MapScreenBgColor, MapScreenBorderColor);
+            MapBackground = new BorderedBackgroundConsole(MyGame.GameSettings.MapScreenWidth + 2, MyGame.GameSettings.MapScreenHeight + 2, "Map", MyGame.GameSettings.MapScreenBgColor, MyGame.GameSettings.MapScreenBorderColor);
             MapBackground.Position = MapScreenBgPosition;
             Children.Add(MapBackground);
 
             // GameMap
-            MapScreen = new GameMapConsole(/*UIManager.MapWidth, UIManager.MapHeight,*/ UIManager.MapScreenWidth, UIManager.MapScreenHeight, font);
+            MapScreen = new GameMapConsole(MyGame.GameSettings.MapScreenWidth, MyGame.GameSettings.MapScreenHeight, font);
             MapScreen.Position = MapScreenPosition;
             Children.Add(MapScreen);
 
-            // Debug Console
-            Point dbgPos = new Point(MapBackground.Position.X, MapScreenBgPosition.Y + MapBackground.Height);
-            DebugScreen = new DebugConsole(DebugConsoleWidth, height - (MapBackground.Height + MapBackground.Position.Y), DebugScreenBgColor, DebugScreenBorderColor);
-            DebugScreen.Position = dbgPos;
-            Children.Add(DebugScreen);
-
             // User Message Console
             Point msgPos = new Point(MapBackground.Position.X + MapBackground.Width, MapScreenBgPosition.Y);
-            MessageScreen = new PlayerMessageConsole(30, (int)System.Math.Floor(MapBackground.Height / 2.0), DebugScreenBgColor, DebugScreenBorderColor);
+            MessageScreen = new PlayerMessageConsole(30, (int)System.Math.Floor(MapBackground.Height / 2.0), MyGame.GameSettings.DebugScreenBgColor, MyGame.GameSettings.DebugScreenBorderColor);
             MessageScreen.Position = msgPos;
             Children.Add(MessageScreen);
 
+            Point ctrlsPos = new Point(MapBackground.Position.X + MapBackground.Width, MapScreenBgPosition.Y + MessageScreen.Height);
+            ControlsConsole = new GameMenuConsole(30, 30);
+            ControlsConsole.Position = ctrlsPos;
+            Children.Add(ControlsConsole);
+
+            //DEBUG/DEVELOPER THINGS BELOW
+
+            // Debug Console
+            Point dbgPos = new Point(width - MyGame.GameSettings.DebugConsoleWidth, 0);
+            DebugScreen = new DebugConsole(MyGame.GameSettings.DebugConsoleWidth, 24, MyGame.GameSettings.DebugScreenBgColor, MyGame.GameSettings.DebugScreenBorderColor);
+            DebugScreen.Position = dbgPos;
+            Children.Add(DebugScreen);
+
+            // Character map for easy reference
             Point chrMapPos = new Point(Width - Font.Columns - CharMapOutputConsole.AdditionalWidth, Height - Font.Rows - CharMapOutputConsole.AdditionalHeight);
             CharMapScreen = new CharMapOutputConsole(Font.Columns, Font.Rows);
             CharMapScreen.Position = chrMapPos;

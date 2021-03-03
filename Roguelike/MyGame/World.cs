@@ -2,8 +2,11 @@
 using GoRogue.GameFramework;
 using GoRogue.MapGeneration;
 using GoRogue.MapViews;
+using GoRogue.Random;
 using Microsoft.Xna.Framework;
 using Roguelike.Entities;
+using Roguelike.Entities.Items;
+using Roguelike.Entities.Monsters;
 using Roguelike.Helpers;
 using SadConsole;
 using System;
@@ -18,6 +21,8 @@ namespace Roguelike
 
         public GameMap CurrentMap { get; set; }
 
+        private static SadConsoleRandomGenerator rnd = new SadConsoleRandomGenerator();
+
         // player data
         public Player Player
         {
@@ -27,7 +32,7 @@ namespace Roguelike
             }
         }
 
-        public World(): this(GenerateDungeon(UIManager.MapWidth, UIManager.MapHeight))
+        public World(): this(GenerateDungeon(MyGame.GameSettings.MapWidth, MyGame.GameSettings.MapHeight))
         {
         }
 
@@ -44,16 +49,40 @@ namespace Roguelike
 
             // Generate map via GoRogue, and update the real map with appropriate terrain.
             var tempMap = new ArrayMap<bool>(map.Width, map.Height);
-            QuickGenerators.GenerateDungeonMazeMap(tempMap, minRooms: 10, maxRooms: 20, roomMinSize: 8, roomMaxSize: 16);
-            map.ApplyTerrainOverlay(tempMap, SpawnTerrain);
+            QuickGenerators.GenerateDungeonMazeMap(tempMap, minRooms: 3, maxRooms: 5, roomMinSize: 8, roomMaxSize: 22);
+            map.ApplyTerrainOverlay(tempMap, SpawnTerrainCreator(tempMap));
 
             Coord posToSpawn;
             // Spawn a few mock enemies
             for (int i = 0; i < 10; i++)
             {
-                posToSpawn = map.WalkabilityView.RandomPosition(true); // Get a location that is walkable
-                var goblin = new BasicEntity(Color.Red, Color.Transparent, 'g', posToSpawn, (int)MapLayer.MONSTERS, isWalkable: false, isTransparent: true);
-                map.AddEntity(goblin);
+                posToSpawn = map.WalkabilityView.RandomPosition(true);
+                var existingMonster = map.GetEntityAt<Monster>(posToSpawn);
+                if (existingMonster == null)
+                {
+                    var dragon = new Dragon(posToSpawn);
+                    map.AddEntity(dragon);
+                }
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                posToSpawn = map.WalkabilityView.RandomPosition(true);
+                var existingMonster = map.GetEntityAt<Monster>(posToSpawn);
+                if (existingMonster == null)
+                {
+                    var goblin = new Goblin(posToSpawn);
+                    map.AddEntity(goblin);
+                }
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                posToSpawn = map.WalkabilityView.RandomPosition(true);
+                var existingPlayer = map.GetEntityAt<Player>(posToSpawn);
+                if (existingPlayer == null)
+                {
+                    var item = new Item("Pebble", Color.White, Color.Transparent, '.', posToSpawn);
+                    map.AddEntity(item);
+                }
             }
 
             // Spawn player
@@ -64,14 +93,15 @@ namespace Roguelike
             return map;
         }
 
-        private static IGameObject SpawnTerrain(Coord position, bool mapGenValue)
+        private static Func<Coord, bool, IGameObject> SpawnTerrainCreator(ArrayMap<bool> map) => (Coord position, bool mapGenValue) => SpawnTerrain(map, position, mapGenValue);
+
+        private static IGameObject SpawnTerrain(ArrayMap<bool> map, Coord position, bool mapGenValue)
         {
-            GoRogue.Random.SadConsoleRandomGenerator rnd = new GoRogue.Random.SadConsoleRandomGenerator();
             var floorChar = (int)System.Math.Floor(rnd.NextDouble() * FloorCharacters.Length);
             // Floor or wall.  This could use the Factory system, or instantiate Floor and Wall classes, or something else if you prefer;
             // this simplistic if-else is just used for example
             if (mapGenValue) // Floor
-                return new BasicTerrain(Color.LightGray, Color.Black, FloorCharacters[floorChar], position, isWalkable: true, isTransparent: true);
+                return new BasicTerrain(new Color(211, 211, 211, 75), Color.Black, FloorCharacters[floorChar], position, isWalkable: true, isTransparent: true);
             else             // Wall
                 return new BasicTerrain(Color.White, Color.Black, (char)219, position, isWalkable: false, isTransparent: false);
         }

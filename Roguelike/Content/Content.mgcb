@@ -25,11 +25,41 @@
 #begin fonts/Anno-16x16.png
 /copy:fonts/Anno-16x16.png
 
+#begin fonts/Cooz.font
+/copy:fonts/Cooz.font
+
+#begin fonts/Cooz-curses-14x16.png
+/copy:fonts/Cooz-curses-14x16.png
+
+#begin fonts/FlyingMage.font
+/copy:fonts/FlyingMage.font
+
+#begin fonts/Flying-Mage-square-16x16.png
+/copy:fonts/Flying-Mage-square-16x16.png
+
+#begin fonts/Fnord.font
+/copy:fonts/Fnord.font
+
+#begin fonts/Fnord-16x16.png
+/copy:fonts/Fnord-16x16.png
+
+#begin fonts/Guybrush.font
+/copy:fonts/Guybrush.font
+
+#begin fonts/Guybrush-square-16x16.png
+/copy:fonts/Guybrush-square-16x16.png
+
 #begin fonts/Isenhertz.font
 /copy:fonts/Isenhertz.font
 
 #begin fonts/Isenhertz-16x16.png
 /copy:fonts/Isenhertz-16x16.png
+
+#begin fonts/Kelora.font
+/copy:fonts/Kelora.font
+
+#begin fonts/Kelora-16x16-diagonal.png
+/copy:fonts/Kelora-16x16-diagonal.png
 
 #begin fonts/Martin.font
 /copy:fonts/Martin.font
@@ -49,12 +79,30 @@
 #begin fonts/Phoebus-16x16.png
 /copy:fonts/Phoebus-16x16.png
 
+#begin fonts/Raving.font
+/copy:fonts/Raving.font
+
+#begin fonts/Raving-1280x400.png
+/copy:fonts/Raving-1280x400.png
+
 #begin fonts/Roboto.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:fonts/Roboto.spritefont
+
+#begin fonts/RogueYun.font
+/copy:fonts/RogueYun.font
+
+#begin fonts/RogueYun-16x16-AgmEdit.png
+/copy:fonts/RogueYun-16x16-AgmEdit.png
+
+#begin fonts/SB.font
+/copy:fonts/SB.font
+
+#begin fonts/sb-ascii-16x16.png
+/copy:fonts/sb-ascii-16x16.png
 
 #begin fonts/Tigrex3d.font
 /copy:fonts/Tigrex3d.font

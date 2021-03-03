@@ -8,7 +8,6 @@ namespace Roguelike.Consoles
 {
     internal class PlayerMessageConsole : Console
     {
-        private Console BackgroundConsole;
         private Console OutputConsole;
 
         private Color BackgroundColor;
@@ -16,6 +15,9 @@ namespace Roguelike.Consoles
 
         private int _maxLines;
         private readonly Queue<string> _lines;
+
+        private string lastMessage;
+        private int lastMessageRepeatCount;
 
         public PlayerMessageConsole(int width, int height, Color backgroundColor, Color borderColor) : base(width, height)
         {
@@ -25,19 +27,18 @@ namespace Roguelike.Consoles
             BackgroundColor = backgroundColor;
             BorderColor = borderColor;
 
-            BackgroundConsole = new BorderedBackgroundConsole(width, height, "Events", BackgroundColor, BorderColor);
-            BackgroundConsole.Position = new Point(0, 0);
+            this.DrawBorderBgTitle(new Rectangle(0, 0, width, height), "Events", BackgroundColor, BorderColor);
 
             OutputConsole = new ScrollingConsole(width - 2, height - 1);
-            //OutputConsole.Font = Global.FontDefault.Master.GetFont(Font.FontSizes.Half);
             OutputConsole.Position = new Point(1, 1);
             OutputConsole.Cursor.Position = new Point(0, OutputConsole.Height - 1);
 
-            Children.Add(BackgroundConsole);
+            //Children.Add(BackgroundConsole);
             Children.Add(OutputConsole);
 
             _maxLines = Height;
-            _lines = new Queue<string>(PlayerMessageManager.Instance.Messages);
+            _lines = new Queue<string>();
+            lastMessageRepeatCount = 0;
 
             foreach (var msg in PlayerMessageManager.Instance.Messages)
             {
@@ -49,15 +50,25 @@ namespace Roguelike.Consoles
 
         public void AddMessage(string message)
         {
-            _lines.Enqueue(message);
-            // when exceeding the max number of lines remove the oldest one
-            if (_lines.Count > _maxLines)
+            if (message == lastMessage)
             {
-                _lines.Dequeue();
+                OutputConsole.Cursor.Position = new Point(0, OutputConsole.Cursor.Position.Y - 1);
+                OutputConsole.Cursor.Print(message + $" (x{++lastMessageRepeatCount})\n");
             }
-            // Move the cursor to the last line and print the message.
-            OutputConsole.Cursor.Position = new Point(0, System.Math.Max(OutputConsole.Height, _lines.Count + 1));
-            OutputConsole.Cursor.Print(message + "\n");
+            else
+            {
+                _lines.Enqueue(message);
+                // when exceeding the max number of lines remove the oldest one
+                if (_lines.Count > _maxLines)
+                {
+                    _lines.Dequeue();
+                }
+                // Move the cursor to the last line and print the message.
+                OutputConsole.Cursor.Position = new Point(0, System.Math.Max(OutputConsole.Height, _lines.Count + 1));
+                OutputConsole.Cursor.Print(message + "\n");
+                lastMessage = message;
+                lastMessageRepeatCount = 1;
+            }
         }
     }
 }
