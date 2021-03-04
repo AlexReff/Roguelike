@@ -1,0 +1,74 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Basic package info -->
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>GoRogue</PackageId>
+    <Version>2.6.4</Version>
+    <Version Condition="'$(Configuration)'=='Debug'">$(Version)-debug</Version>
+    <Authors>Chris3606</Authors>
+    <Description>Roguelike/2D game utility library.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Chris3606/GoRogue</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>Troschuetz bugfix.  See https://github.com/Chris3606/GoRogue/releases/tag/2.6.4 for details.</PackageReleaseNotes>
+    <Copyright>Copyright © 2020 Christopher Ridley (Chris3606)</Copyright>
+    <PackageTags>roguelike roguelikes rogue library 2d game games</PackageTags>
+    <!-- Add symbols package -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GeneratePackageOnBuild Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
+    
+    <!-- Configurations for nuget (where MonoGame private asset doesn't require monogame to be present), and minimal versions for DLL builds where that doesn't work properly -->
+    <Configurations>Debug;Release;Debug Minimal Dependencies;Release Minimal Dependencies</Configurations>
+  </PropertyGroup>
+  
+  <!-- Release warning disables and configuration -->
+  <PropertyGroup Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='Release Minimal Dependencies'">
+    <DocumentationFile>bin\$(Configuration)\netstandard2.0\GoRogue.xml</DocumentationFile>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <NoWarn>1701;1702;1705;RECS0145;RECS0129</NoWarn>
+  </PropertyGroup>
+  
+  <!-- Debug warning disables and configuration -->
+  <PropertyGroup Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Debug Minimal Dependencies'">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <NoWarn>1701;1702;1705;RECS0145;</NoWarn>
+    <DocumentationFile>bin\$(Configuration)\netstandard2.0\GoRogue.xml</DocumentationFile>
+  </PropertyGroup>
+  
+  <!-- When packing, copy the nuget files to the nuget output directory -->
+  <Target Name="CopyPackage" Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Release'" AfterTargets="Pack">
+    <Copy SourceFiles="$(OutputPath)..\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(OutputPath)..\..\..\..\nuget" />
+    <Copy SourceFiles="$(OutputPath)..\$(PackageId).$(PackageVersion).snupkg" DestinationFolder="$(OutputPath)..\..\..\..\nuget" />
+  </Target>
+  
+  <!-- Pack a read-me with the nuget package, so it displays when installed -->
+  <ItemGroup>
+    <None Include="readme.txt" Pack="true" PackagePath="." />
+  </ItemGroup>
+
+  <!-- In Debug and Release builds only, set the ALLCONVERSIONS constant so MonoGame parts compile, and include the monogame reference. -->
+  <PropertyGroup Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='Debug'">
+    <DefineConstants>ALLCONVERSIONS</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Minimal Dependencies|AnyCPU'">
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Minimal Dependencies|AnyCPU'">
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='Debug'">
+    <PackageReference Include="MonoGame.Framework.DesktopGL.Core" Version="3.8.0.1" PrivateAssets="All" />
+  </ItemGroup>
+  
+  <!-- Dependencies that apply to all builds -->
+  <ItemGroup>
+    <PackageReference Include="OptimizedPriorityQueue" Version="4.2.0" />
+    <PackageReference Include="Troschuetz.Random" Version="4.4.0" />
+  </ItemGroup>
+  
+  <!-- Run InheritDoc on the final builds.  This isn't used right now becuase of bugs with docfx and inheriting docs from template classes, but may be in the future -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="&quot;%userprofile%\.nuget\packages\inheritdoc\2.0.2\tools\InheritDoc.exe&quot; -o -b &quot;$(OutDir)\&quot;" />
+  </Target>
+</Project>

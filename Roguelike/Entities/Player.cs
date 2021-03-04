@@ -16,10 +16,13 @@ namespace Roguelike.Entities
     {
         private static readonly char CHAR_PLAYER = (char)1;
 
-        public int FOVRadius { get; set; }
+        public double FOVRadius { get; set; }
         public ActorBody Body { get; set; }
         public List<Attack> Attacks { get; set; }
         public List<Spell> Spells { get; set; }
+        /// <summary>
+        /// Relative to the Player's FacingDirection
+        /// </summary>
         public XYZRelativeDirection VisionDirection { get; set; }
 
         /// <summary>
@@ -31,10 +34,11 @@ namespace Roguelike.Entities
             : base(MyGame.GameSettings.PlayerCharacterGlyphColor, Color.Black, CHAR_PLAYER, position, (int)MapLayer.PLAYER, isWalkable: false, isTransparent: true)
         {
             Name = "Player";
-            FOVRadius = 10;
+            FOVRadius = 14;
             OverallHealth = 100.0;
             Spells = SpellManager.Instance.GetAllSpells();
             VisionDirection = XYZRelativeDirection.Forward;
+            FacingDirection = Direction.UP;
 
             MaxHealth = Health = 120;
             Mana = 60;

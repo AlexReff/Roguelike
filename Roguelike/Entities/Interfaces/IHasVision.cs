@@ -8,7 +8,7 @@ namespace Roguelike.Entities.Interfaces
 {
     public interface IHasVision
     {
-        int FOVRadius { get; set; }
+        double FOVRadius { get; set; }
         XYZRelativeDirection VisionDirection { get; set; }
     }
 }

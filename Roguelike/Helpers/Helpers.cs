@@ -1,5 +1,8 @@
 ﻿using GoRogue;
 using Microsoft.Xna.Framework;
+using Roguelike.Entities;
+using Roguelike.Entities.Interfaces;
+using Roguelike.Models;
 using SadConsole;
 using System.Collections.Generic;
 using System.Text;
@@ -28,6 +31,55 @@ namespace Roguelike.Helpers
             }
         }
 
+        /// <summary>
+        /// Gets the FOV degree of an entity that has vision
+        /// </summary>
+        /// <returns>FOV for map where 0 == RIGHT, 90 == DOWN, 270 == UP</returns>
+        public static double GetFOVDegree<T>(T entity) where T : Actor, IHasVision
+        {
+            XYZRelativeDirection targetDir = entity.VisionDirection;
+            if (entity == null)
+            {
+                return 0;
+            }
+            if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Right))
+            {
+                if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Backward))
+                {
+                    return 45;
+                }
+                if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Forward))
+                {
+                    return 315;
+                }
+
+                return 0;
+            }
+            else if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Left))
+            {
+                if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Backward))
+                {
+                    return 135;
+                }
+                if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Forward))
+                {
+                    return 225;
+                }
+
+                return 180;
+            }
+            else if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Backward))
+            {
+                return 90;
+            }
+            else if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Forward))
+            {
+                return 270;
+            }
+
+            return 0;
+        }
+
         public static System.Action<T> Debounce<T>(this System.Action<T> func, int milliseconds = 300)
         {
             CancellationTokenSource? cancelTokenSource = null;
@@ -47,6 +99,7 @@ namespace Roguelike.Helpers
                     }, TaskScheduler.Default);
             };
         }
+
         public static System.Action<T> DebounceKeyHandler<T>(this System.Action<T> func, int milliseconds = 300) where T : struct
         {
             T? lastValue = null;

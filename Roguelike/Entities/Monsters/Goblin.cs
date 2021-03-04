@@ -14,7 +14,7 @@ namespace Roguelike.Entities.Monsters
     internal class Goblin : Monster, IHasBody, IHasVision, ICanAttack
     {
         public ActorBody Body { get; set; }
-        public int FOVRadius { get; set; }
+        public double FOVRadius { get; set; }
         public List<Attack> Attacks { get; set; }
         //public List<Spell> Spells { get; set; }
         public XYZRelativeDirection VisionDirection { get; set; }

@@ -16,6 +16,11 @@ namespace Roguelike.Entities
         public double MoveSpeed { get; protected set; }
         public int ActionSpeed { get; protected set; }
 
+        /// <summary>
+        /// Which direction the actor is currently facing
+        /// </summary>
+        public Direction FacingDirection { get; set; }
+
         public double MaxHealth { get; set; }
         public double Health { get; set; }
         public double Mana { get; set; }

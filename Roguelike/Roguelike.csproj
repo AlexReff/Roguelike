@@ -29,13 +29,16 @@
     <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="GoRogue" Version="2.6.4" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
-    <PackageReference Include="SadConsole" Version="8.99.3" />
-    <PackageReference Include="SadConsole.GoRogueHelpers" Version="1.0.1" />
+    <PackageReference Include="NETStandard.Library" Version="2.0.3" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\obj\DesktopGL\Content\fonts\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GoRogue\GoRogue.csproj" />
+    <ProjectReference Include="..\SadConsole.GoRogue\SadConsole.GoRogue.csproj" />
+    <ProjectReference Include="..\SadConsole\SadConsole.csproj" />
   </ItemGroup>
 </Project>

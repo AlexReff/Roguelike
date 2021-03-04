@@ -33,8 +33,7 @@ namespace Roguelike
             MapRenderer = Map.CreateRenderer(new XnaRect(0, 0, Width, Height), Font /*SadConsole.Global.FontDefault /*SadConsole.Global.Fonts["Anno"].GetFont(Font.FontSizes.One)*/);
             Children.Add(MapRenderer);
 
-            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE);
-            MapRenderer.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
+            UpdateFOV();
         }
 
         private void ControlledGameObjectChanged(object s, ControlledGameObjectChangedArgs e)
@@ -49,7 +48,17 @@ namespace Roguelike
         {
             Player player = (Player)e.Item;
             DebugManager.Instance.AddMessage(new DebugMessage($"Player_Moved triggered: {player.Glyph}->{e.NewPosition}", DebugSource.System));
-            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE);
+            //Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE);
+            //MapRenderer.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
+
+            UpdateFOV(player);
+        }
+
+        private void UpdateFOV(Player player = null)
+        {
+            double deg = Helpers.Helpers.GetFOVDegree(player);
+            //Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE);
+            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE, deg, 120);
             MapRenderer.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
         }
     }
