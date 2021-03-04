@@ -17,11 +17,7 @@ namespace Roguelike
 {
     class World
     {
-        private static readonly char[] FloorCharacters = { (char)0, (char)39, (char)44, (char)46 };
-
         public GameMap CurrentMap { get; set; }
-
-        private static SadConsoleRandomGenerator rnd = new SadConsoleRandomGenerator();
 
         // player data
         public Player Player
@@ -80,7 +76,7 @@ namespace Roguelike
                 var existingPlayer = map.GetEntityAt<Player>(posToSpawn);
                 if (existingPlayer == null)
                 {
-                    var item = new Item("Pebble", Color.White, Color.Transparent, '.', posToSpawn);
+                    var item = new Item("Pebble", Color.White, Color.Transparent, (char)249, posToSpawn);
                     map.AddEntity(item);
                 }
             }
@@ -97,13 +93,10 @@ namespace Roguelike
 
         private static IGameObject SpawnTerrain(ArrayMap<bool> map, Coord position, bool mapGenValue)
         {
-            var floorChar = (int)System.Math.Floor(rnd.NextDouble() * FloorCharacters.Length);
-            // Floor or wall.  This could use the Factory system, or instantiate Floor and Wall classes, or something else if you prefer;
-            // this simplistic if-else is just used for example
             if (mapGenValue) // Floor
-                return new BasicTerrain(new Color(211, 211, 211, 75), Color.Black, FloorCharacters[floorChar], position, isWalkable: true, isTransparent: true);
+                return new Floor(position);
             else             // Wall
-                return new BasicTerrain(Color.White, Color.Black, (char)219, position, isWalkable: false, isTransparent: false);
+                return new Wall(map, position);
         }
     }
 }

@@ -48,17 +48,14 @@ namespace Roguelike
         {
             Player player = (Player)e.Item;
             DebugManager.Instance.AddMessage(new DebugMessage($"Player_Moved triggered: {player.Glyph}->{e.NewPosition}", DebugSource.System));
-            //Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE);
-            //MapRenderer.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
 
             UpdateFOV(player);
         }
 
-        private void UpdateFOV(Player player = null)
+        public void UpdateFOV(Player player = null)
         {
-            double deg = Helpers.Helpers.GetFOVDegree(player);
-            //Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE);
-            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE, deg, 120);
+            double deg = Helpers.Helpers.GetFOVDegree(player ?? MyGame.World?.Player ?? null);
+            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE, deg, 200);
             MapRenderer.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
         }
     }

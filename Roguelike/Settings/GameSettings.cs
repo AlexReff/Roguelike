@@ -58,7 +58,8 @@ namespace Roguelike.Settings
         public GameSettings()
         {
             //GameFont = "Martin";
-            GameFont = "Cooz";
+            //GameFont = "Cooz";
+            GameFont = "FlyingMage";
 
             GameWidth = 120;
             GameHeight = 60;

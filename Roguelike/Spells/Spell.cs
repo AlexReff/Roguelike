@@ -16,6 +16,7 @@ namespace Roguelike.Spells
         public uint ID { get; set; }
         public string Name { get; set; }
         public double BaseManaCost { get; set; }
+        public double Range { get; set; }
         public List<TargetType> TargetTypes { get; set; }
         /// <summary>
         /// Determines whether this spell can affect 

@@ -85,13 +85,6 @@
 #begin fonts/Raving-1280x400.png
 /copy:fonts/Raving-1280x400.png
 
-#begin fonts/Roboto.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/Roboto.spritefont
-
 #begin fonts/RogueYun.font
 /copy:fonts/RogueYun.font
 

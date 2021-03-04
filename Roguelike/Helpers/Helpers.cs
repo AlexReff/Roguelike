@@ -1,7 +1,7 @@
 ﻿using GoRogue;
+using GoRogue.Random;
 using Microsoft.Xna.Framework;
 using Roguelike.Entities;
-using Roguelike.Entities.Interfaces;
 using Roguelike.Models;
 using SadConsole;
 using System.Collections.Generic;
@@ -14,6 +14,8 @@ namespace Roguelike.Helpers
     public static class Helpers
     {
         public static IDGenerator IDGenerator = new IDGenerator();
+        
+        public static SadConsoleRandomGenerator RandomGenerator = new SadConsoleRandomGenerator();
 
         public static void DrawBorderBgTitle(this Console console, Microsoft.Xna.Framework.Rectangle area, string title, Color backgroundColor, Color borderColor)
         {
@@ -35,49 +37,93 @@ namespace Roguelike.Helpers
         /// Gets the FOV degree of an entity that has vision
         /// </summary>
         /// <returns>FOV for map where 0 == RIGHT, 90 == DOWN, 270 == UP</returns>
-        public static double GetFOVDegree<T>(T entity) where T : Actor, IHasVision
+        public static double GetFOVDegree(Actor entity)
         {
-            XYZRelativeDirection targetDir = entity.VisionDirection;
             if (entity == null)
             {
                 return 0;
             }
-            if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Right))
-            {
-                if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Backward))
-                {
-                    return 45;
-                }
-                if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Forward))
-                {
-                    return 315;
-                }
 
-                return 0;
-            }
-            else if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Left))
-            {
-                if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Backward))
-                {
-                    return 135;
-                }
-                if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Forward))
-                {
-                    return 225;
-                }
+            double angle = 0;
 
-                return 180;
-            }
-            else if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Backward))
+            Direction facingDirection = entity.FacingDirection;
+
+            if (facingDirection == Direction.RIGHT)
             {
-                return 90;
+                angle = 0;
             }
-            else if (entity.VisionDirection.HasFlag(XYZRelativeDirection.Forward))
+            else if (facingDirection == Direction.DOWN_RIGHT)
             {
-                return 270;
+                angle = 45;
+            }
+            else if (facingDirection == Direction.DOWN)
+            {
+                angle = 90;
+            }
+            else if (facingDirection == Direction.DOWN_LEFT)
+            {
+                angle = 135;
+            }
+            else if (facingDirection == Direction.LEFT)
+            {
+                angle = 180;
+            }
+            else if (facingDirection == Direction.UP_LEFT)
+            {
+                angle = 225;
+            }
+            else if (facingDirection == Direction.UP)
+            {
+                angle = 270;
+            }
+            else if (facingDirection == Direction.UP_RIGHT)
+            {
+                angle = 315;
             }
 
-            return 0;
+            XYZRelativeDirection visionDirection = entity.VisionDirection;
+
+            if (visionDirection.HasFlag(XYZRelativeDirection.Right))
+            {
+                if (visionDirection.HasFlag(XYZRelativeDirection.Forward))
+                {
+                    angle += 45;
+                }
+                else if (visionDirection.HasFlag(XYZRelativeDirection.Backward))
+                {
+                    angle += 135;
+                }
+                else
+                {
+                    angle += 90;
+                }
+            }
+            else if (visionDirection.HasFlag(XYZRelativeDirection.Left))
+            {
+                if (visionDirection.HasFlag(XYZRelativeDirection.Forward))
+                {
+                    angle -= 45;
+                }
+                else if (visionDirection.HasFlag(XYZRelativeDirection.Backward))
+                {
+                    angle -= 135;
+                }
+                else
+                {
+                    angle -= 90;
+                }
+            }
+            //else if (visionDirection.HasFlag(XYZRelativeDirection.Forward))
+            //{
+            //    angle += 0;
+            //}
+            else if (visionDirection.HasFlag(XYZRelativeDirection.Backward))
+            {
+                angle += 180;
+            }
+
+
+            return angle;
         }
 
         public static System.Action<T> Debounce<T>(this System.Action<T> func, int milliseconds = 300)

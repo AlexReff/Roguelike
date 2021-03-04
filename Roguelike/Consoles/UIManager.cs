@@ -33,7 +33,7 @@ namespace Roguelike.Helpers
         public UIManagerState CurrentState { get; private set; }
         public Console CurrentScreen { get; private set; }
 
-        private GameConsole GameScreen;
+        public GameConsole GameScreen { get; private set; }
 
         public UIManager()
         {

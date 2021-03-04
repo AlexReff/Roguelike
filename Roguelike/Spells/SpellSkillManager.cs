@@ -6,14 +6,14 @@ using System.Text;
 
 namespace Roguelike.Spells
 {
-    class SpellManager
+    class SpellSkillManager
     {
-        private static readonly SpellManager instance = new SpellManager();
+        private static readonly SpellSkillManager instance = new SpellSkillManager();
 
         // Explicit static constructor to tell C# compiler not to mark type as beforefieldinit
-        static SpellManager() { }
+        static SpellSkillManager() { }
 
-        public static SpellManager Instance
+        public static SpellSkillManager Instance
         {
             get
             {
@@ -23,7 +23,7 @@ namespace Roguelike.Spells
 
         private List<Spell> Spells;
 
-        public SpellManager()
+        public SpellSkillManager()
         {
             //load and manage the list of available spells
             Spells = new List<Spell>();

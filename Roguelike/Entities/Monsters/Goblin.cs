@@ -3,7 +3,6 @@ using GoRogue;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Roguelike.Attacks;
-using Roguelike.Entities.Interfaces;
 using Roguelike.Helpers;
 using Roguelike.Models;
 using Roguelike.Spells;
@@ -11,14 +10,8 @@ using SadConsole;
 
 namespace Roguelike.Entities.Monsters
 {
-    internal class Goblin : Monster, IHasBody, IHasVision, ICanAttack
+    internal class Goblin : Monster
     {
-        public ActorBody Body { get; set; }
-        public double FOVRadius { get; set; }
-        public List<Attack> Attacks { get; set; }
-        //public List<Spell> Spells { get; set; }
-        public XYZRelativeDirection VisionDirection { get; set; }
-
         public Goblin(Coord position) : this(position, "Goblin")
         {
             //
@@ -29,7 +22,8 @@ namespace Roguelike.Entities.Monsters
             VisionDirection = XYZRelativeDirection.Forward;
 
             Name = name;
-            MaxHealth = Health = 40;
+            MaxHealth = 40;
+            Health = 40;
             Mana = 0;
             FOVRadius = 2;
 
@@ -40,38 +34,7 @@ namespace Roguelike.Entities.Monsters
             Intelligence = 4;
             Vitae = 0;
 
-            Body = ActorBody.HumanoidBody(MyGame.GameSettings.GoblinGlyphColor);// new ActorBody();
-            Attacks = new List<Attack>();
+            Body = ActorBody.HumanoidBody(MyGame.GameSettings.GoblinGlyphColor);
         }
-
-        public bool CanAttack(uint attackId, Actor target)
-        {
-            return false;
-        }
-
-        //public bool CastSpell(uint spellId, Actor target)
-        //{
-        //    return false;
-        //}
-
-        public bool DoAttack(uint attackId, Actor target)
-        {
-            return false;
-        }
-
-        public Attack GetAttack(uint attackId)
-        {
-            return null;
-        }
-
-        public Attack GetBestAttack(Actor target)
-        {
-            return null;
-        }
-
-        //public Spell GetSpell(uint spellId)
-        //{
-        //    return null;
-        //}
     }
 }

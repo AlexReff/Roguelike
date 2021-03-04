@@ -20,7 +20,7 @@ namespace Roguelike
         public static UIManager UIManager { get; private set; }
         public static CommandManager CommandManager { get; private set; }
         public static World World { get; private set; }
-        public static SpellManager SpellManager { get; private set; }
+        public static SpellSkillManager SpellManager { get; private set; }
 
         public MyGame()
         {
@@ -90,7 +90,7 @@ namespace Roguelike
             CommandManager = new CommandManager();
             UIManager = new UIManager();
             World = new World();
-            SpellManager = new SpellManager();
+            SpellManager = new SpellSkillManager();
         }
 
         private void Destroyed()

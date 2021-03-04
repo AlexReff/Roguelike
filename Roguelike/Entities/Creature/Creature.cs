@@ -1,7 +1,6 @@
 ﻿using GoRogue;
 using Microsoft.Xna.Framework;
 using Roguelike.Attacks;
-using Roguelike.Entities.Interfaces;
 using Roguelike.Models;
 using Roguelike.Spells;
 using SadConsole;
