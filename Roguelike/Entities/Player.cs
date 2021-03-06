@@ -23,8 +23,7 @@ namespace Roguelike.Entities
             Spells = SpellSkillManager.Instance.GetAllSpells();
             FacingDirection = Direction.UP;
 
-            MaxHealth = 120;
-            Health = 120;
+            MaxHealth = Health = 120;
             Mana = 60;
 
             MoveSpeed = 1;

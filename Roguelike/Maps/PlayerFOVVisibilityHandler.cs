@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Roguelike.Entities;
+using Roguelike.Entities.Items;
 using Roguelike.Helpers;
 using SadConsole;
 using System;
@@ -27,7 +28,15 @@ namespace Roguelike.Maps
                 {
                     VisibleEntities.Add(entity.ID);
                     DebugManager.Instance.AddMessage($"Player::EntitySeen: {entity.Name}");
-                    PlayerMessageManager.Instance.AddMessage($"Spotted a {entity.Name}");
+                    if (entity is Currency)
+                    {
+                        //suppress messages about seeing currency on the ground
+                    }
+                    else
+                    {
+                        var n = Helpers.Helpers.IsVowel(entity.Name[0]) ? "n" : "";
+                        PlayerMessageManager.Instance.AddMessage($"Spotted a{n} {entity.Name}");
+                    }
                 }
                 
             }

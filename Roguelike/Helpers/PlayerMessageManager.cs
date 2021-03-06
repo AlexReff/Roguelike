@@ -12,7 +12,7 @@ namespace Roguelike.Helpers
         Notification,
     }
 
-    class PlayerMessage
+    struct PlayerMessage
     {
         public string Message { get; set; }
         public MessageCategory Category { get; set; }

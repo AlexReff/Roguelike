@@ -11,7 +11,7 @@ namespace Roguelike.Helpers
         System,
     }
 
-    class DebugMessage
+    struct DebugMessage
     {
         public string Message { get; set; }
         public DebugSource Source { get; set; }

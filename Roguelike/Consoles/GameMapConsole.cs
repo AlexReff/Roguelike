@@ -55,7 +55,7 @@ namespace Roguelike
         public void UpdateFOV(Player player = null)
         {
             double deg = Helpers.Helpers.GetFOVDegree(player ?? MyGame.World?.Player ?? null);
-            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE, deg, 200);
+            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE, deg, 200, 4);
             MapRenderer.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
         }
     }

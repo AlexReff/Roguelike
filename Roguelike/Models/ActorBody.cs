@@ -9,8 +9,6 @@ namespace Roguelike.Models
 {
     public class ActorBody
     {
-        public static readonly Color LimbForegroundColor = Color.LightGreen;
-
         /// <summary>
         /// List of all 'limbs' on this body, are connected to other limbs, can be dismembered/removed from body
         /// </summary>
@@ -31,6 +29,45 @@ namespace Roguelike.Models
             Limbs = new List<Limb>();
             Hands = new List<Hand>();
             Feet = new List<Foot>();
+        }
+
+        /// <summary>
+        /// 'Severs' the body part, as well as any sub-connected body parts
+        /// </summary>
+        /// <returns>The removed Limb</returns>
+        public Limb RemoveBodyPart(string name)
+        {
+            Limb part = Limbs.FirstOrDefault((limb) => limb.Name == name);
+
+            if (part != null)
+            {
+                RemoveChildBodyParts(part);
+                part.LimbParent = null;
+            }
+
+            return part;
+        }
+
+        private void RemoveChildBodyParts(Limb part)
+        {
+            this.Limbs.Remove(part);
+
+            if (part is Hand)
+            {
+                this.Hands.Remove((Hand)part);
+            }
+            if (part is Foot)
+            {
+                this.Feet.Remove((Foot)part);
+            }
+
+            if (part.LimbChildren.Count > 0)
+            {
+                foreach (var childPart in part.LimbChildren)
+                {
+                    RemoveChildBodyParts(childPart);
+                }
+            }
         }
 
         public static ActorBody HumanoidBody(Color foregroundColor)
@@ -167,14 +204,33 @@ namespace Roguelike.Models
         /// Set to false when the hand loses the ability to grip
         /// </summary>
         public bool IsAbleToGrip { get; set; }
-        public bool IsHoldingItem { get; set; }
+        
+        public bool IsHoldingItem { get { return HeldItem != null; } }
+
+        public Item HeldItem { get; set; }
 
         public Hand(string name, Color foregroundColor) : base(name, 'h', LimbSize.HandFoot, foregroundColor)
         {
             Name = name;
 
             IsAbleToGrip = true;
-            IsHoldingItem = false;
+            //IsHoldingItem = false;
+        }
+
+        public bool HoldItem(Item item)
+        {
+            if (HeldItem == null && IsAbleToGrip)
+            {
+                HeldItem = item;
+                return true;
+            }
+
+            return false;
+        }
+
+        public void ReleaseItem()
+        {
+            HeldItem = null;
         }
     }
 

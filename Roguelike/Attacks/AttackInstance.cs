@@ -13,6 +13,7 @@ namespace Roguelike.Attacks
         public double ManaCost { get; set; }
         public double Damage { get; set; }
         public double Range { get; set; }
+        public string LimbTargetName { get; set; }
 
         /// <summary>
         /// Any action that occurs to the 'caster' as a result of this attack completing
@@ -24,13 +25,14 @@ namespace Roguelike.Attacks
         /// </summary>
         public Action<Actor> DoEffectTarget { get; set; }
 
-        public AttackInstance(string name, double manaCost, double damage, double range, Action<Actor> targetEffect, Action<Actor> casterEffect)
+        public AttackInstance(string name, double manaCost, double damage, string targetLimbName, double range, Action<Actor> targetEffect, Action<Actor> casterEffect)
         {
             ID = Helpers.Helpers.IDGenerator.UseID();
             Name = name;
             ManaCost = manaCost;
             Damage = damage;
             Range = range;
+            LimbTargetName = targetLimbName;
             DoEffectTarget = targetEffect;
             DoEffectCaster = casterEffect;
         }

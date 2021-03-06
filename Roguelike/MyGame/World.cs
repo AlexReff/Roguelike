@@ -58,6 +58,10 @@ namespace Roguelike
                 {
                     var dragon = new Dragon(posToSpawn);
                     map.AddEntity(dragon);
+                    if (Helpers.Helpers.RandomGenerator.NextBoolean())
+                    {
+                        dragon.AddCurrency(Helpers.Helpers.RandomGenerator.NextDouble() * 50);
+                    }
                 }
             }
             for (int i = 0; i < 10; i++)
@@ -68,6 +72,10 @@ namespace Roguelike
                 {
                     var goblin = new Goblin(posToSpawn);
                     map.AddEntity(goblin);
+                    if (Helpers.Helpers.RandomGenerator.NextBoolean())
+                    {
+                        goblin.AddCurrency(Helpers.Helpers.RandomGenerator.NextDouble() * 10);
+                    }
                 }
             }
             for (int i = 0; i < 10; i++)

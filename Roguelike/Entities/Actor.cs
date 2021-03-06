@@ -8,13 +8,13 @@ using Roguelike.Models;
 using Roguelike.Spells;
 using SadConsole;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Roguelike.Entities
 {
     public class Actor : MyBasicEntity
     {
-        public int CurrentLevel { get; set; }
         public char Glyph { get; protected set; }
         public bool HasVision { get; protected set; }
         public double FOVRadius { get; protected set; }
@@ -28,9 +28,34 @@ namespace Roguelike.Entities
         public Direction FacingDirection { get; protected set; }
         public ActorBody Body { get; protected set; }
 
+        private int _currentLevel;
+        public int CurrentLevel
+        {
+            get { return _currentLevel; }
+            set
+            {
+                _currentLevel = System.Math.Max(1, value);
+            }
+        }
+
+        private double _currency;
+        public double Currency
+        {
+            get { return _currency; }
+            set
+            {
+                var prevCurrency = _currency;
+                _currency = System.Math.Max(0, System.Math.Round(value, 2));
+                if (this is Player)
+                {
+                    PlayerMessageManager.Instance.AddMessage(new PlayerMessage($"Acquired {_currency - prevCurrency} gold", MessageCategory.Notification));
+                }
+            }
+        }
+
         public double MaxHealth { get; protected set; }
 
-        private double _health { get; set; }
+        private double _health;
         public double Health
         {
             get { return _health; }
@@ -42,14 +67,14 @@ namespace Roguelike.Entities
             }
         }
 
-        private double _mana { get; set; }
+        private double _mana;
         public double Mana
         {
             get { return _mana; }
             set
             {
                 //cannot have negative mana
-                _mana = System.Math.Max(0.0, value);
+                _mana = System.Math.Max(0, value);
             }
         }
 
@@ -62,7 +87,6 @@ namespace Roguelike.Entities
         public int Vitae { get; protected set; }
 
         public List<Item> Inventory { get; protected set; }
-
         public List<Spell> Spells { get; set; }
 
         // Attack related conditions
@@ -99,7 +123,7 @@ namespace Roguelike.Entities
                 Item item = MyGame.World.CurrentMap.GetEntityAt<Item>(target);
                 if (otherActor != null)
                 {
-                    PlayerMessageManager.Instance.AddMessage(new PlayerMessage($"Encountered a {otherActor.Name}", MessageCategory.Notification));
+                    //PlayerMessageManager.Instance.AddMessage(new PlayerMessage($"Encountered a {otherActor.Name}", MessageCategory.Notification));
 
                     if (this.IsHostileTo(otherActor))
                     {
@@ -110,8 +134,16 @@ namespace Roguelike.Entities
                 }
                 else if (item != null)
                 {
-                    PlayerMessageManager.Instance.AddMessage(new PlayerMessage($"Encountered a {item.Name}", MessageCategory.Notification));
-                    //handle item interaction
+                    if (this is Player)
+                    {
+                        //PlayerMessageManager.Instance.AddMessage(new PlayerMessage($"Encountered a {item.Name}", MessageCategory.Notification));
+
+                        if (item is Currency && MyGame.GameSettings.GoldAutoPickup)
+                        {
+                            PickupItem(item);
+                        }
+                    }
+
                     allowMovement = true;
                 }
 
@@ -148,6 +180,11 @@ namespace Roguelike.Entities
             return false;
         }
 
+        public IEnumerable<Weapon> GetEquippedWeapons()
+        {
+            return Body.Hands.FindAll(m => m.IsHoldingItem && m.HeldItem is Weapon).Select(m => (Weapon)m.HeldItem);
+        }
+
         public void BumpAttack(Actor target)
         {
             var bestAttack = GetBestAttack(target);
@@ -168,6 +205,28 @@ namespace Roguelike.Entities
                 DebugManager.Instance.AddMessage($"{this.Name} attacked {target.Name}: {attack.Damage} dmg");
             }
 
+            /* 
+             * 1-100 potential attributes/skill?
+             * 
+             */
+            var attackResult = Helpers.Helpers.RandomGenerator.NextDouble();
+            if (attackResult <= 0.001)
+            {
+                //catastrophic failure
+
+                //needs mitigation (luck?)
+            }
+            else if (attackResult <= 0.01)
+            {
+                //failure?
+            }
+            else if (attackResult <= 0.1)
+            {
+                //miss?
+            }
+
+            var dmgRnd = Helpers.Helpers.RandomGenerator.NextDouble();
+
             target.Health -= attack.Damage;
             this.Mana -= attack.ManaCost;
 
@@ -181,9 +240,14 @@ namespace Roguelike.Entities
             }
         }
 
+        public double ResolveAttack()
+        {
+            return 0;
+        }
+
         public AttackInstance GetBestAttack(Actor target)
         {
-            var result = new AttackInstance("Normal Attack", 0, 20, 1, null, null);
+            var result = new AttackInstance("Normal Attack", 0, 20, target.Body.Limbs[0].Name, 1, null, null);
             if (CanAttack(result, target))
             {
                 return result;
@@ -237,6 +301,73 @@ namespace Roguelike.Entities
             return false;
         }
 
+        public void DropAllItems()
+        {
+            foreach (var item in Inventory)
+            {
+                DropItem(item);
+            }
+        }
+
+        public void DropItem(uint id)
+        {
+            var item = Inventory.FirstOrDefault((inv) => inv.ID == id);
+            if (item != null && item.ID == id)
+            {
+                DropItem(item);
+            }
+        }
+
+        public void DropItem(Item item)
+        {
+            item.Position = Position;
+            this.CurrentMap.AddEntity(item);
+            Inventory.Remove(item);
+        }
+
+        public void AddItem(Item item)
+        {
+            if (item is Currency)
+            {
+                this.Currency += ((Currency)item).Amount;
+            }
+            else
+            {
+                this.Inventory.Add(item);
+            }
+        }
+
+        public void PickupItem(Item item)
+        {
+            if (item.CurrentMap != null)
+            {
+                item.CurrentMap.RemoveEntity(item);
+            }
+            AddItem(item);
+        }
+
+        public void AddCurrency(double amount)
+        {
+            if (amount > 0)
+            {
+                Currency += amount;
+            }
+        }
+
+        public void DropCurrency(double amount)
+        {
+            if (Currency >= amount)
+            {
+                Currency -= amount;
+                this.CurrentMap.AddEntity(new Currency(amount, Position));
+            }
+            else if (Currency > 0)
+            {
+                this.CurrentMap.AddEntity(new Currency(Currency, Position));
+                Currency = 0;
+            }
+        }
+
         public void Die()
         {
             if (this is Player)
@@ -247,6 +378,12 @@ namespace Roguelike.Entities
             {
                 PlayerMessageManager.Instance.AddMessage(new PlayerMessage($"{this.Name} died", MessageCategory.Combat));
             }
+
+            // drop full inventory on death
+            DropAllItems();
+
+            // drop all currency on death
+            DropCurrency(double.MaxValue);
 
             this.CurrentMap.RemoveEntity(this);
         }

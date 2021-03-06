@@ -56,8 +56,10 @@ namespace Roguelike.Consoles
             //DEBUG/DEVELOPER THINGS BELOW
 
             // Debug Console
-            Point dbgPos = new Point(width - MyGame.GameSettings.DebugConsoleWidth, 0);
-            DebugScreen = new DebugConsole(MyGame.GameSettings.DebugConsoleWidth, 24, MyGame.GameSettings.DebugScreenBgColor, MyGame.GameSettings.DebugScreenBorderColor);
+            //Point dbgPos = new Point(width - MyGame.GameSettings.DebugConsoleWidth, 0);
+            Point dbgPos = new Point(0, MapBackground.Position.Y + MapBackground.Height + 10);
+            //DebugScreen = new DebugConsole(MyGame.GameSettings.DebugConsoleWidth, 24, MyGame.GameSettings.DebugScreenBgColor, MyGame.GameSettings.DebugScreenBorderColor);
+            DebugScreen = new DebugConsole(MyGame.GameSettings.DebugConsoleWidth, Height - dbgPos.Y, MyGame.GameSettings.DebugScreenBgColor, MyGame.GameSettings.DebugScreenBorderColor);
             DebugScreen.Position = dbgPos;
             Children.Add(DebugScreen);
 

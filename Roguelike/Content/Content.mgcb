@@ -31,6 +31,12 @@
 #begin fonts/Cooz-curses-14x16.png
 /copy:fonts/Cooz-curses-14x16.png
 
+#begin fonts/CP850.font
+/copy:fonts/CP850.font
+
+#begin fonts/CP850.png
+/copy:fonts/CP850.png
+
 #begin fonts/FlyingMage.font
 /copy:fonts/FlyingMage.font
 

@@ -13,22 +13,22 @@ namespace Roguelike.Entities
         private static readonly int[] WallCharacters =
         {
             //Bits are: WSEN
-            206, //0000
-            182, //0001
-            205, //0010
-            200, //0011
-            186, //0100
-            182, //0101
-            213, //0110
-            204, //0111
-            205, //1000
-            189, //1001
-            205, //1010
-            208, //1011
-            183, //1100
-            185, //1101
-            203, //1110
-            206, //1111
+            206, //0000 island
+            182, //0001                 north
+            205, //0010            east
+            200, //0011            east north
+            186, //0100      south
+            182, //0101      south      north
+            213, //0110      south east
+            204, //0111      south east north
+            205, //1000 west
+            189, //1001 west            north
+            205, //1010 west       east
+            208, //1011 west       east north
+            183, //1100 west south
+            185, //1101 west south      north
+            203, //1110 west south east
+            206, //1111 west south east north
         };
 
         public Wall(ArrayMap<bool> map, Coord position) : base(Color.White, Color.Black, (char)219, position, isWalkable: false, isTransparent: false)

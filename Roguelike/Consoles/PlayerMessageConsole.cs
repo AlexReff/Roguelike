@@ -29,9 +29,11 @@ namespace Roguelike.Consoles
 
             this.DrawBorderBgTitle(new Rectangle(0, 0, width, height), "Events", BackgroundColor, BorderColor);
 
-            OutputConsole = new ScrollingConsole(width - 2, height - 1);
-            OutputConsole.Position = new Point(1, 1);
+            OutputConsole = new ScrollingConsole((width * 2) - 3, height - 1);
+            OutputConsole.Position = new Point(2, 1);
             OutputConsole.Cursor.Position = new Point(0, OutputConsole.Height - 1);
+
+            OutputConsole.Font = SadConsole.Global.Fonts["CP850"].GetFont(Font.FontSizes.One);
 
             //Children.Add(BackgroundConsole);
             Children.Add(OutputConsole);

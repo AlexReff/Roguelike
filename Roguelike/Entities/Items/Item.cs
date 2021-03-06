@@ -1,5 +1,6 @@
 ﻿using GoRogue;
 using Microsoft.Xna.Framework;
+using Roguelike.Attacks;
 using SadConsole;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,8 @@ namespace Roguelike.Entities.Items
             }
         }
 
+        public WeaponType WeaponType { get; set; }
+
         /// <summary>
         /// Item without a Coord position (does not start on the map)
         /// </summary>
@@ -42,6 +45,8 @@ namespace Roguelike.Entities.Items
             //Condition = condition;
             Name = name;
             Durability = durability;
+
+            //Attacks = new List<AttackSkill>();
         }
 
         /// <summary>

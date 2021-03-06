@@ -17,6 +17,21 @@ namespace Roguelike.Helpers
         
         public static SadConsoleRandomGenerator RandomGenerator = new SadConsoleRandomGenerator();
 
+        public static bool IsVowel(char vowel)
+        {
+            return vowel == 'a'
+                | vowel == 'e'
+                | vowel == 'i'
+                | vowel == 'o'
+                | vowel == 'u'
+                | vowel == 'A'
+                | vowel == 'E'
+                | vowel == 'I'
+                | vowel == 'O'
+                | vowel == 'U'
+                ;
+        }
+
         public static void DrawBorderBgTitle(this Console console, Microsoft.Xna.Framework.Rectangle area, string title, Color backgroundColor, Color borderColor)
         {
             var bgArea = new Microsoft.Xna.Framework.Rectangle(area.X + 1, area.Y + 1, area.Width - 2, area.Height - 2);

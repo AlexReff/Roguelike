@@ -24,8 +24,6 @@ namespace Roguelike.Menus
         /// <param name="height"></param>
         public PlayerAttackMenu(int width, int height) : base(width, height)
         {
-            UseKeyboard = true;
-
             ButtonTheme AttackBtnTheme = (ButtonTheme)MyGame.GameSettings.ButtonTheme.Clone();
             AttackBtnTheme.EndCharacterLeft = '1';
 

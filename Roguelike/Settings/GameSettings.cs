@@ -55,6 +55,8 @@ namespace Roguelike.Settings
         public Color DragonGlyphColor { get; private set; }
         public Color GoblinGlyphColor { get; private set; }
 
+        public bool GoldAutoPickup { get; private set; }
+
         public GameSettings()
         {
             //GameFont = "Martin";
@@ -62,7 +64,7 @@ namespace Roguelike.Settings
             GameFont = "FlyingMage";
 
             GameWidth = 120;
-            GameHeight = 60;
+            GameHeight = 70;
 
             MapScreenWidth = 60;
             MapScreenHeight = 40;
@@ -72,7 +74,7 @@ namespace Roguelike.Settings
 
             GameMenuWidth = 18;
 
-            DebugConsoleWidth = 28;
+            DebugConsoleWidth = 60;
 
             ButtonTheme = new MyButtonTheme();
             ButtonColors = MyButtonTheme.MyButtonColors();
@@ -87,6 +89,8 @@ namespace Roguelike.Settings
             
             DragonGlyphColor = Color.MediumVioletRed;
             GoblinGlyphColor = Color.DarkGreen;
+
+            GoldAutoPickup = true;
 
             EnsureValidSettings();
         }
