@@ -586,6 +586,17 @@ namespace GoRogue.GameFramework
 		public void CalculateFOV(Coord position, double radius, Distance radiusShape, double angle, double span)
 			=> CalculateFOV(position.X, position.Y, radius, radiusShape, angle, span);
 
+		public void CalculateFOV(Coord position, double radius, Distance radiusShape, double angle, double span, double innerRadius)
+			=> CalculateFOV(position.X, position.Y, radius, radiusShape, angle, span, innerRadius);
+
+		public virtual void CalculateFOV(int x, int y, double radius, Distance radiusShape, double angle, double span, double innerRadius)
+		{
+			_fov.Calculate(x, y, radius, radiusShape, angle, span, innerRadius);
+
+			foreach (var pos in _fov.NewlySeen)
+				Explored[pos] = true;
+		}
+
 		/// <summary>
 		/// Calculates FOV with the given center point and radius, restricted to the given angle and span, and stores the result in the <see cref="FOV"/>
 		/// property.  All tiles that are in the resulting FOV are marked as explored.  Other angle-based overloads call this one, so if you need to

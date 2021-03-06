@@ -198,6 +198,55 @@ namespace GoRogue
 		public void Calculate(Coord start, double radius, Distance distanceCalc) => Calculate(start.X, start.Y, radius, distanceCalc);
 
 		/// <summary>
+		/// Custom implementation that utilizes both a fixed-area viewpoint-independent reveal as well as a longer viewpoint-restricted fov
+		/// </summary>
+		public void Calculate(int startX, int startY, double radius, Distance distanceCalc, double angle, double span, double innerRadius)
+		{
+			radius = Math.Max(1, radius);
+			double decay = 1.0 / (radius + 1);
+
+			angle = ((angle > 360.0 || angle < 0) ? Math.IEEERemainder(angle, 360.0) : angle) *MathHelpers.DEGREE_PCT_OF_CIRCLE;
+			span *= MathHelpers.DEGREE_PCT_OF_CIRCLE;
+
+			previousFOV = currentFOV;
+			currentFOV = new HashSet<Coord>();
+
+			initializeLightMap();
+			light[startX, startY] = 1; // Full power to starting space
+			currentFOV.Add(new Coord(startX, startY));
+
+			shadowCastLimited(1, 1.0, 0.0, 0, 1, 1, 0, radius, startX, startY, decay, light, currentFOV, fovMap, distanceCalc, angle, span);
+			shadowCastLimited(1, 1.0, 0.0, 1, 0, 0, 1, radius, startX, startY, decay, light, currentFOV, fovMap, distanceCalc, angle, span);
+
+			shadowCastLimited(1, 1.0, 0.0, 0, -1, 1, 0, radius, startX, startY, decay, light, currentFOV, fovMap, distanceCalc, angle, span);
+			shadowCastLimited(1, 1.0, 0.0, -1, 0, 0, 1, radius, startX, startY, decay, light, currentFOV, fovMap, distanceCalc, angle, span);
+
+			shadowCastLimited(1, 1.0, 0.0, 0, -1, -1, 0, radius, startX, startY, decay, light, currentFOV, fovMap, distanceCalc, angle, span);
+			shadowCastLimited(1, 1.0, 0.0, -1, 0, 0, -1, radius, startX, startY, decay, light, currentFOV, fovMap, distanceCalc, angle, span);
+
+			shadowCastLimited(1, 1.0, 0.0, 0, 1, -1, 0, radius, startX, startY, decay, light, currentFOV, fovMap, distanceCalc, angle, span);
+			shadowCastLimited(1, 1.0, 0.0, 1, 0, 0, -1, radius, startX, startY, decay, light, currentFOV, fovMap, distanceCalc, angle, span);
+
+
+
+			innerRadius = Math.Max(1, innerRadius);
+			double innerDecay = 1.0 / (innerRadius + 1);
+
+			//previousFOV = currentFOV;
+			//currentFOV = new HashSet<Coord>();
+
+			//initializeLightMap();
+			//light[startX, startY] = 1; // Full power to starting space
+			//currentFOV.Add(new Coord(startX, startY));
+
+			foreach (Direction d in AdjacencyRule.DIAGONALS.DirectionsOfNeighbors())
+			{
+				shadowCast(1, 1.0, 0.0, 0, d.DeltaX, d.DeltaY, 0, innerRadius, startX, startY, innerDecay, light, currentFOV, fovMap, distanceCalc);
+				shadowCast(1, 1.0, 0.0, d.DeltaX, 0, 0, d.DeltaY, innerRadius, startX, startY, innerDecay, light, currentFOV, fovMap, distanceCalc);
+			}
+		}
+
+		/// <summary>
 		/// Calculates FOV given an origin point, a radius, a radius shape, and the given field of view
 		/// restrictions <paramref name="angle"/> and <paramref name="span"/>.  The resulting field of view,
 		/// if unobstructed, will be a cone defined by the angle and span given.

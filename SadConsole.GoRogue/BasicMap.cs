@@ -191,6 +191,14 @@ namespace SadConsole
             FOVRecalculated?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <inheritdoc />
+        public override void CalculateFOV(int x, int y, double radius, Distance radiusShape, double angle, double span, double innerRadius)
+        {
+            base.CalculateFOV(x, y, radius, radiusShape, angle, span, innerRadius);
+
+            FOVRecalculated?.Invoke(this, EventArgs.Empty);
+        }
+
         /// <summary>
         /// Add as a handler to <see cref="ControlledGameObjectChanged"/> to enforce that anything assigned to that field must implement
         /// <typeparamref name="TControlledObject"/>.
