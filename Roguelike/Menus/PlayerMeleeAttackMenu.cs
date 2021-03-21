@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Roguelike.Menus
 {
-    public class PlayerMeleeAttackMenu : ControlsConsole
+    internal class PlayerMeleeAttackMenu : ControlsConsole
     {
         public SelectionButton AttackBtn { get; private set; }
         //public Action AttackBtnAction { get; set; }
@@ -24,7 +24,7 @@ namespace Roguelike.Menus
         /// <param name="height"></param>
         public PlayerMeleeAttackMenu(int width, int height) : base(width, height)
         {
-            var equippedWeapons = MyGame.World.Player.GetEquippedWeapons();
+            //var equippedWeapons = MyGame.World.Player.EquippedWeapons;
 
             ButtonTheme AttackBtnTheme = (ButtonTheme)MyGame.GameSettings.ButtonTheme.Clone();
             AttackBtnTheme.EndCharacterLeft = '1';

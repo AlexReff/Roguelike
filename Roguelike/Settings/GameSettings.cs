@@ -1,5 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Roguelike.Helpers;
+﻿using GoRogue;
+using Microsoft.Xna.Framework;
+using Roguelike.Systems;
 using SadConsole.Themes;
 using System;
 using System.Collections.Generic;
@@ -7,100 +8,108 @@ using System.Text;
 
 namespace Roguelike.Settings
 {
-    class GameSettings
+    internal class GameSettings
     {
-        //public static readonly string GameFont = "Isenhertz"; //possible candidate, needs some remapping, not usable for text
-        //public static readonly string GameFont = "Phoebus"; //decent, needs glyph filled-in full opacity
-        //public static readonly string GameFont = "Tigrex3d"; //ok, needs some remappings
-        // public static readonly string GameFont = "Anno"; //not bad, a little blocky
-        public string GameFont { get; private set; }//= "Martin"; //good but needs 'solid' glyph updated (done)
+        public Radius FOVRadiusType = Radius.CIRCLE;
+
+        public string GameFont = "FlyingMage";
+
+        public int FPSLimit = 60;
 
         /// <summary>
         /// The width of the entire screen/window
         /// </summary>
-        public int GameWidth { get; private set; }
+        public int GameWidth = 75;
         /// <summary>
         /// The height of the entire screen/window
         /// </summary>
-        public int GameHeight { get; private set; }
+        public int GameHeight = 50;
+
         /// <summary>
         /// The width of the 'Game' screen sub-area
         /// </summary>
-        public int MapScreenWidth { get; private set; }
+        public int MapScreenWidth = 45;
         /// <summary>
         /// The height of the 'Game' screen sub-area
         /// </summary>
-        public int MapScreenHeight { get; private set; }
+        public int MapScreenHeight = 25;
+
         /// <summary>
         /// The width of the in-game generated Dungeon
         /// </summary>
-        public int MapWidth { get; private set; }
+        public int MapWidth = 60;
         /// <summary>
         /// The height of the in-game generated Dungeon
         /// </summary>
-        public int MapHeight { get; private set; }
-        public int GameMenuWidth { get; private set; }
+        public int MapHeight = 50;
 
-        public int DebugConsoleWidth { get; private set; }
+        public int GameMenuWidth = 18;
+        public int DebugConsoleWidth = 62;
 
-        public ButtonTheme ButtonTheme { get; private set; }
-        public Colors ButtonColors { get; private set; }
+        public ButtonTheme ButtonTheme = new MyButtonTheme();
+        public Colors ButtonColors = MyButtonTheme.MyButtonColors();
 
-        public Color MapScreenBorderColor { get; private set; }
-        public Color MapScreenBgColor { get; private set; }
-        public Color DebugScreenBorderColor { get; private set; }
-        public Color DebugScreenBgColor { get; private set; }
+        public Color MapScreenBorderColor = Color.DarkSeaGreen;
+        public Color MapScreenBgColor = Color.Black;
+        public Color DebugScreenBorderColor = Color.CadetBlue;
+        public Color DebugScreenBgColor = Color.Black;
 
-        public Color PlayerCharacterGlyphColor { get; private set; }
-        public Color DragonGlyphColor { get; private set; }
-        public Color GoblinGlyphColor { get; private set; }
+        public Color PlayerCharacterGlyphColor = Color.MediumSpringGreen;
+        public Color DragonGlyphColor = Color.MediumVioletRed;
+        public Color GoblinGlyphColor = Color.DarkGreen;
 
-        public bool GoldAutoPickup { get; private set; }
+        public bool GoldAutoPickup = true;
 
         public GameSettings()
         {
-            //GameFont = "Martin";
-            //GameFont = "Cooz";
-            GameFont = "FlyingMage";
+            ////GameFont = "Martin";
+            ////GameFont = "Cooz";
+            //GameFont = "FlyingMage";
 
-            GameWidth = 120;
-            GameHeight = 70;
+            //FOVRadiusType = Radius.CIRCLE;
 
-            MapScreenWidth = 60;
-            MapScreenHeight = 40;
+            ////GameWidth = 120;
+            ////GameHeight = 70;
+            //GameWidth = 75;
+            //GameHeight = 50;
 
-            MapWidth = 60;
-            MapHeight = 50;
+            ////MapScreenWidth = 60;
+            ////MapScreenHeight = 40;
+            //MapScreenWidth = 45;
+            //MapScreenHeight = 25;
 
-            GameMenuWidth = 18;
+            //MapWidth = 60;
+            //MapHeight = 50;
 
-            DebugConsoleWidth = 60;
+            //GameMenuWidth = 18;
 
-            ButtonTheme = new MyButtonTheme();
-            ButtonColors = MyButtonTheme.MyButtonColors();
+            //DebugConsoleWidth = 62;
 
-            MapScreenBorderColor = Color.DarkSeaGreen;
-            MapScreenBgColor = Color.Black;
+            //ButtonTheme = new MyButtonTheme();
+            //ButtonColors = MyButtonTheme.MyButtonColors();
 
-            DebugScreenBorderColor = Color.CadetBlue;
-            DebugScreenBgColor = Color.Black;
+            //MapScreenBorderColor = Color.DarkSeaGreen;
+            //MapScreenBgColor = Color.Black;
 
-            PlayerCharacterGlyphColor = Color.MediumSpringGreen;
+            //DebugScreenBorderColor = Color.CadetBlue;
+            //DebugScreenBgColor = Color.Black;
+
+            //PlayerCharacterGlyphColor = Color.MediumSpringGreen;
             
-            DragonGlyphColor = Color.MediumVioletRed;
-            GoblinGlyphColor = Color.DarkGreen;
+            //DragonGlyphColor = Color.MediumVioletRed;
+            //GoblinGlyphColor = Color.DarkGreen;
 
-            GoldAutoPickup = true;
+            //GoldAutoPickup = true;
 
-            EnsureValidSettings();
+            //EnsureValidSettings();
         }
 
-        private void EnsureValidSettings()
-        {
-            if (MapWidth < MapScreenWidth || MapHeight < MapScreenHeight)
-            {
-                DebugManager.Instance.AddMessage(new DebugMessage($"Invalid map/screen dimensions: Map({MapWidth},{MapHeight}), MapScreen({MapScreenWidth},{MapScreenHeight})", DebugSource.System));
-            }
-        }
+        //private void EnsureValidSettings()
+        //{
+        //    if (MapWidth < MapScreenWidth || MapHeight < MapScreenHeight)
+        //    {
+        //        DebugManager.Instance.AddMessage(new DebugMessage($"Invalid map/screen dimensions: Map({MapWidth},{MapHeight}), MapScreen({MapScreenWidth},{MapScreenHeight})", DebugSource.System));
+        //    }
+        //}
     }
 }

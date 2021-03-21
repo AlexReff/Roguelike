@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Roguelike.SkillTrees
 {
-    public class Dagger
+    internal class Dagger
     {
         public Dagger()
         {

@@ -7,11 +7,11 @@ namespace Roguelike.Models
     [Flags]
     public enum XYZRelativeDirection
     {
-        Forward = 1,
-        Backward = 2,
-        Left = 4,
-        Right = 8,
-        Up = 16,
-        Down = 32,
+        Forward  = 1 << 0,
+        Backward = 1 << 1,
+        Left     = 1 << 2,
+        Right    = 1 << 3,
+        Up       = 1 << 4,
+        Down     = 1 << 5,
     }
 }

@@ -1,0 +1,524 @@
+{
+	"sheets": [
+		{
+			"name": "Materials",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "ID"
+				},
+				{
+					"typeStr": "1",
+					"name": "Name"
+				},
+				{
+					"typeStr": "1",
+					"name": "Descriptor"
+				},
+				{
+					"typeStr": "4",
+					"name": "Density"
+				},
+				{
+					"typeStr": "3",
+					"name": "Hardness"
+				},
+				{
+					"typeStr": "4",
+					"name": "HeatRateOfChange"
+				},
+				{
+					"typeStr": "3",
+					"name": "MeltingPoint",
+					"display": null
+				},
+				{
+					"typeStr": "3",
+					"name": "IgnitePoint"
+				},
+				{
+					"typeStr": "3",
+					"name": "BoilingPoint"
+				},
+				{
+					"typeStr": "4",
+					"name": "Value"
+				}
+			],
+			"lines": [
+				{
+					"ID": "wood",
+					"Density": 1,
+					"Hardness": 1,
+					"MeltingPoint": -1,
+					"IgnitePoint": 573,
+					"BoilingPoint": -1,
+					"Name": "Wood",
+					"HeatRateOfChange": 1.76,
+					"Value": 1,
+					"Descriptor": "wooden"
+				},
+				{
+					"ID": "iron",
+					"Name": "Iron",
+					"Density": 7.5,
+					"Hardness": 5,
+					"HeatRateOfChange": 4.5,
+					"MeltingPoint": 1811,
+					"IgnitePoint": -1,
+					"BoilingPoint": 3134,
+					"Value": 6,
+					"Descriptor": "iron"
+				},
+				{
+					"ID": "steel",
+					"Name": "Steel",
+					"Density": 9,
+					"Hardness": 6,
+					"HeatRateOfChange": 4,
+					"MeltingPoint": 2011,
+					"IgnitePoint": -1,
+					"BoilingPoint": 3434,
+					"Value": 8,
+					"Descriptor": "steel"
+				},
+				{
+					"ID": "silver",
+					"Name": "Silver",
+					"Density": 10.5,
+					"Hardness": 7,
+					"HeatRateOfChange": 2.4,
+					"MeltingPoint": 1235,
+					"IgnitePoint": -1,
+					"BoilingPoint": 2435,
+					"Value": 10,
+					"Descriptor": "silver"
+				},
+				{
+					"ID": "titanium",
+					"Name": "Titanium",
+					"Density": 20,
+					"Hardness": 8,
+					"HeatRateOfChange": 1.6,
+					"MeltingPoint": 1941,
+					"IgnitePoint": -1,
+					"BoilingPoint": 3560,
+					"Value": 15,
+					"Descriptor": "titanium"
+				},
+				{
+					"ID": "adamantine",
+					"Name": "Adamantine",
+					"Density": 1,
+					"Hardness": 15,
+					"HeatRateOfChange": 20,
+					"MeltingPoint": -1,
+					"IgnitePoint": -1,
+					"BoilingPoint": -1,
+					"Value": 30,
+					"Descriptor": "adamantine"
+				},
+				{
+					"ID": "obsidian",
+					"Name": "Obsidian",
+					"Density": 2.55,
+					"Hardness": 10,
+					"HeatRateOfChange": 1,
+					"MeltingPoint": 3000,
+					"IgnitePoint": -1,
+					"BoilingPoint": -1,
+					"Value": 12,
+					"Descriptor": "obsidian"
+				},
+				{
+					"ID": "rock",
+					"Name": "Rock",
+					"Density": 3,
+					"Hardness": 2,
+					"HeatRateOfChange": 2,
+					"MeltingPoint": 1500,
+					"IgnitePoint": 1000,
+					"BoilingPoint": -1,
+					"Value": 2,
+					"Descriptor": "rock"
+				},
+				{
+					"ID": "copper",
+					"Name": "Copper",
+					"Density": 8.9,
+					"Hardness": 4,
+					"HeatRateOfChange": 6,
+					"MeltingPoint": 1084,
+					"IgnitePoint": -1,
+					"BoilingPoint": 2562,
+					"Value": 4,
+					"Descriptor": "copper"
+				},
+				{
+					"ID": "bronze",
+					"Name": "Bronze",
+					"Density": 8,
+					"Hardness": 4,
+					"HeatRateOfChange": 5,
+					"MeltingPoint": 1223,
+					"IgnitePoint": -1,
+					"BoilingPoint": 2760,
+					"Value": 5,
+					"Descriptor": "bronze"
+				},
+				{
+					"ID": "crystal",
+					"Name": "Crystal",
+					"Descriptor": "crystalline",
+					"Density": 1,
+					"Hardness": 14,
+					"HeatRateOfChange": 8,
+					"MeltingPoint": -1,
+					"IgnitePoint": -1,
+					"BoilingPoint": -1,
+					"Value": 20
+				}
+			],
+			"separators": [],
+			"props": {
+				"displayColumn": "Name"
+			}
+		},
+		{
+			"name": "Factions",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "ID"
+				},
+				{
+					"typeStr": "1",
+					"name": "Name",
+					"display": null
+				},
+				{
+					"typeStr": "8",
+					"name": "FriendlyWith"
+				},
+				{
+					"typeStr": "8",
+					"name": "HostileWith"
+				},
+				{
+					"typeStr": "8",
+					"name": "AlliedWith"
+				}
+			],
+			"lines": [
+				{
+					"ID": "player",
+					"Name": "Player",
+					"AlliedWith": [
+						{
+							"Faction": "player"
+						}
+					],
+					"FriendlyWith": [
+						{
+							"Faction": "player"
+						},
+						{
+							"Faction": "npc_neutral"
+						}
+					],
+					"HostileWith": []
+				},
+				{
+					"ID": "npc_neutral",
+					"Name": "Neutral NPCs",
+					"FriendlyWith": [
+						{
+							"Faction": "player"
+						},
+						{
+							"Faction": "npc_neutral"
+						}
+					],
+					"HostileWith": [],
+					"AlliedWith": []
+				}
+			],
+			"separators": [],
+			"props": {
+				"displayColumn": "Name"
+			}
+		},
+		{
+			"name": "Factions@FriendlyWith",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:Factions",
+					"name": "Faction",
+					"display": null
+				}
+			]
+		},
+		{
+			"name": "Factions@AlliedWith",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:Factions",
+					"name": "Faction",
+					"display": null
+				}
+			]
+		},
+		{
+			"name": "Factions@HostileWith",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:Factions",
+					"name": "Faction",
+					"display": null
+				}
+			]
+		},
+		{
+			"name": "NPCStats",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "ID",
+					"display": null
+				},
+				{
+					"typeStr": "1",
+					"name": "Name",
+					"display": null
+				},
+				{
+					"typeStr": "4",
+					"name": "MaxHealth"
+				},
+				{
+					"typeStr": "4",
+					"name": "MaxMana"
+				},
+				{
+					"typeStr": "3",
+					"name": "Strength"
+				},
+				{
+					"typeStr": "3",
+					"name": "Agility"
+				},
+				{
+					"typeStr": "3",
+					"name": "Stamina"
+				},
+				{
+					"typeStr": "3",
+					"name": "Willpower"
+				},
+				{
+					"typeStr": "3",
+					"name": "Intelligence"
+				},
+				{
+					"typeStr": "3",
+					"name": "Vitae"
+				},
+				{
+					"typeStr": "3",
+					"name": "ActionSpeed"
+				},
+				{
+					"typeStr": "3",
+					"name": "MoveSpeed"
+				},
+				{
+					"typeStr": "3",
+					"name": "Awareness"
+				},
+				{
+					"typeStr": "3",
+					"name": "InnerFovAwareness"
+				},
+				{
+					"typeStr": "2",
+					"name": "HasVision",
+					"display": null
+				},
+				{
+					"typeStr": "3",
+					"name": "FovViewAngle"
+				},
+				{
+					"typeStr": "6:Ref_BodyTypes",
+					"name": "BodyType"
+				},
+				{
+					"typeStr": "6:Ref_RelativeDir",
+					"name": "VisionDirection",
+					"display": null
+				},
+				{
+					"typeStr": "1",
+					"name": "Glyph"
+				},
+				{
+					"typeStr": "11",
+					"name": "GlyphColor",
+					"display": null
+				}
+			],
+			"lines": [
+				{
+					"ID": "dragon",
+					"Name": "Dragon",
+					"MaxHealth": 200,
+					"MaxMana": 100,
+					"Strength": 20,
+					"Agility": 7,
+					"Stamina": 20,
+					"Willpower": 14,
+					"Intelligence": 10,
+					"Vitae": 30,
+					"ActionSpeed": 20,
+					"MoveSpeed": 10,
+					"Awareness": 5,
+					"InnerFovAwareness": 2,
+					"HasVision": true,
+					"FovViewAngle": 90,
+					"BodyType": "humanoid",
+					"VisionDirection": "Forward",
+					"Glyph": "d",
+					"GlyphColor": 13047173
+				},
+				{
+					"ID": "goblin",
+					"Name": "Goblin",
+					"MaxHealth": 40,
+					"MaxMana": 0,
+					"Strength": 7,
+					"Agility": 6,
+					"Stamina": 7,
+					"Willpower": 5,
+					"Intelligence": 4,
+					"Vitae": 0,
+					"ActionSpeed": 15,
+					"MoveSpeed": 10,
+					"Awareness": 3,
+					"InnerFovAwareness": 3,
+					"HasVision": true,
+					"FovViewAngle": 75,
+					"BodyType": "humanoid",
+					"VisionDirection": "Forward",
+					"Glyph": "g",
+					"GlyphColor": 25600
+				}
+			],
+			"separators": [],
+			"props": {
+				"displayColumn": "Name"
+			}
+		},
+		{
+			"name": "Ref_BodyTypes",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "ID"
+				},
+				{
+					"typeStr": "1",
+					"name": "Name"
+				}
+			],
+			"lines": [
+				{
+					"ID": "humanoid",
+					"Name": "Humanoid"
+				}
+			],
+			"separators": [],
+			"props": {
+				"displayColumn": "Name"
+			}
+		},
+		{
+			"name": "Ref_RelativeDir",
+			"columns": [
+				{
+					"typeStr": "3",
+					"name": "Value"
+				},
+				{
+					"typeStr": "0",
+					"name": "Label"
+				}
+			],
+			"lines": [
+				{
+					"Label": "Forward",
+					"Value": 1
+				},
+				{
+					"Value": 2,
+					"Label": "Backward"
+				},
+				{
+					"Value": 4,
+					"Label": "Left"
+				},
+				{
+					"Value": 8,
+					"Label": "Right"
+				},
+				{
+					"Value": 16,
+					"Label": "Up"
+				},
+				{
+					"Value": 32,
+					"Label": "Down"
+				}
+			],
+			"separators": [],
+			"props": {
+				"displayColumn": "Label"
+			}
+		},
+		{
+			"name": "Ref_Actions",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "Name"
+				}
+			],
+			"lines": [
+				{
+					"Name": "IdleInPlace"
+				},
+				{
+					"Name": "GoToAction"
+				}
+			],
+			"separators": [],
+			"props": {}
+		}
+	],
+	"customTypes": [],
+	"compress": false
+}

@@ -5,7 +5,7 @@ using GoRogue.MapViews;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Roguelike.Entities;
-using Roguelike.Helpers;
+using Roguelike.Systems;
 using SadConsole;
 using XnaRect = Microsoft.Xna.Framework.Rectangle;
 
@@ -47,16 +47,20 @@ namespace Roguelike
         private void Player_Moved(object sender, ItemMovedEventArgs<IGameObject> e)
         {
             Player player = (Player)e.Item;
-            DebugManager.Instance.AddMessage(new DebugMessage($"Player_Moved triggered: {player.Glyph}->{e.NewPosition}", DebugSource.System));
+            //DebugManager.Instance.AddMessage(new DebugMessage($"Player_Moved: {player.Glyph}->{e.NewPosition}", DebugSource.System));
 
             UpdateFOV(player);
         }
 
         public void UpdateFOV(Player player = null)
         {
-            double deg = Helpers.Helpers.GetFOVDegree(player ?? MyGame.World?.Player ?? null);
-            Map.CalculateFOV(Map.ControlledGameObject.Position, Map.ControlledGameObject.FOVRadius, Radius.CIRCLE, deg, 200, 4);
-            MapRenderer.CenterViewPortOnPoint(Map.ControlledGameObject.Position);
+            if (player == null)
+            {
+                player = Map.ControlledGameObject;
+            }
+            double deg = Helpers.GetFOVDegree(player);
+            Map.CalculateFOV(player.Position, player.Awareness, MyGame.GameSettings.FOVRadiusType, deg, player.FOVViewAngle, player.InnerFOVAwareness);
+            MapRenderer.CenterViewPortOnPoint(player.Position);
         }
     }
 }

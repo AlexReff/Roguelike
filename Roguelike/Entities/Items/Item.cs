@@ -1,9 +1,9 @@
 ﻿using GoRogue;
 using Microsoft.Xna.Framework;
-using Roguelike.Attacks;
 using SadConsole;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Roguelike.Entities.Items
@@ -11,8 +11,30 @@ namespace Roguelike.Entities.Items
     /// <summary>
     /// Represents an item sitting on the ground
     /// </summary>
-    public class Item : MyBasicEntity
+    internal class Item : MyBasicEntity
     {
+        private static readonly IDGenerator IDGenerator = new IDGenerator();
+
+        private static Dictionary<uint, Item> _items;
+        public static List<Item> AllItems { get { return _items.Values.ToList(); } }
+        public static Item GetItem(uint id)
+        {
+            if (_items.ContainsKey(id))
+            {
+                return _items[id];
+            }
+
+            return null;
+        }
+
+        static Item()
+        {
+            _items = new Dictionary<uint, Item>();
+        }
+
+
+        public new uint ID { get; private set; }
+
         private int _durability;
         public int Durability {
             get { return _durability; }
@@ -23,8 +45,10 @@ namespace Roguelike.Entities.Items
                     Destroy();
             }
         }
+        
+        public double Weight { get; set; }
 
-        public WeaponType WeaponType { get; set; }
+        //public WeaponType WeaponType { get; set; }
 
         /// <summary>
         /// Item without a Coord position (does not start on the map)
@@ -35,7 +59,7 @@ namespace Roguelike.Entities.Items
         }
 
 
-        public Item(string name, Color foreground, Color background, char glyph, Coord position, int weight = 1, int durability = 100) : base(foreground, background, glyph, position, (int)MapLayer.ITEMS, isWalkable: true, isTransparent: true)
+        public Item(string name, Color foreground, Color background, char glyph, Coord position, int weight = 1, int durability = 100) : base(name, foreground, background, glyph, position, (int)MapLayer.ITEMS, isWalkable: true, isTransparent: true)
         {
             // assign the object's fields to the parameters set in the constructor
             Animation.CurrentFrame[0].Foreground = foreground;
@@ -43,16 +67,19 @@ namespace Roguelike.Entities.Items
             Animation.CurrentFrame[0].Glyph = glyph;
             //Weight = weight;
             //Condition = condition;
-            Name = name;
             Durability = durability;
 
             //Attacks = new List<AttackSkill>();
+
+            ID = IDGenerator.UseID();
+
+            _items.Add(this.ID, this);
         }
 
         /// <summary>
         /// Remove this Entity from the CurrentMap (eg character picked up this item)
         /// </summary>
-        public void Destroy()
+        public virtual void Destroy()
         {
             if (this.CurrentMap != null)
             {

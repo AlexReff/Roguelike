@@ -13,6 +13,9 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin data.cdb
+/copy:data.cdb
+
 #begin fonts/Aesomatica.font
 /copy:fonts/Aesomatica.font
 

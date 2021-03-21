@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Roguelike.Helpers;
+using Roguelike.Systems;
 using SadConsole;
 using System.Collections.Generic;
 using System.Text;
@@ -27,7 +27,7 @@ namespace Roguelike.Consoles
             //BackgroundConsole.Position = new Point(0, 0);
             this.DrawBorderBgTitle(new Rectangle(0, 0, width, height), "Debug", BackgroundColor, BorderColor);
 
-            OutputConsole = new ScrollingConsole(width - 2, height - 1);
+            OutputConsole = new ScrollingConsole(width - 2, height - 2);
             //OutputConsole.Font = Global.FontDefault.Master.GetFont(Font.FontSizes.Half);
             OutputConsole.Position = new Point(1, 1);
             OutputConsole.Cursor.Position = new Point(0, OutputConsole.Height - 1);

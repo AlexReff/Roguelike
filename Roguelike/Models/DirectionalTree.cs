@@ -4,12 +4,12 @@ using System.Linq;
 
 namespace Roguelike.Models
 {
-    public interface DTObj
+    internal interface DTObj
     {
         string Name { get; set; }
     }
 
-    public class DirectionalTree<T> where T : DTObj
+    internal class DirectionalTree<T> where T : DTObj
     {
         /// <summary>
         /// 'This' root object

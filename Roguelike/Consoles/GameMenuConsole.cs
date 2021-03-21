@@ -1,6 +1,6 @@
 ﻿using SadConsole;
 using GoRogue;
-using Roguelike.Helpers;
+using Roguelike.Systems;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Text;
@@ -42,22 +42,23 @@ namespace Roguelike.Consoles
             }
         }
         
-        private PlayerSpellMenu _psmInstance { get; set; }
-        private PlayerSpellMenu PlayerSpellMenu
-        {
-            get
-            {
-                if (_psmInstance == null)
-                {
-                    _psmInstance = new PlayerSpellMenu(Width, Height);
-                }
+        //private PlayerSpellMenu _psmInstance { get; set; }
+        //private PlayerSpellMenu PlayerSpellMenu
+        //{
+        //    get
+        //    {
+        //        if (_psmInstance == null)
+        //        {
+        //            _psmInstance = new PlayerSpellMenu(Width, Height);
+        //        }
 
-                return _psmInstance;
-            }
-        }
+        //        return _psmInstance;
+        //    }
+        //}
 
         public GameMenuConsole(int width, int height) : base(width, height)
         {
+            this.Clear();
             IsVisible = true;
             UseKeyboard = true;
 
@@ -66,7 +67,7 @@ namespace Roguelike.Consoles
             AddMenu(PlayerBaseMenu);
 
             PlayerBaseMenu.AttackBtnAction = () => AddMenu(PlayerAttackMenu);
-            PlayerBaseMenu.SpellBtnAction = () => AddMenu(PlayerSpellMenu);
+            //PlayerBaseMenu.SpellBtnAction = () => AddMenu(PlayerSpellMenu);
             //PlayerAttackMenu.AttackBtnAction = () => AddMenu();
         }
 

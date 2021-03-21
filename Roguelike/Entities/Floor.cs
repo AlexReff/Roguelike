@@ -13,7 +13,7 @@ namespace Roguelike.Entities
 
         public Floor(Coord position) : base(new Color(211, 211, 211, 75), Color.Black, ' ', position, isWalkable: true, isTransparent: true)
         {
-            var floorChar = (int)System.Math.Floor(Helpers.Helpers.RandomGenerator.NextDouble() * FloorCharacters.Length);
+            var floorChar = (int)System.Math.Floor(Helpers.RandomGenerator.NextDouble() * FloorCharacters.Length);
             Glyph = FloorCharacters[floorChar];
         }
     }

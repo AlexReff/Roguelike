@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Roguelike.Menus
 {
-    public class PlayerAttackMenu : ControlsConsole
+    internal class PlayerAttackMenu : ControlsConsole
     {
         public SelectionButton AttackBtn { get; private set; }
         public Action AttackBtnAction { get; set; }

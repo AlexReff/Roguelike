@@ -6,9 +6,9 @@ using System.Text;
 
 namespace Roguelike.Entities.Items
 {
-    public class Currency : Item
+    internal class Currency : Item
     {
-        public double Amount { get; protected set; }
+        public double Amount { get; set; }
 
         public Currency(double amount, Coord position) : base("Gold", Color.Gold, Color.Transparent, '$', position)
         {

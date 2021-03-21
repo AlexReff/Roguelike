@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Roguelike.Helpers;
+using Roguelike.Systems;
 using SadConsole;
 using System.Collections.Generic;
 using System.Text;
@@ -19,7 +19,7 @@ namespace Roguelike.Consoles
 
         private Point LastMouseOverPos;
 
-        public CharMapOutputConsole(int width, int height) : base(width + AdditionalWidth, height + AdditionalHeight)
+        public CharMapOutputConsole(int width, int height) : base(width + AdditionalWidth, height + AdditionalHeight/*, SadConsole.Global.Fonts["CP850"].GetFont(Font.FontSizes.One)*/)
         {
             PopulateCharacterMapConsole();
 

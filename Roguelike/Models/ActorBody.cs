@@ -1,5 +1,6 @@
 ﻿using GoRogue;
 using Microsoft.Xna.Framework;
+using Roguelike.Entities;
 using Roguelike.Entities.Items;
 using SadConsole;
 using System.Collections.Generic;
@@ -7,13 +8,19 @@ using System.Linq;
 
 namespace Roguelike.Models
 {
-    public class ActorBody
+    internal class ActorBody
     {
         /// <summary>
+        /// The actor this body is connected to
+        /// </summary>
+        public Actor Parent { get; set; }
+
+        /// <summary>
         /// List of all 'limbs' on this body, are connected to other limbs, can be dismembered/removed from body
+        /// Limbs[0] must represent the Torso or 'primary' limb
         /// </summary>
         public List<Limb> Limbs { get; set; }
-        
+
         /// <summary>
         /// Parts that can grapple and hold things/weapons
         /// </summary>
@@ -24,9 +31,14 @@ namespace Roguelike.Models
         /// </summary>
         public List<Foot> Feet { get; set; }
 
+
+        private Dictionary<string, Limb> _limbs;
+
+
         public ActorBody()
         {
             Limbs = new List<Limb>();
+            _limbs = new Dictionary<string, Limb>();
             Hands = new List<Hand>();
             Feet = new List<Foot>();
         }
@@ -37,19 +49,57 @@ namespace Roguelike.Models
         /// <returns>The removed Limb</returns>
         public Limb RemoveBodyPart(string name)
         {
-            Limb part = Limbs.FirstOrDefault((limb) => limb.Name == name);
+            Limb part = GetLimb(name);
 
             if (part != null)
             {
-                RemoveChildBodyParts(part);
+                var fatal = RemoveChildBodyParts(part);
                 part.LimbParent = null;
+
+                if (fatal && Parent != null)
+                {
+                    Parent.Die();
+                }
             }
 
             return part;
         }
 
-        private void RemoveChildBodyParts(Limb part)
+        public bool AddLimb(Limb limb)
         {
+            if (_limbs.TryAdd(limb.Name, limb))
+            {
+                Limbs.Add(limb);
+
+                if (limb is Hand)
+                {
+                    Hands.Add(limb as Hand);
+                }
+                if (limb is Foot)
+                {
+                    Feet.Add(limb as Foot);
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public Limb GetLimb(string name)
+        {
+            //return Limbs.FirstOrDefault((limb) => limb.Name == name);
+            return _limbs[name];
+        }
+
+        /// <summary>
+        /// Removes child body parts
+        /// </summary>
+        /// <returns>TRUE if any part is marked IsLifeSupporting</returns>
+        private bool RemoveChildBodyParts(Limb part)
+        {
+            var isLifeSupporting = part.IsLifeSupporting;
+
             this.Limbs.Remove(part);
 
             if (part is Hand)
@@ -65,89 +115,94 @@ namespace Roguelike.Models
             {
                 foreach (var childPart in part.LimbChildren)
                 {
-                    RemoveChildBodyParts(childPart);
+                    if (RemoveChildBodyParts(childPart))
+                    {
+                        isLifeSupporting = true;
+                    }
                 }
             }
+
+            return isLifeSupporting;
         }
 
         public static ActorBody HumanoidBody(Color foregroundColor)
         {
             ActorBody body = new ActorBody();
 
-            Limb Torso = new Limb("Torso", 't', LimbSize.Torso, foregroundColor);
-            body.Limbs.Add(Torso);
+            Limb Torso = new Limb("Torso", 't', true, LimbSize.Torso, foregroundColor);
+            body.AddLimb(Torso);
 
-            Limb Neck = new Limb("Neck", 'n', LimbSize.Neck, foregroundColor);
-            body.Limbs.Add(Neck);
+            Limb Neck = new Limb("Neck", 'n', true, LimbSize.Neck, foregroundColor);
+            body.AddLimb(Neck);
             Neck.LimbParent = Torso;
             Torso.LimbChildren.Add(Neck);
 
-            Limb Head = new Limb("Head", 'h', LimbSize.Head, foregroundColor);
-            body.Limbs.Add(Head);
+            Limb Head = new Limb("Head", 'h', true, LimbSize.Head, foregroundColor);
+            body.AddLimb(Head);
             Head.LimbParent = Neck;
             Neck.LimbChildren.Add(Head);
 
-            Limb LeftUpperArm = new Limb("Left Upper Arm", 'a', LimbSize.ArmLeg, foregroundColor);
-            body.Limbs.Add(LeftUpperArm);
+            Limb LeftUpperArm = new Limb("Left Upper Arm", 'a', false, LimbSize.ArmLeg, foregroundColor);
+            body.AddLimb(LeftUpperArm);
             LeftUpperArm.LimbParent = Torso;
             Torso.LimbChildren.Add(LeftUpperArm);
 
-            Limb LeftLowerArm = new Limb("Left Lower Arm", 'a', LimbSize.ArmLeg, foregroundColor);
-            body.Limbs.Add(LeftLowerArm);
+            Limb LeftLowerArm = new Limb("Left Lower Arm", 'a', false, LimbSize.ArmLeg, foregroundColor);
+            body.AddLimb(LeftLowerArm);
             LeftLowerArm.LimbParent = LeftUpperArm;
             LeftUpperArm.LimbChildren.Add(LeftLowerArm);
 
             Hand LeftHand = new Hand("Left Hand", foregroundColor);
-            body.Limbs.Add(LeftHand);
-            body.Hands.Add(LeftHand);
+            body.AddLimb(LeftHand);
+            //body.Hands.Add(LeftHand);
             LeftHand.LimbParent = LeftLowerArm;
             LeftLowerArm.LimbChildren.Add(LeftHand);
 
-            Limb LeftUpperLeg = new Limb("Left Upper Leg", 'l', LimbSize.ArmLeg, foregroundColor);
-            body.Limbs.Add(LeftUpperLeg);
+            Limb LeftUpperLeg = new Limb("Left Upper Leg", 'l', false, LimbSize.ArmLeg, foregroundColor);
+            body.AddLimb(LeftUpperLeg);
             LeftUpperLeg.LimbParent = Torso;
             Torso.LimbChildren.Add(LeftUpperLeg);
 
-            Limb LeftLowerLeg = new Limb("Left Lower Leg", 'l', LimbSize.ArmLeg, foregroundColor);
-            body.Limbs.Add(LeftLowerLeg);
+            Limb LeftLowerLeg = new Limb("Left Lower Leg", 'l', false, LimbSize.ArmLeg, foregroundColor);
+            body.AddLimb(LeftLowerLeg);
             LeftLowerLeg.LimbParent = LeftUpperLeg;
             LeftUpperLeg.LimbChildren.Add(LeftLowerLeg);
 
             Foot LeftFoot = new Foot("Left Foot", foregroundColor);
-            body.Limbs.Add(LeftFoot);
-            body.Feet.Add(LeftFoot);
+            body.AddLimb(LeftFoot);
+            //body.Feet.Add(LeftFoot);
             LeftFoot.LimbParent = LeftLowerLeg;
             LeftLowerLeg.LimbChildren.Add(LeftFoot);
 
-            Limb RightUpperArm = new Limb("Right Upper Arm", 'a', LimbSize.ArmLeg, foregroundColor);
-            body.Limbs.Add(RightUpperArm);
+            Limb RightUpperArm = new Limb("Right Upper Arm", 'a', false, LimbSize.ArmLeg, foregroundColor);
+            body.AddLimb(RightUpperArm);
             RightUpperArm.LimbParent = Torso;
             Torso.LimbChildren.Add(RightUpperArm);
 
-            Limb RightLowerArm = new Limb("Right Lower Arm", 'a', LimbSize.ArmLeg, foregroundColor);
-            body.Limbs.Add(RightLowerArm);
+            Limb RightLowerArm = new Limb("Right Lower Arm", 'a', false, LimbSize.ArmLeg, foregroundColor);
+            body.AddLimb(RightLowerArm);
             RightLowerArm.LimbParent = RightUpperArm;
             RightUpperArm.LimbChildren.Add(RightLowerArm);
 
             Hand RightHand = new Hand("Right Hand", foregroundColor);
-            body.Limbs.Add(RightHand);
-            body.Hands.Add(RightHand);
+            body.AddLimb(RightHand);
+            //body.Hands.Add(RightHand);
             RightHand.LimbParent = RightLowerArm;
             RightLowerArm.LimbChildren.Add(RightHand);
 
-            Limb RightUpperLeg = new Limb("Right Upper Leg", 'l', LimbSize.ArmLeg, foregroundColor);
-            body.Limbs.Add(RightUpperLeg);
+            Limb RightUpperLeg = new Limb("Right Upper Leg", 'l', false, LimbSize.ArmLeg, foregroundColor);
+            body.AddLimb(RightUpperLeg);
             RightUpperLeg.LimbParent = Torso;
             Torso.LimbChildren.Add(RightUpperLeg);
 
-            Limb RightLowerLeg = new Limb("Right Lower Leg", 'l', LimbSize.ArmLeg, foregroundColor);
-            body.Limbs.Add(RightLowerLeg);
+            Limb RightLowerLeg = new Limb("Right Lower Leg", 'l', false, LimbSize.ArmLeg, foregroundColor);
+            body.AddLimb(RightLowerLeg);
             RightLowerLeg.LimbParent = RightUpperLeg;
             RightUpperLeg.LimbChildren.Add(RightLowerLeg);
 
             Foot RightFoot = new Foot("Right Foot", foregroundColor);
-            body.Limbs.Add(RightFoot);
-            body.Feet.Add(RightFoot);
+            body.AddLimb(RightFoot);
+            //body.Feet.Add(RightFoot);
             RightFoot.LimbParent = RightLowerLeg;
             RightLowerLeg.LimbChildren.Add(RightFoot);
 
@@ -156,8 +211,11 @@ namespace Roguelike.Models
     }
 
 
-    public class ActorBodyPart : Item
+    internal class ActorBodyPart : Item
     {
+        public double Health { get; set; }
+        public double MaxHealth { get; set; }
+
         public ActorBodyPart(string name, Color foreground, Color background, char glyph) : base(name, foreground, background, glyph)
         {
             Name = name;
@@ -175,7 +233,7 @@ namespace Roguelike.Models
         Torso,
     }
 
-    public class Limb : ActorBodyPart
+    internal class Limb : ActorBodyPart
     {
         /// <summary>
         /// NULL if THIS is TORSO, else the body part this this part connects to
@@ -188,17 +246,22 @@ namespace Roguelike.Models
         public List<Limb> LimbChildren { get; set; }
 
         public LimbSize LimbSize { get; set; }
+        /// <summary>
+        /// Whether this limb is required for the body to continue living
+        /// </summary>
+        public bool IsLifeSupporting { get; set; }
 
-        public Limb(string name, char glyph, LimbSize size, Color foregroundColor) : base(name, foregroundColor, Color.Transparent, glyph)
+        public Limb(string name, char glyph, bool isLifeSupporting, LimbSize size, Color foregroundColor) : base(name, foregroundColor, Color.Transparent, glyph)
         {
             Name = name;
             LimbParent = null;
             LimbChildren = new List<Limb>();
             LimbSize = size;
+            IsLifeSupporting = isLifeSupporting;
         }
     }
 
-    public class Hand : Limb
+    internal class Hand : Limb
     {
         /// <summary>
         /// Set to false when the hand loses the ability to grip
@@ -209,12 +272,11 @@ namespace Roguelike.Models
 
         public Item HeldItem { get; set; }
 
-        public Hand(string name, Color foregroundColor) : base(name, 'h', LimbSize.HandFoot, foregroundColor)
+        public Hand(string name, Color foregroundColor) : base(name, 'h', false, LimbSize.HandFoot, foregroundColor)
         {
             Name = name;
 
             IsAbleToGrip = true;
-            //IsHoldingItem = false;
         }
 
         public bool HoldItem(Item item)
@@ -234,7 +296,7 @@ namespace Roguelike.Models
         }
     }
 
-    public class Foot : Limb
+    internal class Foot : Limb
     {
         /// <summary>
         /// Whether this foot is connected to 'ground'
@@ -246,7 +308,7 @@ namespace Roguelike.Models
         /// </summary>
         public bool IsStable { get; set; }
 
-        public Foot(string name, Color foregroundColor) : base(name, 'f', LimbSize.HandFoot, foregroundColor)
+        public Foot(string name, Color foregroundColor) : base(name, 'f', false, LimbSize.HandFoot, foregroundColor)
         {
             Name = name;
 
@@ -255,7 +317,7 @@ namespace Roguelike.Models
         }
     }
 
-    //public class ActorBody : DirectionalTree<ActorBodyPart>
+    //internal class ActorBody : DirectionalTree<ActorBodyPart>
     //{
     //    //public DirectionalTree<ActorBodyPart> BodyParts { get; set; }
 
@@ -301,7 +363,7 @@ namespace Roguelike.Models
     //    }
     //}
 
-    //public class ActorBodyPart : DTObj
+    //internal class ActorBodyPart : DTObj
     //{
     //    /// <summary>
     //    /// Represents the 'layers' of the body part, where the first item is the outermost layer, eg skin
@@ -332,7 +394,7 @@ namespace Roguelike.Models
     //    }
     //}
 
-    //public class BodyPartLayer
+    //internal class BodyPartLayer
     //{
     //    public string Name { get; set; }
     //    public double Health { get; set; }

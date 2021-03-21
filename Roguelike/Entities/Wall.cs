@@ -39,7 +39,7 @@ namespace Roguelike.Entities
             {
                 if (!map[northNeighbor])
                 {
-                    if (CanBeSeenByPlayer(map, northNeighbor))
+                    if (HasVisibleSelfOrNeighbor(map, northNeighbor))
                     {
                         //North neighbor exists
                         wallCharIndex += 1;
@@ -51,7 +51,7 @@ namespace Roguelike.Entities
             {
                 if (!map[eastNeighbor])
                 {
-                    if (CanBeSeenByPlayer(map, eastNeighbor))
+                    if (HasVisibleSelfOrNeighbor(map, eastNeighbor))
                     {
                         //East neighbor exists
                         wallCharIndex += 2;
@@ -63,7 +63,7 @@ namespace Roguelike.Entities
             {
                 if (!map[southNeighbor])
                 {
-                    if (CanBeSeenByPlayer(map, southNeighbor))
+                    if (HasVisibleSelfOrNeighbor(map, southNeighbor))
                     {
                         //South neighbor exists
                         wallCharIndex += 4;
@@ -75,7 +75,7 @@ namespace Roguelike.Entities
             {
                 if (!map[westNeighbor])
                 {
-                    if (CanBeSeenByPlayer(map, westNeighbor))
+                    if (HasVisibleSelfOrNeighbor(map, westNeighbor))
                     {
                         //West neighbor exists
                         wallCharIndex += 8;
@@ -86,7 +86,7 @@ namespace Roguelike.Entities
             Glyph = WallCharacters[wallCharIndex];
         }
 
-        public static bool CanBeSeenByPlayer(ArrayMap<bool> map, Coord position)
+        public static bool HasVisibleSelfOrNeighbor(ArrayMap<bool> map, Coord position)
         {
             if (map.Contains(position) && map[position])
             {

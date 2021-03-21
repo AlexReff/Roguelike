@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Roguelike.Entities;
 using Roguelike.Entities.Items;
-using Roguelike.Helpers;
+using Roguelike.Systems;
 using SadConsole;
 using System;
 using System.Collections.Generic;
@@ -27,16 +27,17 @@ namespace Roguelike.Maps
                 if (!VisibleEntities.Contains(entity.ID))
                 {
                     VisibleEntities.Add(entity.ID);
-                    DebugManager.Instance.AddMessage($"Player::EntitySeen: {entity.Name}");
-                    if (entity is Currency)
-                    {
-                        //suppress messages about seeing currency on the ground
-                    }
-                    else
-                    {
-                        var n = Helpers.Helpers.IsVowel(entity.Name[0]) ? "n" : "";
-                        PlayerMessageManager.Instance.AddMessage($"Spotted a{n} {entity.Name}");
-                    }
+                    ////DebugManager.Instance.AddMessage($"Player::EntitySeen: {entity.Name}");
+                    //if (entity is Currency)
+                    //{
+                    //    //suppress messages about seeing currency on the ground
+                    //}
+                    //else
+                    //{
+                    //    var n = Helpers.IsVowel(entity.Name[0]) ? "n" : "";
+                    //    var colorStr = $"{((MyBasicEntity)entity).ForegroundColor.R},{((MyBasicEntity)entity).ForegroundColor.G},{((MyBasicEntity)entity).ForegroundColor.B}";
+                    //    //PlayerMessageManager.Instance.AddMessage($"Spotted a{n} [c:r f:{colorStr}]{entity.Name}[c:u]");
+                    //}
                 }
                 
             }
@@ -45,7 +46,7 @@ namespace Roguelike.Maps
 
         protected override void UpdateEntityUnseen(BasicEntity entity)
         {
-            DebugManager.Instance.AddMessage($"Player::EntityUnseen: {entity.Name}");
+            //DebugManager.Instance.AddMessage($"Player::EntityUnseen: {entity.Name}");
             VisibleEntities.Remove(entity.ID);
             entity.IsVisible = false;
         }
