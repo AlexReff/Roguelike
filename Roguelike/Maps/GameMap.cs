@@ -9,9 +9,10 @@ using Microsoft.Xna.Framework;
 using Roguelike.Consoles;
 using Roguelike.Entities;
 using Roguelike.Entities.Items;
-using Roguelike.Entities.Monsters;
 using Roguelike.Interfaces;
+using Roguelike.JSON;
 using Roguelike.Maps;
+using Roguelike.Models;
 using Roguelike.Systems;
 using SadConsole;
 using SadConsole.Entities;
@@ -56,22 +57,65 @@ namespace Roguelike
             EventManager.Instance.InvokePlayerSpawn(player);
         }
 
+        //public NPC CreateNPC(string id, Coord pos)
+        //{
+        //    if (!Data.NPCStats.ContainsKey(id))
+        //    {
+        //        return null;
+        //    }
+
+        //    NPCStats npcData = Data.NPCStats[id];
+
+        //    XYZRelativeDirection dir = (XYZRelativeDirection)Enum.Parse(typeof(XYZRelativeDirection), npcData.VisionDirection);
+        //    Color color = new Color(npcData.GlyphColor);
+            
+        //    NPC result = new NPC(
+        //        npcData.Name,
+        //        npcData.MaxHealth,
+        //        npcData.MaxMana,
+        //        npcData.Strength,
+        //        npcData.Agility,
+        //        npcData.Stamina,
+        //        npcData.Willpower,
+        //        npcData.Intelligence,
+        //        npcData.Vitae,
+        //        npcData.ActionSpeed,
+        //        npcData.MoveSpeed,
+        //        npcData.Awareness,
+        //        npcData.InnerFovAwareness,
+        //        npcData.HasVision,
+        //        npcData.FovViewAngle,
+        //        dir,
+        //        npcData.BodyType,
+        //        npcData.ActionSet,
+        //        npcData.GoalSet,
+        //        color,
+        //        Color.Transparent,
+        //        npcData.Glyph[0],
+        //        pos,
+        //        true,
+        //        true
+        //        );
+
+        //    return result;
+        //}
+
         public bool AddEntity(MyBasicEntity entity)
         {
-            //if (entity is IScheduleable)
-            //{
-            //    MyGame.Scheduler.Add(entity as IScheduleable);
-            //}
+            if (entity is NPC)
+            {
+                MyGame.Karma.Add((entity as NPC).ActionSpeed, entity as NPC);
+            }
 
             return base.AddEntity(entity);
         }
 
         public bool RemoveEntity(MyBasicEntity entity)
         {
-            //if (entity is IScheduleable)
-            //{
-            //    MyGame.Scheduler.Remove(entity as IScheduleable);
-            //}
+            if (entity is NPC)
+            {
+                MyGame.Karma.Remove(entity as NPC);
+            }
 
             return base.RemoveEntity(entity);
         }
@@ -115,11 +159,12 @@ namespace Roguelike
                 var existingActor = GetEntityAt<Actor>(posToSpawn);
                 if (existingActor == null)
                 {
-                    var dragon = new Dragon(posToSpawn);
+                    //var dragon = new Dragon(posToSpawn);
+                    var dragon = new NPC(Data.NPCStats["dragon"], posToSpawn);
                     AddEntity(dragon);
                     if (Helpers.RandomGenerator.NextBoolean())
                     {
-                        dragon.AddCurrency(Helpers.RandomGenerator.NextDouble() * 50);
+                        dragon.AddCurrency((int)Math.Floor(Helpers.RandomGenerator.NextDouble() * 50));
                     }
                 }
                 else
@@ -133,11 +178,12 @@ namespace Roguelike
                 var existingActor = GetEntityAt<Actor>(posToSpawn);
                 if (existingActor == null)
                 {
-                    var goblin = new Goblin(posToSpawn);
+                    //var goblin = new Goblin(posToSpawn);
+                    var goblin = new NPC(Data.NPCStats["goblin"], posToSpawn);
                     AddEntity(goblin);
                     if (Helpers.RandomGenerator.NextBoolean())
                     {
-                        goblin.AddCurrency(Helpers.RandomGenerator.NextDouble() * 10);
+                        goblin.AddCurrency((int)Math.Floor(Helpers.RandomGenerator.NextDouble() * 10));
                     }
                 }
                 else

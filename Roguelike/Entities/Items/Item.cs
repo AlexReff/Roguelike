@@ -13,8 +13,7 @@ namespace Roguelike.Entities.Items
     /// </summary>
     internal class Item : MyBasicEntity
     {
-        private static readonly IDGenerator IDGenerator = new IDGenerator();
-
+        // static
         private static Dictionary<uint, Item> _items;
         public static List<Item> AllItems { get { return _items.Values.ToList(); } }
         public static Item GetItem(uint id)
@@ -32,23 +31,23 @@ namespace Roguelike.Entities.Items
             _items = new Dictionary<uint, Item>();
         }
 
-
-        public new uint ID { get; private set; }
+        // non-static
 
         private int _durability;
         public int Durability {
             get { return _durability; }
             set
             {
-                _durability += value;
+                _durability = value;
                 if (_durability <= 0)
                     Destroy();
             }
         }
         
+        /// <summary>
+        /// Specific to backpack-carry weight, not necessarily 'mass' or kg
+        /// </summary>
         public double Weight { get; set; }
-
-        //public WeaponType WeaponType { get; set; }
 
         /// <summary>
         /// Item without a Coord position (does not start on the map)
@@ -58,20 +57,18 @@ namespace Roguelike.Entities.Items
             Destroy();
         }
 
-
-        public Item(string name, Color foreground, Color background, char glyph, Coord position, int weight = 1, int durability = 100) : base(name, foreground, background, glyph, position, (int)MapLayer.ITEMS, isWalkable: true, isTransparent: true)
+        /// <summary>
+        /// Create an item with a map position
+        /// </summary>
+        public Item(string name, Color foreground, Color background, char glyph, Coord position, double weight = 1, int durability = 100) : base(name, foreground, background, glyph, position, (int)MapLayer.ITEMS, isWalkable: true, isTransparent: true)
         {
             // assign the object's fields to the parameters set in the constructor
             Animation.CurrentFrame[0].Foreground = foreground;
             Animation.CurrentFrame[0].Background = background;
             Animation.CurrentFrame[0].Glyph = glyph;
-            //Weight = weight;
-            //Condition = condition;
+
             Durability = durability;
-
-            //Attacks = new List<AttackSkill>();
-
-            ID = IDGenerator.UseID();
+            Weight = weight;
 
             _items.Add(this.ID, this);
         }

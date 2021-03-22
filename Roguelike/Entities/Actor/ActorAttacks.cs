@@ -1,5 +1,4 @@
 ﻿using Roguelike.Entities.Items;
-using Roguelike.Entities.Monsters;
 using Roguelike.Systems;
 using Roguelike.Weapons;
 using System;
@@ -34,6 +33,8 @@ namespace Roguelike.Entities
         public void DoBumpAttack(Actor target)
         {
             //get the best 'attack' (from skills) that costs no mana and attempt to default-target hit the enemy
+            
+            MyGame.Karma.Add(ActionSpeed, this);
         }
 
         ///// <summary>

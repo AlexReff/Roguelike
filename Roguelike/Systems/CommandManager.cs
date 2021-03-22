@@ -14,67 +14,19 @@ namespace Roguelike.Systems
 {
     class CommandManager
     {
-        public bool IsPlayerTurn { get; set; }
+        //public bool IsPlayerTurn { get; set; }
         public bool IsGameOver { get; set; }
 
-        private Stopwatch Timer;
-        private double ms;
+        //private Stopwatch Timer;
+        //private double ms;
 
         public CommandManager()
         {
-            IsPlayerTurn = true;
+            //IsPlayerTurn = true;
             IsGameOver = false;
 
-            Timer = new Stopwatch();
-            ms = 1000 / MyGame.GameSettings.FPSLimit;
-        }
-
-        //public void ScheduleTime()
-        //{
-        //    if (!Timer.IsRunning)
-        //    {
-        //        Timer.Start();
-        //        DoTime();
-        //    }
-        //    else if (Timer.ElapsedMilliseconds >= ms)
-        //    {
-        //        Timer.Restart();
-        //        DoTime();
-        //    }
-        //    else
-        //    {
-        //        var future = ms - Timer.ElapsedMilliseconds;
-        //        Task.Delay(TimeSpan.FromMilliseconds(future)).ContinueWith((e) =>
-        //        {
-        //            ScheduleTime();
-        //        });
-        //    }
-        //}
-
-        public void DoTime()
-        {
-            //IScheduleable scheduleable = MyGame.Scheduler.Get();
-            //if (scheduleable is Player)
-            //{
-            //    IsPlayerTurn = true;
-            //    //?
-            //    MyGame.Scheduler.Add(scheduleable);
-            //}
-            //else
-            //{
-            //    if (scheduleable != null)
-            //    {
-            //        (scheduleable as INonPlayerSchedulable).PerformAction();
-            //        MyGame.Scheduler.Add(scheduleable);
-            //    }
-
-            //    //ScheduleTime();
-
-
-            //    //DoTime();
-            //    //Task.Delay(TimeSpan.FromMilliseconds(ms)).Wait();//.ContinueWith(DoTime);
-            //    DoTime();
-            //}
+            //Timer = new Stopwatch();
+            //ms = 1000 / MyGame.GameSettings.FPSLimit;
         }
 
         public void GameOver()
@@ -86,13 +38,13 @@ namespace Roguelike.Systems
 
         public void EndPlayerTurn()
         {
-            IsPlayerTurn = false;
+            //IsPlayerTurn = false;
+            MyGame.Karma.EndPlayerTurn();
         }
 
         public void KillPlayer()
         {
             MyGame.World.Player.Die();
-            IsPlayerTurn = true;
         }
 
         public void KillActor(Actor actor)
@@ -121,7 +73,14 @@ namespace Roguelike.Systems
         public bool MoveActorBy(Actor actor, Direction direction)
         {
             //DebugManager.Instance.AddMessage(new DebugMessage($"Command MoveActorBy: {actor.Name}, {direction}", DebugSource.Command));
-            return actor.MoveBump(direction);
+            var result = actor.MoveBump(direction);
+
+            if (actor is Player)
+            {
+                MyGame.Karma.EndPlayerTurn();
+            }
+
+            return result;
         }
 
         public void CenterOnActor(Actor actor)

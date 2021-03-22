@@ -8,9 +8,9 @@ namespace Roguelike.Entities.Items
 {
     internal class Currency : Item
     {
-        public double Amount { get; set; }
+        public int Amount { get; set; }
 
-        public Currency(double amount, Coord position) : base("Gold", Color.Gold, Color.Transparent, '$', position)
+        public Currency(int amount, Coord position) : base("Gold", Color.Gold, Color.Transparent, '$', position)
         {
             Amount = amount;
         }

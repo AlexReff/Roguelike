@@ -40,6 +40,7 @@ namespace Roguelike
             return list;
         }
 
+
         public static bool IsVowel(char vowel)
         {
             return vowel == 'a'

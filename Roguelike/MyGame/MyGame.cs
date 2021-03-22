@@ -24,7 +24,7 @@ namespace Roguelike
         public static World World { get; private set; }
         public static PlayerStatistics PlayerStatistics { get; private set; }
         //public static SpellSkillManager SpellManager { get; private set; }
-        public static WeaponManager WeaponManager { get; private set; }
+        //public static WeaponManager WeaponManager { get; private set; }
         public static KarmaMaster Karma { get; private set; }
 
         public MyGame()
@@ -89,7 +89,7 @@ namespace Roguelike
             World = new World();
             //SpellManager = new SpellSkillManager();
 
-            WeaponManager = new WeaponManager();
+            //WeaponManager = new WeaponManager();
         }
 
         private void Destroyed()

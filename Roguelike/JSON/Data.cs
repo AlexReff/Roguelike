@@ -8,17 +8,21 @@ using System.Threading.Tasks;
 
 namespace Roguelike.JSON
 {
-    public static class Data
+    internal static class Data
     {
         public static Dictionary<string, Materials> Materials { get; }
         public static Dictionary<string, Factions> Factions { get; }
         public static Dictionary<string, NPCStats> NPCStats { get; }
+        public static Dictionary<string, ActionSets> ActionSets { get; }
+        public static Dictionary<string, GoalSets> GoalSets { get; }
 
         static Data()
         {
             Materials = new Dictionary<string, Materials>();
             Factions = new Dictionary<string, Factions>();
             NPCStats = new Dictionary<string, NPCStats>();
+            ActionSets = new Dictionary<string, ActionSets>();
+            GoalSets = new Dictionary<string, GoalSets>();
         }
 
         public static async Task LoadCoreData()
@@ -60,6 +64,22 @@ namespace Roguelike.JSON
                         {
                             var npcs = new NPCStats(record);
                             NPCStats.Add(npcs.ID, npcs);
+                        }
+                        break;
+                    case "ActionSets":
+                        ActionSets.Clear();
+                        foreach (var record in thisSheet.lines)
+                        {
+                            var actionSets = new ActionSets(record);
+                            ActionSets.Add(actionSets.ID, actionSets);
+                        }
+                        break;
+                    case "GoalSets":
+                        GoalSets.Clear();
+                        foreach (var record in thisSheet.lines)
+                        {
+                            var goalSet = new GoalSets(record);
+                            GoalSets.Add(goalSet.ID, goalSet);
                         }
                         break;
                     default:

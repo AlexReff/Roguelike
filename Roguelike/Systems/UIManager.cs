@@ -107,7 +107,7 @@ namespace Roguelike.Systems
                     }
                     else
                     {
-                        MyGame.CommandManager.DoTime();
+                        MyGame.Karma.DoTime();
                     }
 
                     break;

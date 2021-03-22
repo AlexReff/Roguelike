@@ -6,7 +6,6 @@ using GoRogue.Random;
 using Microsoft.Xna.Framework;
 using Roguelike.Entities;
 using Roguelike.Entities.Items;
-using Roguelike.Entities.Monsters;
 using Roguelike.Karma;
 using Roguelike.Systems;
 using SadConsole;

@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace Roguelike.JSON
 {
-    public struct NPCStats
+    internal struct NPCStats
     {
         public string ID { get; set; }
         public string Name { get; set; }
@@ -26,7 +26,17 @@ namespace Roguelike.JSON
         public int FovViewAngle { get; set; }
         public string BodyType { get; set; }
         public string VisionDirection { get; set; }
+        public string Glyph { get; set; }
+        public uint GlyphColor { get; set; }
 
+        /// <summary>
+        /// Reference to JSON.ActionSets
+        /// </summary>
+        public string ActionSet { get; set; }
+        /// <summary>
+        /// Reference to JSON.GoalSets
+        /// </summary>
+        public string GoalSet { get; set; }
 
         public NPCStats(JsonElement m)
         {
@@ -49,6 +59,10 @@ namespace Roguelike.JSON
             FovViewAngle = m.GetProperty("FovViewAngle").GetInt32();
             BodyType = m.GetProperty("BodyType").GetString();
             VisionDirection = m.GetProperty("VisionDirection").GetString();
+            Glyph = m.GetProperty("Glyph").GetString();
+            GlyphColor = m.GetProperty("GlyphColor").GetUInt32();
+            ActionSet = m.GetProperty("ActionSet").GetString();
+            GoalSet = m.GetProperty("GoalSet").GetString();
         }
     }
 }

@@ -380,6 +380,15 @@
 					"typeStr": "11",
 					"name": "GlyphColor",
 					"display": null
+				},
+				{
+					"typeStr": "6:ActionSets",
+					"name": "ActionSet"
+				},
+				{
+					"typeStr": "6:GoalSets",
+					"name": "GoalSet",
+					"display": null
 				}
 			],
 			"lines": [
@@ -400,10 +409,12 @@
 					"InnerFovAwareness": 2,
 					"HasVision": true,
 					"FovViewAngle": 90,
-					"BodyType": "humanoid",
+					"BodyType": "Humanoid",
 					"VisionDirection": "Forward",
 					"Glyph": "d",
-					"GlyphColor": 13047173
+					"GlyphColor": 13047173,
+					"ActionSet": "NPCIdle",
+					"GoalSet": "IdleInPlace"
 				},
 				{
 					"ID": "goblin",
@@ -422,10 +433,12 @@
 					"InnerFovAwareness": 3,
 					"HasVision": true,
 					"FovViewAngle": 75,
-					"BodyType": "humanoid",
+					"BodyType": "Humanoid",
 					"VisionDirection": "Forward",
 					"Glyph": "g",
-					"GlyphColor": 25600
+					"GlyphColor": 25600,
+					"ActionSet": "NPCIdle",
+					"GoalSet": "IdleInPlace"
 				}
 			],
 			"separators": [],
@@ -434,27 +447,75 @@
 			}
 		},
 		{
-			"name": "Ref_BodyTypes",
+			"name": "ActionSets",
 			"columns": [
 				{
 					"typeStr": "0",
 					"name": "ID"
 				},
 				{
-					"typeStr": "1",
-					"name": "Name"
+					"typeStr": "8",
+					"name": "Actions",
+					"display": null
 				}
 			],
 			"lines": [
 				{
-					"ID": "humanoid",
-					"Name": "Humanoid"
+					"Actions": [
+						{
+							"Action": "IdleInPlace",
+							"Cost": 10
+						}
+					],
+					"ID": "NPCIdle"
 				}
 			],
 			"separators": [],
-			"props": {
-				"displayColumn": "Name"
-			}
+			"props": {}
+		},
+		{
+			"name": "GoalSets",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "ID",
+					"display": null
+				},
+				{
+					"typeStr": "8",
+					"name": "Goals",
+					"display": null
+				}
+			],
+			"lines": [
+				{
+					"ID": "IdleInPlace",
+					"Goals": [
+						{
+							"Goal": "IdleInPlace",
+							"Value": true
+						}
+					]
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "Ref_BodyTypes",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "ID"
+				}
+			],
+			"lines": [
+				{
+					"ID": "Humanoid"
+				}
+			],
+			"separators": [],
+			"props": {}
 		},
 		{
 			"name": "Ref_RelativeDir",
@@ -517,6 +578,75 @@
 			],
 			"separators": [],
 			"props": {}
+		},
+		{
+			"name": "Ref_Goals",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "Name",
+					"display": null
+				},
+				{
+					"typeStr": "1",
+					"name": "Type"
+				}
+			],
+			"lines": [
+				{
+					"Name": "IdleInPlace",
+					"Type": "bool"
+				},
+				{
+					"Name": "AttackHostile",
+					"Type": "bool"
+				},
+				{
+					"Name": "TargetPosition",
+					"Type": "Coord?"
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "ActionSets@Actions",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:Ref_Actions",
+					"name": "Action",
+					"display": null
+				},
+				{
+					"typeStr": "4",
+					"name": "Cost"
+				}
+			]
+		},
+		{
+			"name": "GoalSets@Goals",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:Ref_Goals",
+					"name": "Goal",
+					"display": null
+				},
+				{
+					"typeStr": "16",
+					"name": "Value",
+					"display": null
+				}
+			]
 		}
 	],
 	"customTypes": [],

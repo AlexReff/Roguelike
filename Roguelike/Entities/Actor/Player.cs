@@ -29,7 +29,7 @@ namespace Roguelike.Entities
             true, //hasVision
             160, //fovViewAngle
             XYZRelativeDirection.Forward, //visionDirection
-            ActorBody.HumanoidBody(MyGame.GameSettings.PlayerCharacterGlyphColor), //body
+            "Humanoid",//ActorBody.HumanoidBody(MyGame.GameSettings.PlayerCharacterGlyphColor), //body
             position
             )
         { }
@@ -51,10 +51,11 @@ namespace Roguelike.Entities
             bool hasVision,
             double fovViewAngle,
             XYZRelativeDirection visionDirection,
-            ActorBody body,
+            //ActorBody body,
+            string bodyType,
             Coord position
-            ) : base(name, maxHealth, maxMana, strength, agility, stamina, willpower, intelligence, vitae, actionSpeed, moveSpeed, awareness, innerFovAwareness, hasVision, fovViewAngle, visionDirection, body,
-                MyGame.GameSettings.PlayerCharacterGlyphColor, Color.Transparent, 'g', position, (int)MapLayer.PLAYER, isWalkable: true, isTransparent: true)
+            ) : base(name, maxHealth, maxMana, strength, agility, stamina, willpower, intelligence, vitae, actionSpeed, moveSpeed, awareness, innerFovAwareness, hasVision, fovViewAngle, visionDirection, bodyType,
+                MyGame.GameSettings.PlayerCharacterGlyphColor, Color.Transparent, CHAR_PLAYER, position, (int)MapLayer.PLAYER, isWalkable: true, isTransparent: true)
         {
             //Spells = SpellSkillManager.Instance.GetAllSpells();
         }

@@ -5,6 +5,44 @@ using System.Text;
 
 namespace Roguelike.Karma
 {
+    internal struct KarmaCombinedState : IKarmaCombinedState
+    {
+        //actor state
+        public Coord? TargetPosition { get; set; }
+
+        public bool AtTargetPosition { get; set; }
+
+        public bool IdleInPlace { get; set; }
+
+        public bool AttackHostile { get; set; }
+
+        //world state
+
+
+        public KarmaCombinedState(IKarmaGoalState actorState, IKarmaWorldState worldState) : this(actorState.TargetPosition, actorState.AtTargetPosition, actorState.IdleInPlace, actorState.AttackHostile)
+        {
+            //
+        }
+
+        public KarmaCombinedState(Coord? targetPosition, bool atTargetPosition, bool idleInPlace, bool attackHostile)
+        {
+            this.TargetPosition = targetPosition;
+            this.AtTargetPosition = atTargetPosition;
+            this.IdleInPlace = idleInPlace;
+            this.AttackHostile = attackHostile;
+        }
+
+        public KarmaCombinedState Clone()
+        {
+            Coord? targetPos = null;
+            if (TargetPosition.HasValue)
+            {
+                targetPos = new Coord(TargetPosition.Value.X, TargetPosition.Value.Y);
+            }
+            return new KarmaCombinedState(targetPos, AtTargetPosition, IdleInPlace, AttackHostile);
+        }
+    }
+
     internal interface IKarmaGoalState
     {
         public Coord? TargetPosition { get; }

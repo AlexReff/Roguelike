@@ -3,6 +3,7 @@ using Roguelike.Interfaces;
 using Roguelike.Karma.Actions;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 /*
@@ -38,6 +39,7 @@ namespace Roguelike.Karma
     {
         private KarmaSchedule _schedule;
         private Dictionary<uint, Queue<KarmaAction>> _plans;
+        private IKarmaWorldState _worldState;
 
         public bool IsPlayerTurn { get; set; }
 
@@ -69,23 +71,48 @@ namespace Roguelike.Karma
                  * action either initiates a move request, or an attack request
                  */
                 NPC npc = scheduleable as NPC;
-                bool needsPlan = true;
-                if (npc.CurrentAction == null || !npc.CurrentAction.IsValid(npc))
+                if (npc.CurrentAction == null || !npc.CurrentAction.IsValid())
                 {
-                    npc.CurrentAction?.Invalidate(npc);
+                    // invalidate/remove the invalid action
+                    npc.CurrentAction?.Invalidate();
                     npc.CurrentAction = null;
-                }
-                else
-                {
-                    npc.CurrentAction.Perform(npc);
-                    needsPlan = false;
+
+                    // check to see if we already have a plan for this npc
+                    if (_plans.ContainsKey(npc.ID) && _plans[npc.ID].Count > 0)
+                    {
+                        // plan already exists and has another action available
+                        npc.CurrentAction = _plans[npc.ID].Dequeue();
+                        if (_plans[npc.ID].Count == 0)
+                        {
+                            _plans.Remove(npc.ID);
+                        }
+                    }
+                    else
+                    {
+                        // no action, no stored plan: get a new plan!
+                        _plans.Remove(npc.ID);
+
+                        Queue<KarmaAction> plan = KarmaPlanner.GetPlan(npc, GetCombinedState(npc));
+                        
+                        if (plan != null && plan.Count > 0)
+                        {
+                            var first = plan.Dequeue();
+                            npc.CurrentAction = first;
+
+                            // if the plan has additional steps, save it
+                            if (plan.Count > 0)
+                            {
+                                _plans.Add(npc.ID, plan);
+                            }
+                        }
+                    }
                 }
 
-                if (needsPlan)
+                if (npc.CurrentAction != null)
                 {
-                    Queue<KarmaAction> plan = GetPlan(npc);
+                    npc.CurrentAction.Perform();
                 }
-                
+
                 //(scheduleable as NPC).PerformAction();
                 //_schedule.Add(scheduleable);
 
@@ -93,9 +120,19 @@ namespace Roguelike.Karma
             }
         }
 
+        public void Remove(Actor actor)
+        {
+            _schedule.Remove(actor);
+        }
+
         public void Add(int time, Actor actor)
         {
             _schedule.Add(time, actor);
+        }
+
+        public void EndPlayerTurn()
+        {
+            IsPlayerTurn = false;
         }
 
         public void Add(Actor actor)
@@ -110,34 +147,18 @@ namespace Roguelike.Karma
             _schedule.Add(0, player);
         }
 
-        public Queue<KarmaAction> GetPlan(NPC actor)
+
+        public Dictionary<string, object> GetCombinedState(NPC actor)
         {
-            Queue<KarmaAction> plan = null;
+            Dictionary<string, object> result = new Dictionary<string, object>();
 
-            if (_plans.ContainsKey(actor.ID))
+            var combinedState = new KarmaCombinedState(actor, _worldState);
+            foreach (PropertyInfo property in combinedState.GetType().GetProperties())
             {
-                return _plans[actor.ID];
+                result.Add(property.Name, property.GetValue(combinedState));
             }
 
-            //do logic to get a new plan here
-            plan = KarmaPlanner.GetPlan(actor);
-
-            if (plan != null && plan.Count > 0)
-            {
-                _plans.Add(actor.ID, plan);
-            }
-
-            return plan;
+            return result;
         }
-
-        //public IKarmaGoalState GetState<T>(T entity) where T : MyBasicEntity
-        //{
-        //    return State;
-        //}
-
-        //public void SetState(IKarmaGoalState newState)
-        //{
-        //    State = newState;
-        //}
     }
 }

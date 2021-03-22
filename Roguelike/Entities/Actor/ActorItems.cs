@@ -13,16 +13,16 @@ namespace Roguelike.Entities
         public double MaxCarryWeight { get; set; }
         public double CurrentCarryWeight { get; set; }
 
-        private double _currency;
-        public double Currency
+        private int _currency;
+        public int Currency
         {
             get { return _currency; }
             set
             {
                 var prevValue = _currency;
-                _currency = Math.Max(0, Math.Round(value, 2));
-                var difference = Math.Round(_currency - prevValue, 2);
-                if (this is Player && this.Health > 0.001)
+                _currency = Math.Max(0, value);
+                var difference = _currency - prevValue;
+                if (this is Player && this.Health > 0)
                 {
                     if (difference < 0)
                     {
@@ -88,7 +88,7 @@ namespace Roguelike.Entities
             AddItem(item);
         }
 
-        public void AddCurrency(double amount)
+        public void AddCurrency(int amount)
         {
             if (amount > 0)
             {
@@ -96,9 +96,9 @@ namespace Roguelike.Entities
             }
         }
 
-        public void DropCurrency(double amount)
+        public void DropCurrency(int amount)
         {
-            if (amount == 0)
+            if (amount <= 0)
             {
                 return;
             }

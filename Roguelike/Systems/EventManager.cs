@@ -58,6 +58,7 @@ namespace Roguelike.Systems
             {
                 ActorDiedEvent(actor);
             }
+            MyGame.World.CurrentMap.RemoveEntity(actor);
         }
 
         public void InvokeActorHealthChanged(Actor actor, double prevHealth)

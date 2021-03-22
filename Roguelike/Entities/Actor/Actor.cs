@@ -1,8 +1,8 @@
 ﻿using GoRogue;
 using Microsoft.Xna.Framework;
 using Roguelike.Entities.Items;
-using Roguelike.Entities.Monsters;
 using Roguelike.Interfaces;
+using Roguelike.JSON;
 using Roguelike.Models;
 using Roguelike.Skills;
 using Roguelike.Systems;
@@ -54,6 +54,7 @@ namespace Roguelike.Entities
         /// </summary>
         public Direction FacingDirection { get; set; }
         public XYZRelativeDirection VisionDirection { get; set; }
+        public Coord SpawnPoint { get; set; }
 
         public ActorBody Body { get; set; }
 
@@ -74,7 +75,7 @@ namespace Roguelike.Entities
             bool hasVision,
             double fovViewAngle,
             XYZRelativeDirection visionDirection,
-            ActorBody body,
+            string bodyType,
             Color fgColor,
             Color bgColor,
             char icon,
@@ -84,11 +85,13 @@ namespace Roguelike.Entities
             bool isTransparent
             ) : base(name, fgColor, bgColor, icon, position, layer, isWalkable, isTransparent)
         {
+            SpawnPoint = position;
+
             CurrentLevel = 1;
             Inventory = new List<Item>();
             Skills = new List<Skill>();
             FacingDirection = Direction.UP;
-            VisionDirection = XYZRelativeDirection.Forward;
+            VisionDirection = visionDirection;
 
             MaxHealth = Health = maxHealth;
             MaxMana = Mana = maxMana;
@@ -108,7 +111,14 @@ namespace Roguelike.Entities
             HasVision = hasVision;
             FOVViewAngle = fovViewAngle;
             VisionDirection = VisionDirection;
-            Body = body;
+
+            switch (bodyType)
+            {
+                case "Humanoid":
+                default:
+                    Body = ActorBody.HumanoidBody(fgColor);
+                    break;
+            }
 
             if (Body != null)
             {
@@ -118,60 +128,51 @@ namespace Roguelike.Entities
             _actors.Add(this.ID, this);
         }
 
+        /// <returns>True if an action occurs</returns>
         public bool MoveBump(Direction direction)
         {
             Coord target = Position + direction;
             FacingDirection = direction;
 
-            //var feedbackMsg = "";
-
             Actor otherActor = MyGame.World.CurrentMap.GetEntityAt<Actor>(target);
-            Item item = MyGame.World.CurrentMap.GetEntityAt<Item>(target);
             
-            bool allowMovement = true;
-
             if (otherActor != null)
             {
-                //PlayerMessageManager.Instance.AddMessage(new PlayerMessage($"Encountered a {otherActor.Name}", MessageCategory.Notification));
-
+                // if an enemy is in the way, kill it!
+                // could be refactored to move around or through the enemy if there is a 'higher priority' move or attack order (in future versions)
                 if (this.IsHostileTo(otherActor))
                 {
                     BumpAttack(otherActor);
                     return true;
                 }
-
-                allowMovement = false;
             }
 
-            if (allowMovement && MyGame.World.CurrentMap.IsTileWalkable(target))
+            if (MyGame.World.CurrentMap.IsTileWalkable(target))
             {
+                Item item = MyGame.World.CurrentMap.GetEntityAt<Item>(target);
                 if (item != null)
                 {
+                    //an item is in the tile we are about to walk to
+                    
+                    //potentially...
+                    //monsters and npc's might equip/use/throw items as needed
+                    
                     if (this is Player)
                     {
-                        //PlayerMessageManager.Instance.AddMessage(new PlayerMessage($"Encountered a {item.Name}", MessageCategory.Notification));
-
                         if (item is Currency && MyGame.GameSettings.GoldAutoPickup)
                         {
                             PickupItem(item);
                         }
+                        else
+                        {
+                            PlayerMessageManager.Instance.AddMessage(new PlayerMessage($"Encountered a {item.Name}", MessageCategory.Notification));
+                        }
                     }
-
-                    allowMovement = true;
                 }
 
-                if (allowMovement)
-                {
-                    //DebugManager.Instance.AddMessage(new DebugMessage($"Actor {Glyph}, Walking to: {target}", DebugSource.System));
-
-                    Position += direction;
-                    return true;
-                }
-                else
-                {
-                    //DebugManager.Instance.AddMessage(new DebugMessage($"Actor {Glyph}, failed walking to: {target}", DebugSource.System));
-                    //return false;
-                }
+                Position += direction;
+                MyGame.Karma.Add(this.MoveSpeed, this);
+                return true;
             }
             else
             {

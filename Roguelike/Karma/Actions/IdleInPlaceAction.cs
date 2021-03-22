@@ -10,30 +10,28 @@ namespace Roguelike.Karma.Actions
     /// </summary>
     internal class IdleInPlaceAction : KarmaAction
     {
-        public IdleInPlaceAction() : base("IdleInPlace")
+        public IdleInPlaceAction(NPC actor, double cost) : base("IdleInPlace", actor, cost)
         {
             Conditions.Add("AtTargetPosition", true);
             Effects.Add("IdleInPlace", true);
         }
 
-        public override bool IsCompleted(NPC actor)
+        public override bool IsCompleted()
         {
-            return actor.AtTargetPosition;
+            return NPC.AtTargetPosition;
         }
 
         /// <summary>
         /// AKA "Check Procedural Preconditions"
         /// </summary>
-        /// <param name="actor"></param>
-        /// <returns></returns>
-        public override bool IsValid(NPC actor)
+        public override bool IsValid()
         {
-            return actor.TargetPosition != null && !actor.AtTargetPosition;
+            return NPC.TargetPosition != null && !NPC.AtTargetPosition;
         }
 
-        public override bool Perform(NPC actor)
+        public override bool Perform()
         {
-            MyGame.Karma.Add(actor.ActionSpeed, actor);
+            MyGame.Karma.Add(NPC.ActionSpeed, NPC);
             return true;
         }
     }
