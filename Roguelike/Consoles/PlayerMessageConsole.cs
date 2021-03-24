@@ -35,7 +35,6 @@ namespace Roguelike.Consoles
 
             OutputConsole.Font = SadConsole.Global.Fonts["CP850"].GetFont(Font.FontSizes.One);
 
-            //Children.Add(BackgroundConsole);
             Children.Add(OutputConsole);
 
             _maxLines = Height;

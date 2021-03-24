@@ -14,22 +14,22 @@ namespace Roguelike.Entities.Items
     internal class Item : MyBasicEntity
     {
         // static
-        private static Dictionary<uint, Item> _items;
-        public static List<Item> AllItems { get { return _items.Values.ToList(); } }
-        public static Item GetItem(uint id)
-        {
-            if (_items.ContainsKey(id))
-            {
-                return _items[id];
-            }
+        //private static Dictionary<long, Item> _items;
+        //public static List<Item> AllItems { get { return _items.Values.ToList(); } }
+        //public static Item GetItem(long id)
+        //{
+        //    if (_items.ContainsKey(id))
+        //    {
+        //        return _items[id];
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
 
-        static Item()
-        {
-            _items = new Dictionary<uint, Item>();
-        }
+        //static Item()
+        //{
+        //    _items = new Dictionary<long, Item>();
+        //}
 
         // non-static
 
@@ -48,6 +48,11 @@ namespace Roguelike.Entities.Items
         /// Specific to backpack-carry weight, not necessarily 'mass' or kg
         /// </summary>
         public double Weight { get; set; }
+
+        /// <summary>
+        /// Whether or not this item can be dropped on the ground, or if it just gets destroyed
+        /// </summary>
+        public bool IsDroppable { get; }
 
         /// <summary>
         /// Item without a Coord position (does not start on the map)
@@ -69,8 +74,9 @@ namespace Roguelike.Entities.Items
 
             Durability = durability;
             Weight = weight;
+            IsDroppable = true;
 
-            _items.Add(this.ID, this);
+            //_items.Add(this.ID, this);
         }
 
         /// <summary>

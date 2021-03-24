@@ -10,23 +10,21 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Roguelike.JSON;
+using System.Reflection;
+using Roguelike.Systems;
+using SadConsole;
+using Roguelike.Maps;
 
 namespace Roguelike.Entities
 {
-    public enum ActionStatus
-    {
-        Idle,
-        Goto,
-        Animate,
-    }
-
     internal partial class NPC : Actor
     {
         //public IBehavior Behavior { get; set; }
-        public Dictionary<uint, int> TurnsAlerted { get; set; }
-        public uint? CurrentTarget { get; set; }
+        public string NPCID { get; }
 
-        public KarmaAction CurrentAction { get; set; }
+        public Dictionary<long, int> TurnsAlerted { get; set; }
+
+
 
         private Dictionary<string, object> _goals;
         public Dictionary<string, object> Goals 
@@ -57,6 +55,7 @@ namespace Roguelike.Entities
 
 
         public NPC(
+            string npcId,
             string name,
             double maxHealth,
             double maxMana,
@@ -66,12 +65,13 @@ namespace Roguelike.Entities
             int willpower,
             int intelligence,
             int vitae,
-            int actionSpeed,
-            int moveSpeed,
+            double actionSpeed,
+            double moveSpeed,
             double awareness,
             double innerFovAwareness,
             bool hasVision,
             double fovViewAngle,
+            string faction,
             XYZRelativeDirection visionDirection,
             //ActorBody body,
             string bodyType,
@@ -81,17 +81,18 @@ namespace Roguelike.Entities
             Coord position,
             bool isWalkable,
             bool isTransparent
-            ) : base(name, maxHealth, maxMana, strength, agility, stamina, willpower, intelligence, vitae, actionSpeed, moveSpeed, awareness, innerFovAwareness, hasVision, fovViewAngle, visionDirection, bodyType,
+            ) : base(name, maxHealth, maxMana, strength, agility, stamina, willpower, intelligence, vitae, actionSpeed, moveSpeed, awareness, innerFovAwareness, hasVision, fovViewAngle, faction, visionDirection, bodyType,
                 foreground, background, glyph, position, (int)MapLayer.MONSTERS, isWalkable, isTransparent)
         {
-            //Behavior = new StandardMoveAndAttack();
-            TurnsAlerted = new Dictionary<uint, int>();
+            NPCID = npcId;
+            TurnsAlerted = new Dictionary<long, int>();
 
             AvailableActions = new List<KarmaAction>();
             _goals = new Dictionary<string, object>();
         }
 
         public NPC(
+            string npcId,
             string name,
             double maxHealth,
             double maxMana,
@@ -101,14 +102,14 @@ namespace Roguelike.Entities
             int willpower,
             int intelligence,
             int vitae,
-            int actionSpeed,
-            int moveSpeed,
+            double actionSpeed,
+            double moveSpeed,
             double awareness,
             double innerFovAwareness,
             bool hasVision,
             double fovViewAngle,
+            string faction,
             XYZRelativeDirection visionDirection,
-            //ActorBody body,
             string bodyType,
             string actionSet,
             string goalSet,
@@ -118,7 +119,7 @@ namespace Roguelike.Entities
             Coord position,
             bool isWalkable,
             bool isTransparent
-            ) : this(name, maxHealth, maxMana, strength, agility, stamina, willpower, intelligence, vitae, actionSpeed, moveSpeed, awareness, innerFovAwareness, hasVision, fovViewAngle, visionDirection, bodyType,
+            ) : this(npcId, name, maxHealth, maxMana, strength, agility, stamina, willpower, intelligence, vitae, actionSpeed, moveSpeed, awareness, innerFovAwareness, hasVision, fovViewAngle, faction, visionDirection, bodyType,
                 foreground, background, glyph, position, isWalkable, isTransparent)
         {
             if (Data.ActionSets.ContainsKey(actionSet))
@@ -126,16 +127,17 @@ namespace Roguelike.Entities
                 ActionSets actions = Data.ActionSets[actionSet];
                 foreach (ActionListItem el in actions.Actions)
                 {
-                    switch(el.Action)
+                    var args = new object[] { this, el.Cost };
+                    var actionType = Type.GetType($"Roguelike.Karma.Actions.{el.Action}Action");
+                    var result = Activator.CreateInstance(actionType, args);
+
+                    if (result != null && result is KarmaAction)
                     {
-                        case "IdleInPlace":
-                            this.AvailableActions.Add(new IdleInPlaceAction(this, el.Cost));
-                            break;
-                        case "GoToAction":
-                            this.AvailableActions.Add(new GoToAction(this, el.Cost));
-                            break;
-                        default:
-                            break;
+                        this.AvailableActions.Add(result as KarmaAction);
+                    }
+                    else
+                    {
+                        DebugManager.Instance.AddMessage($"Unable to find action type for '{el.Action}'");
                     }
                 }
             }
@@ -159,8 +161,13 @@ namespace Roguelike.Entities
             }
         }
 
-        public NPC(NPCStats npc, Coord pos) : this(npc.Name, npc.MaxHealth, npc.MaxMana, npc.Strength, npc.Agility, npc.Stamina, npc.Willpower, npc.Intelligence, npc.Vitae, npc.ActionSpeed, npc.MoveSpeed, npc.Awareness, npc.InnerFovAwareness, npc.HasVision, npc.FovViewAngle, 
-            (XYZRelativeDirection)Enum.Parse(typeof(XYZRelativeDirection), npc.VisionDirection), npc.BodyType, npc.ActionSet, npc.GoalSet, new Color(npc.GlyphColor), Color.Transparent, npc.Glyph[0], pos, true, true)
+        public NPC(string npcId, NPCStats npc, Coord pos) : this(npcId, npc.Name, npc.MaxHealth, npc.MaxMana, npc.Strength, npc.Agility, npc.Stamina, npc.Willpower, npc.Intelligence, npc.Vitae, npc.ActionSpeed, npc.MoveSpeed, npc.Awareness, npc.InnerFovAwareness, npc.HasVision, npc.FovViewAngle, npc.Faction,
+            (XYZRelativeDirection)Enum.Parse(typeof(XYZRelativeDirection), npc.VisionDirection), npc.BodyType, npc.ActionSet, npc.GoalSet, new Color(new Color(npc.GlyphColor), 1.0f), Color.Transparent, npc.Glyph[0], pos, true, true)
+        {
+            //
+        }
+
+        public NPC(string npcId, Coord pos) : this(npcId, Data.NPCStats[npcId], pos)
         {
             //
         }

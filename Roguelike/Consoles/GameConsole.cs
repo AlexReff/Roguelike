@@ -51,7 +51,7 @@ namespace Roguelike.Consoles
 
             // User Message Console
             Point msgPos = new Point(0, MapBackground.Height);
-            MessageScreen = new PlayerMessageConsole(MapBackground.Width, height - MapBackground.Height, MyGame.GameSettings.DebugScreenBgColor, MyGame.GameSettings.DebugScreenBorderColor);
+            MessageScreen = new PlayerMessageConsole(MapBackground.Width, height - MapBackground.Height - (MyGame.GameSettings.EnableDebugOutput ? MyGame.GameSettings.DebugHeight : 0), MyGame.GameSettings.DebugScreenBgColor, MyGame.GameSettings.DebugScreenBorderColor);
             MessageScreen.Position = msgPos;
             Children.Add(MessageScreen);
 
@@ -69,17 +69,23 @@ namespace Roguelike.Consoles
 
             //DEBUG/DEVELOPER THINGS BELOW
 
-            //// Debug Console
-            //Point dbgPos = new Point(0, MapBackground.Position.Y + MapBackground.Height + 1);
-            //DebugScreen = new DebugConsole(MyGame.GameSettings.DebugConsoleWidth, Height - dbgPos.Y, MyGame.GameSettings.DebugScreenBgColor, MyGame.GameSettings.DebugScreenBorderColor);
-            //DebugScreen.Position = dbgPos;
-            //Children.Add(DebugScreen);
+            if (MyGame.GameSettings.EnableDebugOutput)
+            {
+                // Debug Console
+                Point dbgPos = new Point(0, height - MyGame.GameSettings.DebugHeight);
+                DebugScreen = new DebugConsole(MyGame.GameSettings.DebugConsoleWidth, MyGame.GameSettings.DebugHeight, MyGame.GameSettings.DebugScreenBgColor, MyGame.GameSettings.DebugScreenBorderColor);
+                DebugScreen.Position = dbgPos;
+                Children.Add(DebugScreen);
+            }
 
-            //// Character map for easy reference
-            Point chrMapPos = new Point(Width - Font.Columns - CharMapOutputConsole.AdditionalWidth, Height - Font.Rows - CharMapOutputConsole.AdditionalHeight);
-            CharMapScreen = new CharMapOutputConsole(Font.Columns, Font.Rows);
-            CharMapScreen.Position = chrMapPos;
-            Children.Add(CharMapScreen);
+            if (MyGame.GameSettings.EnableCharMapOutput)
+            {
+                // Character map for easy reference
+                Point chrMapPos = new Point(Width - Font.Columns - CharMapOutputConsole.AdditionalWidth, Height - Font.Rows - CharMapOutputConsole.AdditionalHeight);
+                CharMapScreen = new CharMapOutputConsole(Font.Columns, Font.Rows);
+                CharMapScreen.Position = chrMapPos;
+                Children.Add(CharMapScreen);
+            }
         }
 
         public void SetMap(GameMap map)

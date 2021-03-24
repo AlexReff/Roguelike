@@ -210,15 +210,34 @@ namespace Roguelike.Models
         }
     }
 
+    //internal class ActorBodyPart : Item
+    //{
+    //    public double Health { get; set; }
+    //    public double MaxHealth { get; set; }
 
-    internal class ActorBodyPart : Item
+    //    public ActorBodyPart(string name, Color foreground, Color background, char glyph) : base(name, foreground, background, glyph)
+    //    {
+    //        //
+    //    }
+    //}
+
+    internal class ActorBodyPart
     {
         public double Health { get; set; }
         public double MaxHealth { get; set; }
 
-        public ActorBodyPart(string name, Color foreground, Color background, char glyph) : base(name, foreground, background, glyph)
+        // item properties
+        public string Name { get; set; }
+        public Color Foreground { get; set; }
+        public Color Background { get; set; }
+        public char Glyph { get; set; }
+
+        public ActorBodyPart(string name, Color foreground, Color background, char glyph)
         {
             Name = name;
+            Foreground = foreground;
+            Background = background;
+            Glyph = glyph;
         }
     }
 
@@ -258,6 +277,16 @@ namespace Roguelike.Models
             LimbChildren = new List<Limb>();
             LimbSize = size;
             IsLifeSupporting = isLifeSupporting;
+        }
+
+        public Item CreateItemInstance(Coord pos)
+        {
+            return new Item(Name, Foreground, Background, Glyph, pos);
+        }
+
+        public Item CreateItemInstance()
+        {
+            return new Item(Name, Foreground, Background, Glyph);
         }
     }
 

@@ -1,8 +1,10 @@
 ﻿using GoRogue;
+using GoRogue.Pathing;
 using Microsoft.Xna.Framework;
 using Roguelike.Entities.Items;
 using Roguelike.Interfaces;
 using Roguelike.JSON;
+using Roguelike.Karma.Actions;
 using Roguelike.Models;
 using Roguelike.Skills;
 using Roguelike.Systems;
@@ -15,38 +17,27 @@ namespace Roguelike.Entities
 {
     internal partial class Actor : MyBasicEntity
     {
-        private static Dictionary<uint, Actor> _actors;
-        public static List<Actor> AllActors { get { return _actors.Values.ToList(); } }
-        public static Actor GetActor(uint id)
-        {
-            if (_actors.ContainsKey(id))
-            {
-                return _actors[id];
-            }
+        // static
+        //private static Dictionary<long, Actor> _actors;
+        //public static List<Actor> AllActors { get { return _actors.Values.ToList(); } }
+        //public static Actor GetActor(long id)
+        //{
+        //    if (_actors.ContainsKey(id))
+        //    {
+        //        return _actors[id];
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
 
-        static Actor()
-        {
-            _actors = new Dictionary<uint, Actor>();
-        }
+        //static Actor()
+        //{
+        //    _actors = new Dictionary<long, Actor>();
+        //}
 
-        protected int? _time;
-        public virtual int Time
-        {
-            get
-            {
-                if (_time.HasValue)
-                {
-                    var val = _time.Value;
-                    _time = null;
-                    return val;
-                }
-                return ActionSpeed;
-            }
-        }
+        // non-static
 
+        public string Faction { get; set; }
         public string Description { get; set; }
 
         /// <summary>
@@ -68,12 +59,13 @@ namespace Roguelike.Entities
             int willpower,
             int intelligence,
             int vitae,
-            int actionSpeed,
-            int moveSpeed,
+            double actionSpeed,
+            double moveSpeed,
             double awareness,
             double innerFovAwareness,
             bool hasVision,
             double fovViewAngle,
+            string faction,
             XYZRelativeDirection visionDirection,
             string bodyType,
             Color fgColor,
@@ -86,8 +78,15 @@ namespace Roguelike.Entities
             ) : base(name, fgColor, bgColor, icon, position, layer, isWalkable, isTransparent)
         {
             SpawnPoint = position;
+            State = ActorState.Idle;
 
             CurrentLevel = 1;
+            QueuedActions = new Queue<MultiStageAction>();
+            InterruptQueuedActions = false;
+
+            VisibleActors = new HashSet<Actor>();
+            VisibleEnemies = new HashSet<Actor>();
+
             Inventory = new List<Item>();
             Skills = new List<Skill>();
             FacingDirection = Direction.UP;
@@ -112,6 +111,8 @@ namespace Roguelike.Entities
             FOVViewAngle = fovViewAngle;
             VisionDirection = VisionDirection;
 
+            Faction = faction;
+
             switch (bodyType)
             {
                 case "Humanoid":
@@ -125,76 +126,7 @@ namespace Roguelike.Entities
                 Body.Parent = this;
             }
 
-            _actors.Add(this.ID, this);
-        }
-
-        /// <returns>True if an action occurs</returns>
-        public bool MoveBump(Direction direction)
-        {
-            Coord target = Position + direction;
-            FacingDirection = direction;
-
-            Actor otherActor = MyGame.World.CurrentMap.GetEntityAt<Actor>(target);
-            
-            if (otherActor != null)
-            {
-                // if an enemy is in the way, kill it!
-                // could be refactored to move around or through the enemy if there is a 'higher priority' move or attack order (in future versions)
-                if (this.IsHostileTo(otherActor))
-                {
-                    BumpAttack(otherActor);
-                    return true;
-                }
-            }
-
-            if (MyGame.World.CurrentMap.IsTileWalkable(target))
-            {
-                Item item = MyGame.World.CurrentMap.GetEntityAt<Item>(target);
-                if (item != null)
-                {
-                    //an item is in the tile we are about to walk to
-                    
-                    //potentially...
-                    //monsters and npc's might equip/use/throw items as needed
-                    
-                    if (this is Player)
-                    {
-                        if (item is Currency && MyGame.GameSettings.GoldAutoPickup)
-                        {
-                            PickupItem(item);
-                        }
-                        else
-                        {
-                            PlayerMessageManager.Instance.AddMessage(new PlayerMessage($"Encountered a {item.Name}", MessageCategory.Notification));
-                        }
-                    }
-                }
-
-                Position += direction;
-                MyGame.Karma.Add(this.MoveSpeed, this);
-                return true;
-            }
-            else
-            {
-                //DebugManager.Instance.AddMessage(new DebugMessage($"Actor {Glyph}, Unable to walk to non-walkable: {target}", DebugSource.System));
-                //ImmediateFeedbackManager.Instance.AddMessage($"Cannot walk {direction.ToString().Replace("_", "").ToProperCase()}");
-                //feedbackMsg = $"Cannot walk {direction.ToString().Replace("_", "").ToProperCase()}";
-                //return false;
-
-                //// Check for the presence of a door
-                //TileDoor door = GameLoop.World.CurrentMap.GetTileAt<TileDoor>(Position + positionChange);
-                //// if there's a door here,
-                //// try to use it
-                //if (door != null)
-                //{
-                //    GameLoop.CommandManager.UseDoor(this, door);
-                //    return true;
-                //}
-            }
-
-            //ImmediateFeedbackManager.Instance.AddMessage(feedbackMsg);
-            //MyGame.UIManager.GameScreen.MapScreen.UpdateFOV();
-            return false;
+            //_actors.Add(this.ID, this);
         }
 
         public void Die()

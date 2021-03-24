@@ -44,7 +44,9 @@ namespace Roguelike.Settings
         public int MapHeight = 50;
 
         public int GameMenuWidth = 18;
-        public int DebugConsoleWidth = 62;
+
+        public int DebugConsoleWidth = 40;
+        public int DebugHeight = 25;
 
         public ButtonTheme ButtonTheme = new MyButtonTheme();
         public Colors ButtonColors = MyButtonTheme.MyButtonColors();
@@ -59,6 +61,9 @@ namespace Roguelike.Settings
         public Color GoblinGlyphColor = Color.DarkGreen;
 
         public bool GoldAutoPickup = true;
+
+        public bool EnableCharMapOutput = true;
+        public bool EnableDebugOutput = true;
 
         public GameSettings()
         {

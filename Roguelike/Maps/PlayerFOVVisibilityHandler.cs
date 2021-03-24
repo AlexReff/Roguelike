@@ -12,11 +12,11 @@ namespace Roguelike.Maps
     class PlayerFOVVisibilityHandler : FOVVisibilityHandler
     {
         public Color ExploredColor { get; set; }
-        private HashSet<uint> VisibleEntities { get; set; }
+        private HashSet<long> VisibleEntities { get; set; }
 
         public PlayerFOVVisibilityHandler(BasicMap map, Color exploredColor) : base(map)
         {
-            VisibleEntities = new HashSet<uint>();
+            VisibleEntities = new HashSet<long>();
             ExploredColor = exploredColor;
         }
 

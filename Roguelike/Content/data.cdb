@@ -241,6 +241,41 @@
 					],
 					"HostileWith": [],
 					"AlliedWith": []
+				},
+				{
+					"ID": "goblin",
+					"Name": "Goblins",
+					"FriendlyWith": [],
+					"HostileWith": [
+						{
+							"Faction": "player"
+						},
+						{
+							"Faction": "npc_neutral"
+						}
+					],
+					"AlliedWith": [
+						{
+							"Faction": "goblin"
+						}
+					]
+				},
+				{
+					"ID": "dragon",
+					"Name": "Dragons",
+					"FriendlyWith": [],
+					"HostileWith": [
+						{
+							"Faction": "player"
+						},
+						{
+							"Faction": "goblin"
+						},
+						{
+							"Faction": "npc_neutral"
+						}
+					],
+					"AlliedWith": []
 				}
 			],
 			"separators": [],
@@ -339,11 +374,11 @@
 					"name": "Vitae"
 				},
 				{
-					"typeStr": "3",
+					"typeStr": "4",
 					"name": "ActionSpeed"
 				},
 				{
-					"typeStr": "3",
+					"typeStr": "4",
 					"name": "MoveSpeed"
 				},
 				{
@@ -389,6 +424,11 @@
 					"typeStr": "6:GoalSets",
 					"name": "GoalSet",
 					"display": null
+				},
+				{
+					"typeStr": "6:Factions",
+					"name": "Faction",
+					"display": null
 				}
 			],
 			"lines": [
@@ -403,8 +443,8 @@
 					"Willpower": 14,
 					"Intelligence": 10,
 					"Vitae": 30,
-					"ActionSpeed": 20,
-					"MoveSpeed": 10,
+					"ActionSpeed": 2,
+					"MoveSpeed": 1,
 					"Awareness": 5,
 					"InnerFovAwareness": 2,
 					"HasVision": true,
@@ -413,8 +453,9 @@
 					"VisionDirection": "Forward",
 					"Glyph": "d",
 					"GlyphColor": 13047173,
-					"ActionSet": "NPCIdle",
-					"GoalSet": "IdleInPlace"
+					"ActionSet": "NPCAttackHostiles",
+					"GoalSet": "AttackHostiles",
+					"Faction": "dragon"
 				},
 				{
 					"ID": "goblin",
@@ -427,8 +468,8 @@
 					"Willpower": 5,
 					"Intelligence": 4,
 					"Vitae": 0,
-					"ActionSpeed": 15,
-					"MoveSpeed": 10,
+					"ActionSpeed": 0.9,
+					"MoveSpeed": 0.8,
 					"Awareness": 3,
 					"InnerFovAwareness": 3,
 					"HasVision": true,
@@ -437,8 +478,9 @@
 					"VisionDirection": "Forward",
 					"Glyph": "g",
 					"GlyphColor": 25600,
-					"ActionSet": "NPCIdle",
-					"GoalSet": "IdleInPlace"
+					"ActionSet": "NPCAttackHostiles",
+					"GoalSet": "AttackHostiles",
+					"Faction": "goblin"
 				}
 			],
 			"separators": [],
@@ -468,6 +510,19 @@
 						}
 					],
 					"ID": "NPCIdle"
+				},
+				{
+					"ID": "NPCAttackHostiles",
+					"Actions": [
+						{
+							"Action": "AttackHostiles",
+							"Cost": 0
+						},
+						{
+							"Action": "IdleInArea",
+							"Cost": 1
+						}
+					]
 				}
 			],
 			"separators": [],
@@ -493,6 +548,19 @@
 					"Goals": [
 						{
 							"Goal": "IdleInPlace",
+							"Value": true
+						}
+					]
+				},
+				{
+					"ID": "AttackHostiles",
+					"Goals": [
+						{
+							"Goal": "AttackHostiles",
+							"Value": true
+						},
+						{
+							"Goal": "IdleInArea",
 							"Value": true
 						}
 					]
@@ -574,6 +642,12 @@
 				},
 				{
 					"Name": "GoToAction"
+				},
+				{
+					"Name": "AttackHostiles"
+				},
+				{
+					"Name": "IdleInArea"
 				}
 			],
 			"separators": [],
@@ -598,12 +672,16 @@
 					"Type": "bool"
 				},
 				{
-					"Name": "AttackHostile",
+					"Name": "AttackHostiles",
 					"Type": "bool"
 				},
 				{
 					"Name": "TargetPosition",
 					"Type": "Coord?"
+				},
+				{
+					"Name": "IdleInArea",
+					"Type": ""
 				}
 			],
 			"separators": [],

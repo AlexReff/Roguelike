@@ -8,27 +8,27 @@ namespace Roguelike.Karma.Actions
 {
     internal abstract class KarmaAction
     {
-        public NPC NPC { get; }
+        public Actor Actor { get; }
 
         /// <summary>
         /// Ref_Actions::Name
         /// </summary>
         public string Name { get; }
         
-        public double Cost { get; set; }
+        public double Cost { get; }
 
         public Dictionary<string, object> Conditions { get; }
         public Dictionary<string, object> Effects { get; }
 
         /// <summary>
-        /// Perform the current action for the given actor
-        /// Perform must also Karma-Schedule the actor
+        /// Perform the current action for the given actor.
+        /// IMPORTANT: Perform must also Karma-Schedule the actor (or call actions that do so)
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Returns TRUE if </returns>
         public abstract bool Perform();
 
         /// <summary>
-        /// Checks preconditions to see if this action is still 'valid' for the given actor
+        /// Checks preconditions to see if this action is still 'valid' for the given actor. Does not fail for out of range (use IsInValidRange to move actor)
         /// </summary>
         /// <returns></returns>
         public abstract bool IsValid();
@@ -38,6 +38,12 @@ namespace Roguelike.Karma.Actions
         /// </summary>
         /// <returns></returns>
         public abstract bool IsCompleted();
+
+        /// <summary>
+        /// Should be used to initially determine where the NPC is trying to go
+        /// </summary>
+        /// <returns>Null if irrelevant, eg infinite range or cast-on-self</returns>
+        public virtual Coord? GetTargetPosition() => null;
 
         /// <summary>
         /// Needs to be called when action preconditions become invalid
@@ -53,24 +59,53 @@ namespace Roguelike.Karma.Actions
         /// If this fails, the AI will attempt to get in range before running this action
         /// </summary>
         /// <returns>False if this actor requires movement before being able to do this action</returns>
-        public virtual bool IsInValidRange() => true;
-
-
-        public KarmaAction(string name, NPC actor, double cost)
+        public virtual bool IsInValidRange()
         {
-            NPC = actor;
+            if (!(Actor is NPC))
+            {
+                return true;
+            }
+
+            NPC npc = Actor as NPC;
+            
+            Coord? targetPos = null;
+            if (npc.TargetPosition.HasValue)
+            {
+                targetPos = npc.TargetPosition.Value;
+            }
+            else if (npc.CurrentAction != null)
+            {
+                var actPos = npc.CurrentAction.GetTargetPosition();
+                if (actPos.HasValue)
+                {
+                    targetPos = actPos.Value;
+                }
+            }
+
+            if (targetPos != null && targetPos.HasValue)
+            {
+                return Distance.EUCLIDEAN.Calculate(Actor.Position, targetPos.Value) <= GetRange();
+            }
+
+            // There is no 'target position', so default return 'true' since there is no possible range to calculate
+            return true;
+        }
+
+        /// <summary>
+        /// Returns how far 'in distance' from the npc's targetPosition we need to be to use this action.
+        /// Defaults to 1.5 (all 8 neighboring squares). 1.0 would be just N,E,S,W squares. 0.5 for on-square.
+        /// </summary>
+        public virtual double GetRange() => 1.5;
+
+
+        public KarmaAction(string name, Actor actor, double cost)
+        {
+            Actor = actor;
             Name = name;
             Cost = cost;
 
             Conditions = new Dictionary<string, object>();
             Effects = new Dictionary<string, object>();
-
-            //Actions.Add(name, this);
         }
-        
-        //protected Action<IReGoapAction<T, W>> doneCallback;
-        //protected Action<IReGoapAction<T, W>> failCallback;
-        //protected IReGoapAction<T, W> previousAction;
-        //protected IReGoapAction<T, W> nextAction;
     }
 }

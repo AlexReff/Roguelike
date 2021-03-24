@@ -7,6 +7,7 @@ using Roguelike.Models;
 using SadConsole;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -40,6 +41,21 @@ namespace Roguelike
             return list;
         }
 
+        public static List<Coord> GetNeighbors(this Coord center)
+        {
+            List<Coord> vals = new List<Coord>()
+            {
+                new Coord(center.X    , center.Y + 1),
+                new Coord(center.X + 1, center.Y),
+                new Coord(center.X + 1, center.Y + 1),
+                new Coord(center.X    , center.Y - 1),
+                new Coord(center.X - 1, center.Y),
+                new Coord(center.X - 1, center.Y - 1),
+                new Coord(center.X - 1, center.Y + 1),
+                new Coord(center.X + 1, center.Y - 1),
+            };
+            return vals.Where(m => m.X >= 0 && m.Y >= 0).ToList();
+        }
 
         public static bool IsVowel(char vowel)
         {

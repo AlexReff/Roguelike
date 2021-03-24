@@ -1,4 +1,5 @@
-﻿using Roguelike.Entities;
+﻿using GoRogue;
+using Roguelike.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,9 +17,14 @@ namespace Roguelike.Karma.Actions
             Effects.Add("IdleInPlace", true);
         }
 
+        public override Coord? GetTargetPosition()
+        {
+            return Actor.SpawnPoint;
+        }
+
         public override bool IsCompleted()
         {
-            return NPC.AtTargetPosition;
+            return (Actor as NPC).AtTargetPosition;
         }
 
         /// <summary>
@@ -26,13 +32,18 @@ namespace Roguelike.Karma.Actions
         /// </summary>
         public override bool IsValid()
         {
-            return NPC.TargetPosition != null && !NPC.AtTargetPosition;
+            return (Actor as NPC).TargetPosition != null && !(Actor as NPC).AtTargetPosition;
         }
 
         public override bool Perform()
         {
-            MyGame.Karma.Add(NPC.ActionSpeed, NPC);
+            MyGame.Karma.Add(Actor);
             return true;
+        }
+
+        public override double GetRange()
+        {
+            return .5;
         }
     }
 }

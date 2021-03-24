@@ -14,6 +14,8 @@ namespace Roguelike.Entities
         
         public bool AtTargetPosition { get { return TargetPosition != null && Position != null && TargetPosition == Position; } }
 
+
+        public bool IdleInArea { get; set; }
         /// <summary>
         /// Goal to idle in a specific place (TargetPosition required)
         /// </summary>
@@ -22,7 +24,7 @@ namespace Roguelike.Entities
         /// <summary>
         /// Attack nearest (or biggest threat?) hostile
         /// </summary>
-        public bool AttackHostile { get; set; }
+        public bool AttackHostiles { get; set; }
 
         //public bool CanSeePlayer { get; set; }
         //public bool AlertedToPlayer { get; set; }

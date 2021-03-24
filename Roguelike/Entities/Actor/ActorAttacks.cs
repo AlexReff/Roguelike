@@ -1,4 +1,6 @@
 ﻿using Roguelike.Entities.Items;
+using Roguelike.JSON;
+using Roguelike.Karma.Actions;
 using Roguelike.Systems;
 using Roguelike.Weapons;
 using System;
@@ -13,6 +15,7 @@ namespace Roguelike.Entities
         ///// What an actor attacks with if no weapon is equipped. eg fists, claws, teeth
         ///// </summary>
         //public object DefaultWeapon { get; set; }
+        public Actor CurrentTarget { get; set; }
 
 
         public IEnumerable<Weapon> EquippedWeapons
@@ -23,18 +26,48 @@ namespace Roguelike.Entities
             }
         }
 
-        public void BumpAttack(Actor target)
+        public void StartBumpAttack(Actor target)
         {
+            //get the default 'attack' and attempt to default-target hit the enemy
             //var bestAttack = GetDefaultAttack(target);
             //DoAttack(target, bestAttack);
-            DoBumpAttack(target);
+
+            //DoAttack(target);
+            QueueAttack(target);
         }
 
-        public void DoBumpAttack(Actor target)
+        public void QueueAttack(Actor target)
         {
-            //get the best 'attack' (from skills) that costs no mana and attempt to default-target hit the enemy
+            //if (this is Player || target is Player || MyGame.World.Player.VisibleActors.Contains(target))
+            //{
+            //    PlayerMessageManager.Instance.AddMessage($"{Name} swings at {target.Name}({target.State})");
+            //}
+            State = ActorState.Attacking;
+            QueuedActions.Enqueue(new AttackBumpAction(this, target));
+            MyGame.Karma.AddAfterLast(KarmaActionSpeed, this);
+
+            //if (target is Player)
+            //{
+            //    MyGame.CommandManager.EndPlayerTurn();
+            //}
+            //TODO: 'attack swing speed': math based on weapon weight/size, str/agi
+        }
+
+        /// <summary>
+        /// Performs an attack. TODO: add attack data
+        /// </summary>
+        public void ResolveAttack(Actor target)
+        {
+            //if (this is Player || target is Player || MyGame.World.Player.VisibleActors.Contains(target))
+            //{
+            //    PlayerMessageManager.Instance.AddMessage($"{Name} barely misses {target.Name}({target.State})");
+            //}
+
+            target.InterruptQueuedActions = true;
+            EventManager.Instance.InvokeActorAttacked(this, target);
+            State = ActorState.Recovering;
             
-            MyGame.Karma.Add(ActionSpeed, this);
+            //MyGame.Karma.Add(this);
         }
 
         ///// <summary>
@@ -168,19 +201,18 @@ namespace Roguelike.Entities
 
         public bool IsHostileTo(Actor otherActor)
         {
-            //make everyone hostile to the player, for debugging purposes
-            if (this is Player || otherActor is Player)
+            ////make everyone hostile to the player, for debugging purposes
+            //if (this is Player || otherActor is Player)
+            //{
+            //    return true;
+            //}
+
+            if (Data.Factions[Faction].HostileWith.Contains(otherActor.Faction) ||
+                Data.Factions[otherActor.Faction].HostileWith.Contains(Faction))
             {
                 return true;
             }
 
-            //everyone hates monsters, for debugging purposes
-            if (this is NPC)
-            {
-                return true;
-            }
-
-            //TODO: implement whenever factions + reputation exists
             return false;
         }
 

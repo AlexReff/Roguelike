@@ -10,7 +10,7 @@ namespace Roguelike.Entities
 {
     internal class Player : Actor
     {
-        private static readonly char CHAR_PLAYER = (char)1;
+        private static readonly char CHAR_PLAYER = (char)64;// (char)1;
 
         public Player(Coord position) : this(
             "Player",
@@ -44,8 +44,8 @@ namespace Roguelike.Entities
             int willpower,
             int intelligence,
             int vitae,
-            int actionSpeed,
-            int moveSpeed,
+            double actionSpeed,
+            double moveSpeed,
             double awareness,
             double innerFovAwareness,
             bool hasVision,
@@ -54,7 +54,7 @@ namespace Roguelike.Entities
             //ActorBody body,
             string bodyType,
             Coord position
-            ) : base(name, maxHealth, maxMana, strength, agility, stamina, willpower, intelligence, vitae, actionSpeed, moveSpeed, awareness, innerFovAwareness, hasVision, fovViewAngle, visionDirection, bodyType,
+            ) : base(name, maxHealth, maxMana, strength, agility, stamina, willpower, intelligence, vitae, actionSpeed, moveSpeed, awareness, innerFovAwareness, hasVision, fovViewAngle, "player", visionDirection, bodyType,
                 MyGame.GameSettings.PlayerCharacterGlyphColor, Color.Transparent, CHAR_PLAYER, position, (int)MapLayer.PLAYER, isWalkable: true, isTransparent: true)
         {
             //Spells = SpellSkillManager.Instance.GetAllSpells();

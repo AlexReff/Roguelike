@@ -16,8 +16,6 @@ namespace Roguelike.Karma
 
 		public static Queue<KarmaAction> GetPlan(NPC npc, Dictionary<string, object> state)
 		{
-			Queue<KarmaAction> plan = new Queue<KarmaAction>();
-
 			//reset all actions
 			npc.AvailableActions.ForEach(m => m.Reset());
 
@@ -45,24 +43,44 @@ namespace Roguelike.Karma
 				}
 			}
 
-			List<KarmaAction> result = new List<KarmaAction>();
+            //List<KarmaAction> result = new List<KarmaAction>();
 
-			KarmaNode n = cheapest;
-			while (n != null)
-			{
-				if (n.action != null)
-				{
-					result.Insert(0, n.action); // insert the action in the front
-				}
-				n = n.parent;
-			}
+            KarmaNode n = cheapest;
+            //while (n != null)
+            //{
+            //	if (n.action != null)
+            //	{
+            //		result.Insert(0, n.action); // insert the action in the front
+            //	}
+            //	n = n.parent;
+            //}
+            Stack<KarmaAction> result = new Stack<KarmaAction>();
+            while (n != null)
+            {
+                if (n.action != null)
+                {
+                    result.Push(n.action); // insert the action in the front
+                }
+                n = n.parent;
+            }
 
-			foreach (KarmaAction a in result)
-			{
-				plan.Enqueue(a);
-			}
+			Queue<KarmaAction> test = new Queue<KarmaAction>(result);
+			Queue<KarmaAction> plan = new Queue<KarmaAction>();
+			KarmaAction p = null; // result.Pop();
+			while (result.TryPop(out p))
+            {
+				plan.Enqueue(p);
+            }
 
-			return plan;
+			var atest = test.ToList();
+			var btest = plan.ToList();
+
+            //foreach (KarmaAction a in result)
+            //{
+            //    plan.Enqueue(a);
+            //}
+
+            return plan;
         }
 
 		public static bool BuildGraph(KarmaNode parent, List<KarmaNode> leaves, HashSet<KarmaAction> usableActions, Dictionary<string, object> goal)

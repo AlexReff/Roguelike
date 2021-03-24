@@ -4,33 +4,35 @@ using Roguelike.Interfaces;
 using SadConsole;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
 namespace Roguelike.Entities
 {
+    [DebuggerDisplay("{Name}")]
     internal abstract class MyBasicEntity : BasicEntity
     {
-        private static Dictionary<uint, MyBasicEntity> _entities;
-        public static List<MyBasicEntity> AllEntities { get { return _entities.Values.ToList(); } }
-        public static MyBasicEntity GetEntity(uint id)
-        {
-            if (_entities.ContainsKey(id))
-            {
-                return _entities[id];
-            }
+        //private static Dictionary<long, MyBasicEntity> _entities;
+        //public static List<MyBasicEntity> AllEntities { get { return _entities.Values.ToList(); } }
+        //public static MyBasicEntity GetEntity(long id)
+        //{
+        //    if (_entities.ContainsKey(id))
+        //    {
+        //        return _entities[id];
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
 
-        static MyBasicEntity()
-        {
-            _entities = new Dictionary<uint, MyBasicEntity>();
-        }
+        //static MyBasicEntity()
+        //{
+        //    _entities = new Dictionary<long, MyBasicEntity>();
+        //}
 
         private static readonly IDGenerator IDGenerator = new IDGenerator();
 
-        public new uint ID { get; }
+        public new long ID { get; }
         public new GameMap CurrentMap { get { return (GameMap)base.CurrentMap; } }
         public Color ForegroundColor { get; set; }
         public Color BackgroundColor { get; set; }
@@ -57,7 +59,7 @@ namespace Roguelike.Entities
             BackgroundColor = background;
             Glyph = glyph;
              
-            _entities.Add(this.ID, this);
+            //_entities.Add(this.ID, this);
         }
 
         /// <summary>

@@ -42,10 +42,10 @@ namespace Roguelike.Entities
         /// </summary>
         public double Awareness { get; set; }
         public double InnerFOVAwareness { get; set; }
-        public int MoveSpeed { get; set; }
+        public double MoveSpeed { get; set; }
         
-        private int _actionSpeed;
-        public int ActionSpeed
+        private double _actionSpeed;
+        public double ActionSpeed
         {
             get
             {

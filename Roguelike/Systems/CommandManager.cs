@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Roguelike.Entities;
 using Roguelike.Entities.Items;
 using Roguelike.Interfaces;
+using Roguelike.Karma.Actions;
 using Roguelike.Models;
 using System;
 using System.Collections.Generic;
@@ -39,6 +40,11 @@ namespace Roguelike.Systems
         public void EndPlayerTurn()
         {
             //IsPlayerTurn = false;
+            //MyGame.Karma.EndPlayerTurn();
+            var player = MyGame.World.Player;
+            //player.QueuedActions.Enqueue(new ResolveEndPlayerTurnAction(player));
+            MyGame.Karma.AddAfterLast(0, player);
+            //MyGame.Karma.DoTime();
             MyGame.Karma.EndPlayerTurn();
         }
 
@@ -64,7 +70,13 @@ namespace Roguelike.Systems
         public bool MovePlayer(Direction direction)
         {
             //DebugManager.Instance.AddMessage(new DebugMessage($"Command MovePlayer: {direction}", DebugSource.Command));
-            return MoveActorBy(MyGame.World.Player, direction);
+            if (MoveActorBy(MyGame.World.Player, direction))
+            {
+                EndPlayerTurn();
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -73,12 +85,8 @@ namespace Roguelike.Systems
         public bool MoveActorBy(Actor actor, Direction direction)
         {
             //DebugManager.Instance.AddMessage(new DebugMessage($"Command MoveActorBy: {actor.Name}, {direction}", DebugSource.Command));
-            var result = actor.MoveBump(direction);
-
-            if (actor is Player)
-            {
-                MyGame.Karma.EndPlayerTurn();
-            }
+            //var result = actor.MoveBump(direction);
+            var result = actor.CommandMove(direction);
 
             return result;
         }

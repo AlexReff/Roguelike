@@ -1,5 +1,6 @@
 ﻿using Roguelike.Entities;
 using Roguelike.Interfaces;
+using Roguelike.Karma;
 using Roguelike.Karma.Actions;
 using System;
 using System.Collections.Generic;
@@ -38,86 +39,178 @@ namespace Roguelike.Karma
     internal class KarmaMaster
     {
         private KarmaSchedule _schedule;
-        private Dictionary<uint, Queue<KarmaAction>> _plans;
+        private Dictionary<long, Queue<KarmaAction>> _plans;
         private IKarmaWorldState _worldState;
 
         public bool IsPlayerTurn { get; set; }
 
         public KarmaMaster()
         {
+            IsPlayerTurn = true;
             _schedule = new KarmaSchedule();
-            _plans = new Dictionary<uint, Queue<KarmaAction>>();
+            _plans = new Dictionary<long, Queue<KarmaAction>>();
         }
 
         public void DoTime()
         {
-            Actor scheduleable = _schedule.Get();
-            if (scheduleable is Player)
+            while (!IsPlayerTurn)
             {
-                IsPlayerTurn = true;
-                //?
-                //_schedule.Add(scheduleable);
-            }
-            else if (scheduleable is NPC)
-            {
-                /* NPC is added fresh to the system, and is now being freshly plucked from the system
-                 * We need to get the first valid goal and save the plan to our system
-                 * 
-                 * If the actor has a current action, check if it is completed, and still valid, then perform the action
-                 * If the actor completes an action successfully, the next action is chosen from the plan (plan advances), and the actor is scheduled
-                 * If the actor's action becomes invalid (precondition check fail) invalidate the goal and request a new goal
-                 * 
-                 * agent action example: attack target
-                 * action either initiates a move request, or an attack request
-                 */
-                NPC npc = scheduleable as NPC;
-                if (npc.CurrentAction == null || !npc.CurrentAction.IsValid())
-                {
-                    // invalidate/remove the invalid action
-                    npc.CurrentAction?.Invalidate();
-                    npc.CurrentAction = null;
+                Actor scheduleable = _schedule.Get();
 
-                    // check to see if we already have a plan for this npc
-                    if (_plans.ContainsKey(npc.ID) && _plans[npc.ID].Count > 0)
+                // handle recovery
+                if (scheduleable.State == ActorState.Recovering)
+                {
+                    scheduleable.State = ActorState.Idle;
+                    Add(scheduleable);
+                    continue;
+                }
+
+                // continue with any queued actions
+                if (scheduleable.QueuedActions.Count > 0)
+                {
+                    var action = scheduleable.QueuedActions.Peek();
+                    if (scheduleable.InterruptQueuedActions && action.Interruptable)
                     {
-                        // plan already exists and has another action available
-                        npc.CurrentAction = _plans[npc.ID].Dequeue();
-                        if (_plans[npc.ID].Count == 0)
+                        // unless something happened...
+                        scheduleable.QueuedActions.Clear();
+                        scheduleable.InterruptQueuedActions = false;
+                        RemoveAll(scheduleable);
+                    }
+                    else
+                    {
+                        action.Perform();
+                        if (action.IsComplete)
                         {
+                            scheduleable.QueuedActions.Dequeue();
+                        }
+                        else
+                        {
+                            AddAfterLast(scheduleable.KarmaReactionSpeed, scheduleable);
+                        }
+                        continue;
+                    }
+                }
+
+                if (scheduleable is Player)
+                {
+                    IsPlayerTurn = true;
+                    break;
+                }
+                
+                if (scheduleable is NPC)
+                {
+                    /* If the actor has a current action, check if it is completed, and still valid, then perform the action
+                     * If the actor completes an action successfully, the next action is chosen from the plan (plan advances), and the actor is scheduled
+                     * If the actor's action becomes invalid (precondition check fail) invalidate the goal and request a new goal
+                     */
+
+                    NPC npc = scheduleable as NPC;
+                    if (npc.CurrentAction != null)
+                    {
+                        if (npc.CurrentAction.IsCompleted())
+                        {
+                            // action is complete!
+                            npc.CurrentAction.Reset();
+                            npc.CurrentAction = null;
+                        }
+                        else if (!npc.CurrentAction.IsValid())
+                        {
+                            // invalidate/remove the invalid action
+                            npc.CurrentAction.Invalidate();
+                            npc.CurrentAction.Reset();
+                            npc.CurrentAction = null;
+                        }
+                    }
+
+                    if (npc.CurrentAction == null)
+                    {
+                        // check to see if we already have a plan for this npc
+                        if (_plans.ContainsKey(npc.ID) && _plans[npc.ID].Count > 0)
+                        {
+                            // plan already exists and has another action available
+                            npc.CurrentAction = _plans[npc.ID].Dequeue();
+                            if (_plans[npc.ID].Count == 0)
+                            {
+                                _plans.Remove(npc.ID);
+                            }
+                        }
+                        else
+                        {
+                            // no action, no stored plan: get a new plan!
                             _plans.Remove(npc.ID);
+
+                            Queue<KarmaAction> plan = KarmaPlanner.GetPlan(npc, GetCombinedState(npc));
+
+                            if (plan != null && plan.Count > 0)
+                            {
+                                npc.CurrentAction = plan.Dequeue();
+
+                                // if the plan has additional steps, save it
+                                if (plan.Count > 0)
+                                {
+                                    _plans.Add(npc.ID, plan);
+                                }
+                            }
+                        }
+                    }
+
+                    // check to see if the action is valid
+                    if (npc.CurrentAction != null && npc.CurrentAction.IsValid())
+                    {
+                        // check to see if we are in range
+                        if (npc.CurrentAction.IsInValidRange())
+                        {
+                            // we have a valid, in-range action! do it!
+                            npc.CurrentAction.Perform();
+                            continue;
+                        }
+                        else
+                        {
+                            // we are out of range! we must move towards the target
+                            // add the npc's current action back to the front of the plan
+                            // set a getInRange action as the current action
+                            // TODO: refactor this logic to instead navigate towards the closest spot in range, instead of a generic pathfind to the center
+                        
+                            // insert the current action to the front of the plan's queue
+                            var npcAction = npc.CurrentAction;
+                            var newQueue = new Queue<KarmaAction>(new[] { npcAction });
+                            npc.TargetPosition = npcAction.GetTargetPosition();
+
+                            if (_plans.ContainsKey(npc.ID))
+                            {
+                                var existing = _plans[npc.ID];
+                            
+                                foreach (var e in existing)
+                                {
+                                    newQueue.Enqueue(e);
+                                }
+                                _plans[npc.ID] = newQueue;
+                            }
+                            else
+                            {
+                                _plans.Add(npc.ID, newQueue);
+                            }
+
+                            npc.CurrentAction = new GetInRangeAction(npc, npcAction.GetRange());
+                            npc.CurrentAction.Perform();
+                            continue;
                         }
                     }
                     else
                     {
-                        // no action, no stored plan: get a new plan!
-                        _plans.Remove(npc.ID);
-
-                        Queue<KarmaAction> plan = KarmaPlanner.GetPlan(npc, GetCombinedState(npc));
-                        
-                        if (plan != null && plan.Count > 0)
-                        {
-                            var first = plan.Dequeue();
-                            npc.CurrentAction = first;
-
-                            // if the plan has additional steps, save it
-                            if (plan.Count > 0)
-                            {
-                                _plans.Add(npc.ID, plan);
-                            }
-                        }
+                        // we were not able to get a valid action
+                        // add the npc back to the schedule, maybe it will work next time
+                        MyGame.Karma.Add(npc.KarmaReactionSpeed, npc);
                     }
+
+                    //DoTime();
                 }
-
-                if (npc.CurrentAction != null)
-                {
-                    npc.CurrentAction.Perform();
-                }
-
-                //(scheduleable as NPC).PerformAction();
-                //_schedule.Add(scheduleable);
-
-                DoTime();
             }
+        }
+
+        public void RemoveAll(Actor actor)
+        {
+            _schedule.RemoveAll(actor);
         }
 
         public void Remove(Actor actor)
@@ -125,28 +218,39 @@ namespace Roguelike.Karma
             _schedule.Remove(actor);
         }
 
-        public void Add(int time, Actor actor)
+        public void Add(long time, Actor actor)
         {
             _schedule.Add(time, actor);
+        }
+
+        public void AddAfterLast(long time, Actor actor)
+        {
+            _schedule.AddAfterLast(time, actor);
+        }
+
+        public bool IsActorScheduled(Actor actor)
+        {
+            return _schedule.IsActorScheduled(actor);
         }
 
         public void EndPlayerTurn()
         {
             IsPlayerTurn = false;
+            DoTime();
         }
 
+        /// <summary>
+        /// Adds the actor with KarmaReactionSpeed delay
+        /// </summary>
         public void Add(Actor actor)
         {
-            //Adds the selected actor to the scheduling system
-            //Initially delayed to prevent immediate acting
-            Add(actor.ActionSpeed, actor);
+            Add(actor.KarmaReactionSpeed, actor);
         }
 
         public void Initialize(Player player)
         {
             _schedule.Add(0, player);
         }
-
 
         public Dictionary<string, object> GetCombinedState(NPC actor)
         {

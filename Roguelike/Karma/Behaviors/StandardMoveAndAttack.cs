@@ -19,7 +19,7 @@ namespace Roguelike.Behaviors
             FOV fov = new FOV(map.TransparencyView);
 
             //see if there is a player or other enemy in FOV
-            if (!actor.CurrentTarget.HasValue)
+            if (actor.CurrentTarget != null)
             {
                 var deg = Helpers.GetFOVDegree(actor);
                 fov.Calculate(actor.Position, actor.Awareness, MyGame.GameSettings.FOVRadiusType, deg, actor.FOVViewAngle);

@@ -39,7 +39,7 @@ namespace Roguelike
         protected override void Initialize()
         {
             // Setup the engine and create the main window.
-            SadConsole.Game.Create($"{Content.RootDirectory}\\Fonts\\{GameSettings.GameFont}.font", GameSettings.GameWidth, GameSettings.GameHeight);
+            SadConsole.Game.Create($"{Content.RootDirectory}\\Fonts\\{GameSettings.GameFont}.font", GameSettings.GameWidth, GameSettings.GameHeight + (MyGame.GameSettings.EnableDebugOutput ? MyGame.GameSettings.DebugHeight : 0));
             //SadConsole.Game.Create(GameWidth, GameHeight, InitGame);
 
             // Hook the start event so we can add consoles to the system.
@@ -65,15 +65,15 @@ namespace Roguelike
             //Roboto = this.Content.Load<SpriteFont>("fonts/Roboto");
         }
 
-        protected override void Update(GameTime gameTime)
-        {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+        //protected override void Update(GameTime gameTime)
+        //{
+        //    if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+        //        Exit();
 
-            //
+        //    //
 
-            base.Update(gameTime);
-        }
+        //    base.Update(gameTime);
+        //}
 
         private void Init()
         {

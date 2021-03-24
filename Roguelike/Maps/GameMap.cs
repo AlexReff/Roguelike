@@ -57,64 +57,31 @@ namespace Roguelike
             EventManager.Instance.InvokePlayerSpawn(player);
         }
 
-        //public NPC CreateNPC(string id, Coord pos)
-        //{
-        //    if (!Data.NPCStats.ContainsKey(id))
-        //    {
-        //        return null;
-        //    }
-
-        //    NPCStats npcData = Data.NPCStats[id];
-
-        //    XYZRelativeDirection dir = (XYZRelativeDirection)Enum.Parse(typeof(XYZRelativeDirection), npcData.VisionDirection);
-        //    Color color = new Color(npcData.GlyphColor);
-            
-        //    NPC result = new NPC(
-        //        npcData.Name,
-        //        npcData.MaxHealth,
-        //        npcData.MaxMana,
-        //        npcData.Strength,
-        //        npcData.Agility,
-        //        npcData.Stamina,
-        //        npcData.Willpower,
-        //        npcData.Intelligence,
-        //        npcData.Vitae,
-        //        npcData.ActionSpeed,
-        //        npcData.MoveSpeed,
-        //        npcData.Awareness,
-        //        npcData.InnerFovAwareness,
-        //        npcData.HasVision,
-        //        npcData.FovViewAngle,
-        //        dir,
-        //        npcData.BodyType,
-        //        npcData.ActionSet,
-        //        npcData.GoalSet,
-        //        color,
-        //        Color.Transparent,
-        //        npcData.Glyph[0],
-        //        pos,
-        //        true,
-        //        true
-        //        );
-
-        //    return result;
-        //}
-
         public bool AddEntity(MyBasicEntity entity)
         {
-            if (entity is NPC)
+            var result = base.AddEntity(entity);
+
+            if (entity is Actor)
             {
-                MyGame.Karma.Add((entity as NPC).ActionSpeed, entity as NPC);
+                if (entity is Player)
+                {
+                    MyGame.Karma.Add(0, entity as Actor);
+                }
+                else
+                {
+                    MyGame.Karma.Add(entity as Actor);
+                }
+                (entity as Actor).AddedToMap();
             }
 
-            return base.AddEntity(entity);
+            return result;
         }
 
         public bool RemoveEntity(MyBasicEntity entity)
         {
-            if (entity is NPC)
+            if (entity is Actor)
             {
-                MyGame.Karma.Remove(entity as NPC);
+                MyGame.Karma.RemoveAll(entity as Actor);
             }
 
             return base.RemoveEntity(entity);
@@ -148,7 +115,8 @@ namespace Roguelike
         {
             // Generate map via GoRogue, and update the real map with appropriate terrain.
             var tempMap = new ArrayMap<bool>(Width, Height);
-            QuickGenerators.GenerateDungeonMazeMap(tempMap, minRooms: 3, maxRooms: 5, roomMinSize: 8, roomMaxSize: 22);
+            //QuickGenerators.GenerateDungeonMazeMap(tempMap, minRooms: 3, maxRooms: 5, roomMinSize: 8, roomMaxSize: 22);
+            QuickGenerators.GenerateDungeonMazeMap(tempMap, minRooms: 1, maxRooms: 1, roomMinSize: 16, roomMaxSize: 24);
             ApplyTerrainOverlay(tempMap, SpawnTerrainCreator(tempMap));
 
             Coord posToSpawn;
@@ -159,10 +127,9 @@ namespace Roguelike
                 var existingActor = GetEntityAt<Actor>(posToSpawn);
                 if (existingActor == null)
                 {
-                    //var dragon = new Dragon(posToSpawn);
-                    var dragon = new NPC(Data.NPCStats["dragon"], posToSpawn);
-                    AddEntity(dragon);
-                    if (Helpers.RandomGenerator.NextBoolean())
+                    var dragon = new NPC("dragon", posToSpawn);
+                    var added = AddEntity(dragon);
+                    if (Helpers.RandomGenerator.NextBoolean() || Helpers.RandomGenerator.NextBoolean())
                     {
                         dragon.AddCurrency((int)Math.Floor(Helpers.RandomGenerator.NextDouble() * 50));
                     }
@@ -178,10 +145,9 @@ namespace Roguelike
                 var existingActor = GetEntityAt<Actor>(posToSpawn);
                 if (existingActor == null)
                 {
-                    //var goblin = new Goblin(posToSpawn);
-                    var goblin = new NPC(Data.NPCStats["goblin"], posToSpawn);
-                    AddEntity(goblin);
-                    if (Helpers.RandomGenerator.NextBoolean())
+                    var goblin = new NPC("goblin", posToSpawn);
+                    var added = AddEntity(goblin);
+                    if (Helpers.RandomGenerator.NextBoolean() || Helpers.RandomGenerator.NextBoolean())
                     {
                         goblin.AddCurrency((int)Math.Floor(Helpers.RandomGenerator.NextDouble() * 10));
                     }

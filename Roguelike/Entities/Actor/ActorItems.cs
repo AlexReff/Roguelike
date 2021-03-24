@@ -44,7 +44,7 @@ namespace Roguelike.Entities
             }
         }
 
-        public void DropItem(uint id)
+        public void DropItem(long id)
         {
             var item = Inventory.FirstOrDefault((inv) => inv.ID == id);
             if (item != null && item.ID == id)
@@ -55,9 +55,22 @@ namespace Roguelike.Entities
 
         public void DropItem(Item item)
         {
+            if (!item.IsDroppable)
+            {
+                DestroyItem(item);
+                return;
+            }
+
             item.Position = Position;
             this.CurrentMap.AddEntity(item);
             Inventory.Remove(item);
+            CalculateCurrentCarryWeight();
+        }
+
+        public void DestroyItem(Item item)
+        {
+            Inventory.Remove(item);
+            item.Destroy();
             CalculateCurrentCarryWeight();
         }
 
@@ -70,7 +83,7 @@ namespace Roguelike.Entities
         {
             if (item is Currency)
             {
-                AddCurrency(((Currency)item).Amount);
+                AddCurrency((item as Currency).Amount);
             }
             else
             {

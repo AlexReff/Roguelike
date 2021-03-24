@@ -37,7 +37,7 @@ namespace Roguelike.Systems
 
         public UIManager()
         {
-            GameScreen = new GameConsole(MyGame.GameSettings.GameWidth, MyGame.GameSettings.GameHeight, SadConsole.Global.FontDefault);
+            GameScreen = new GameConsole(MyGame.GameSettings.GameWidth, MyGame.GameSettings.GameHeight + (MyGame.GameSettings.EnableDebugOutput ? MyGame.GameSettings.DebugHeight : 0), SadConsole.Global.FontDefault);
             Children.Add(GameScreen);
 
             CurrentState = UIManagerState.MainGame;
@@ -77,7 +77,11 @@ namespace Roguelike.Systems
                     break;
                 case UIManagerState.MainGame:
                 default:
-                    if (MyGame.CommandManager.IsPlayerTurn && !MyGame.CommandManager.IsGameOver)
+                    if (MyGame.CommandManager.IsGameOver)
+                    {
+                        return false;
+                    }
+                    if (MyGame.Karma.IsPlayerTurn)
                     {
                         // PLAYER MOVEMENT START
                         Direction moveDirection = Direction.NONE;
@@ -94,11 +98,12 @@ namespace Roguelike.Systems
 
                         if (moveDirection != Direction.NONE)
                         {
-                            if (MyGame.CommandManager.MovePlayer(moveDirection))
-                            {
-                                //player successfully performed movement or action
-                                MyGame.CommandManager.EndPlayerTurn();
-                            }
+                            //if (MyGame.CommandManager.MovePlayer(moveDirection))
+                            //{
+                            //    //player successfully performed movement or action
+                            //    MyGame.CommandManager.EndPlayerTurn();
+                            //}
+                            MyGame.CommandManager.MovePlayer(moveDirection);
                             return true;
                         }
                         // PLAYER MOVEMENT END
@@ -107,7 +112,7 @@ namespace Roguelike.Systems
                     }
                     else
                     {
-                        MyGame.Karma.DoTime();
+                        //MyGame.Karma.DoTime();
                     }
 
                     break;

@@ -8,13 +8,11 @@ namespace Roguelike.Consoles
 {
     internal class DebugConsole : Console
     {
-        //private Console BackgroundConsole;
         private ScrollingConsole OutputConsole;
 
         private Color BackgroundColor;
         private Color BorderColor;
 
-        //private List<string> messages;
         private readonly Queue<string> _lines;
         private int _maxLines;
 
@@ -23,16 +21,14 @@ namespace Roguelike.Consoles
             BackgroundColor = backgroundColor;
             BorderColor = borderColor;
 
-            //BackgroundConsole = new BorderedBackgroundConsole(width, height, "Debug", BackgroundColor, BorderColor);
-            //BackgroundConsole.Position = new Point(0, 0);
             this.DrawBorderBgTitle(new Rectangle(0, 0, width, height), "Debug", BackgroundColor, BorderColor);
 
-            OutputConsole = new ScrollingConsole(width - 2, height - 2);
-            //OutputConsole.Font = Global.FontDefault.Master.GetFont(Font.FontSizes.Half);
-            OutputConsole.Position = new Point(1, 1);
+            OutputConsole = new ScrollingConsole((width * 2) - 3, height - 1);
+            OutputConsole.Position = new Point(2, 1);
             OutputConsole.Cursor.Position = new Point(0, OutputConsole.Height - 1);
 
-            //Children.Add(BackgroundConsole);
+            OutputConsole.Font = SadConsole.Global.Fonts["CP850"].GetFont(Font.FontSizes.One);
+
             Children.Add(OutputConsole);
 
             _maxLines = Height;

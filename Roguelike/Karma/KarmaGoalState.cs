@@ -13,23 +13,27 @@ namespace Roguelike.Karma
         public bool AtTargetPosition { get; set; }
 
         public bool IdleInPlace { get; set; }
+        public bool IdleInArea { get; set; }
 
-        public bool AttackHostile { get; set; }
+        public bool SensesHostiles { get; set; }
+        public bool AttackHostiles { get; set; }
 
         //world state
 
 
-        public KarmaCombinedState(IKarmaGoalState actorState, IKarmaWorldState worldState) : this(actorState.TargetPosition, actorState.AtTargetPosition, actorState.IdleInPlace, actorState.AttackHostile)
+        public KarmaCombinedState(IKarmaGoalState actorState, IKarmaWorldState worldState) : this(actorState.TargetPosition, actorState.AtTargetPosition, actorState.IdleInPlace, actorState.IdleInArea, actorState.AttackHostiles, actorState.SensesHostiles)
         {
             //
         }
 
-        public KarmaCombinedState(Coord? targetPosition, bool atTargetPosition, bool idleInPlace, bool attackHostile)
+        public KarmaCombinedState(Coord? targetPosition, bool atTargetPosition, bool idleInPlace, bool idleInArea, bool attackHostiles, bool sensesHostiles)
         {
             this.TargetPosition = targetPosition;
             this.AtTargetPosition = atTargetPosition;
             this.IdleInPlace = idleInPlace;
-            this.AttackHostile = attackHostile;
+            this.IdleInArea = idleInArea;
+            this.AttackHostiles = attackHostiles;
+            this.SensesHostiles = sensesHostiles;
         }
 
         public KarmaCombinedState Clone()
@@ -39,18 +43,22 @@ namespace Roguelike.Karma
             {
                 targetPos = new Coord(TargetPosition.Value.X, TargetPosition.Value.Y);
             }
-            return new KarmaCombinedState(targetPos, AtTargetPosition, IdleInPlace, AttackHostile);
+            return new KarmaCombinedState(targetPos, AtTargetPosition, IdleInPlace, IdleInArea, AttackHostiles, SensesHostiles);
         }
     }
 
     internal interface IKarmaGoalState
     {
         public Coord? TargetPosition { get; }
+
+        // conditions
+        public bool SensesHostiles { get; }
         public bool AtTargetPosition { get; }
 
-        //goals
+        // goals
         public bool IdleInPlace { get; }
-        public bool AttackHostile { get; }
+        public bool IdleInArea { get; set; }
+        public bool AttackHostiles { get; }
 
         //public bool CanSeePlayer { get; set; }
         //public bool AlertedToPlayer { get; set; }

@@ -21,6 +21,10 @@ namespace Roguelike.Systems
         /// </summary>
         public event Action<Actor, double> ActorHealthChangedEvent;
         /// <summary>
+        /// Fires when an actor attacks another actor. TODO: Include attack data as needed
+        /// </summary>
+        public event Action<Actor, Actor> ActorAttackEvent;
+        /// <summary>
         /// Fires every time the player's turn ends
         /// </summary>
         public event Action PlayerTurnEndedEvent;
@@ -36,13 +40,23 @@ namespace Roguelike.Systems
             //
         }
 
-        //public void ClearAllSubscribers()
-        //{
-        //    ActorMovedEvent = null;
-        //    ActorDiedEvent = null;
-        //    ActorHealthChangedEvent = null;
-        //    PlayerTurnEndedEvent = null;
-        //}
+        public void Reset()
+        {
+            ActorMovedEvent = null;
+            ActorAttackEvent = null;
+            ActorDiedEvent = null;
+            ActorHealthChangedEvent = null;
+            PlayerSpawnedEvent = null;
+            PlayerTurnEndedEvent = null;
+        }
+
+        public void InvokeActorAttacked(Actor attacker, Actor target)
+        {
+            if (ActorAttackEvent != null)
+            {
+                ActorAttackEvent(attacker, target);
+            }
+        }
 
         public void InvokeActorMoved(Actor actor, Coord oldPosition, Coord newPosition)
         {
@@ -86,10 +100,7 @@ namespace Roguelike.Systems
         }
 
 
-
-        //
-
-
+        // static
 
         private static readonly EventManager instance = new EventManager();
 

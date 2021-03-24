@@ -18,8 +18,8 @@ namespace Roguelike.JSON
         public int Willpower { get; set; }
         public int Intelligence { get; set; }
         public int Vitae { get; set; }
-        public int ActionSpeed { get; set; }
-        public int MoveSpeed { get; set; }
+        public double ActionSpeed { get; set; }
+        public double MoveSpeed { get; set; }
         public int Awareness { get; set; }
         public int InnerFovAwareness { get; set; }
         public bool HasVision { get; set; }
@@ -38,11 +38,15 @@ namespace Roguelike.JSON
         /// </summary>
         public string GoalSet { get; set; }
 
+        /// <summary>
+        /// Reference to JSON.Factions
+        /// </summary>
+        public string Faction { get; set; }
+
         public NPCStats(JsonElement m)
         {
             ID = m.GetProperty("ID").GetString();
             Name = m.GetProperty("Name").GetString();
-
             MaxHealth = m.GetProperty("MaxHealth").GetDouble();
             MaxMana = m.GetProperty("MaxMana").GetDouble();
             Strength = m.GetProperty("Strength").GetInt32();
@@ -51,8 +55,8 @@ namespace Roguelike.JSON
             Willpower = m.GetProperty("Willpower").GetInt32();
             Intelligence = m.GetProperty("Intelligence").GetInt32();
             Vitae = m.GetProperty("Vitae").GetInt32();
-            ActionSpeed = m.GetProperty("ActionSpeed").GetInt32();
-            MoveSpeed = m.GetProperty("MoveSpeed").GetInt32();
+            ActionSpeed = m.GetProperty("ActionSpeed").GetDouble();
+            MoveSpeed = m.GetProperty("MoveSpeed").GetDouble();
             Awareness = m.GetProperty("Awareness").GetInt32();
             InnerFovAwareness = m.GetProperty("InnerFovAwareness").GetInt32();
             HasVision = m.GetProperty("HasVision").GetBoolean();
@@ -63,6 +67,7 @@ namespace Roguelike.JSON
             GlyphColor = m.GetProperty("GlyphColor").GetUInt32();
             ActionSet = m.GetProperty("ActionSet").GetString();
             GoalSet = m.GetProperty("GoalSet").GetString();
+            Faction = m.GetProperty("Faction").GetString();
         }
     }
 }
