@@ -48,7 +48,6 @@ namespace Roguelike.Karma.Actions
         {
             if (IsCompleted())
             {
-                //MyGame.Karma.AddAfterLast(1, Actor);
                 return false;
             }
 
@@ -57,17 +56,9 @@ namespace Roguelike.Karma.Actions
             if (targetDir != null)
             {
                 Actor.QueueActionTurnAndMove(targetDir);
-                //MyGame.Karma.AddImmediate(Actor);
                 return true;
-                //if (Actor.QueueActionTurnAndMove(targetDir))
-                //{
-                //    MyGame.Karma.AddAfterLast(Actor.KarmaMoveSpeed, Actor);
-                //    return true;
-                //}
             }
 
-            //MyGame.Karma.AddAfterLast(1, Actor);
-            //MyGame.Karma.Add(1, Actor);
             return false;
         }
     }

@@ -126,6 +126,8 @@ namespace Roguelike.Entities
                 Body.Parent = this;
             }
 
+            Moved += Actor_Moved;
+
             //_actors.Add(this.ID, this);
         }
 

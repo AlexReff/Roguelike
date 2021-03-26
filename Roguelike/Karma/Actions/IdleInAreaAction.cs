@@ -57,7 +57,6 @@ namespace Roguelike.Karma.Actions
                     if (targetDir != null && targetDir != Direction.NONE)
                     {
                         Actor.QueueActionTurnAndMove(targetDir);
-                        //MyGame.Karma.AddImmediate(Actor);
                         return true;
                     }
 
@@ -65,7 +64,6 @@ namespace Roguelike.Karma.Actions
                 }
             }
 
-            //MyGame.Karma.AddAfterLast(Actor.KarmaReactionSpeed, Actor);
             return false;
         }
 

@@ -35,7 +35,6 @@ namespace Roguelike.Karma
 {
     /// <summary>
     /// GOAP-ish AI manager
-    /// 
     /// </summary>
     internal class KarmaMaster
     {
@@ -43,6 +42,7 @@ namespace Roguelike.Karma
         private Dictionary<long, Queue<KarmaAction>> _plans;
         private IKarmaWorldState _worldState;
 
+        public long CurrentTime { get { return _schedule.CurrentTime; } }
         public bool IsPlayerTurn { get; set; }
         public bool IsStopped { get; set; }
 
@@ -71,33 +71,34 @@ namespace Roguelike.Karma
                 if (scheduleable.ActionQueue.Count > 0)
                 {
                     var action = scheduleable.ActionQueue.Peek();
-                    if (scheduleable.InterruptQueuedActions && action.Interruptable)
+                    //if (scheduleable.InterruptQueuedActions && action.Interruptable)
+                    //{
+                    //    // unless something happened...
+                    //    scheduleable.ActionQueue.Clear();
+                    //    scheduleable.InterruptQueuedActions = false;
+                    //    RemoveAll(scheduleable);
+                    //}
+                    //else
+                    //{
+                    action.Perform();
+                    if (action.IsComplete)
                     {
-                        // unless something happened...
-                        scheduleable.ActionQueue.Clear();
-                        scheduleable.InterruptQueuedActions = false;
-                        RemoveAll(scheduleable);
+                        scheduleable.ActionQueue.Dequeue();
+                        Add(scheduleable);
                     }
                     else
                     {
-                        action.Perform();
-                        if (action.IsComplete)
-                        {
-                            scheduleable.ActionQueue.Dequeue();
-                            Add(scheduleable);
-                        }
-                        else
-                        {
-                            Add(action.GetDelay(), scheduleable);
-                        }
-                        continue;
+                        Add(action.GetDelay(), scheduleable);
                     }
+                    continue;
+                    //}
                 }
 
                 // pause for player input (no action units left)
                 if (scheduleable is Player)
                 {
                     IsPlayerTurn = true;
+                    MyGame.CommandManager.PlayerTurnStarted();
                     break;
                 }
                 
@@ -252,7 +253,7 @@ namespace Roguelike.Karma
         public void Stop()
         {
             IsStopped = true;
-            _schedule.Reset();
+            _schedule.Stop();
         }
 
         public void EndPlayerTurn()

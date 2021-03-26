@@ -11,7 +11,6 @@ namespace Roguelike.Entities
         private FOV _fov;
         public HashSet<Actor> VisibleActors { get; }
         public HashSet<Actor> VisibleEnemies { get; }
-        public bool SensesHostiles { get; set; }
 
         /// <summary>
         /// Call this after an entity is added to a map
@@ -52,7 +51,6 @@ namespace Roguelike.Entities
 
         public void CheckHostiles()
         {
-            SensesHostiles = false;
             VisibleEnemies.Clear();
 
             foreach (var actor in VisibleActors)
@@ -60,7 +58,6 @@ namespace Roguelike.Entities
                 if (IsHostileTo(actor))
                 {
                     VisibleEnemies.Add(actor);
-                    SensesHostiles = true;
                 }
             }
         }

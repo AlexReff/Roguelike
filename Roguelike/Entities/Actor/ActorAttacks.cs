@@ -63,13 +63,11 @@ namespace Roguelike.Entities
             //{
             //    PlayerMessageManager.Instance.AddMessage($"{Name} barely misses {target.Name}({target.State})");
             //}
-
-            // being attacked will interrupt certain stacked actions
-            target.InterruptQueuedActions = true;
-
             // TODO: do attack math things
             long dmg = (long)(Helpers.RandomGenerator.NextDouble() * (Strength + Agility) * .8);
+            
             target.Health -= dmg;
+            
             if (target is Player || this is Player)
             {
                 DebugManager.Instance.AddMessage($"{Name} attacks {target.Name} for {dmg}dmg");
@@ -77,7 +75,20 @@ namespace Roguelike.Entities
 
             EventManager.Instance.InvokeActorAttacked(this, target);
             State = ActorState.Recovering;
-            //return true;
+        }
+
+        public void ResolveDefense(Actor attacker)
+        {
+            InterruptQueuedActions = true;
+
+            if (CurrentTarget == null)
+            {
+                CurrentTarget = attacker;
+            }
+
+            // process an incoming attack
+
+            _lastAttackedTime = MyGame.Karma.CurrentTime;
         }
 
         ///// <summary>

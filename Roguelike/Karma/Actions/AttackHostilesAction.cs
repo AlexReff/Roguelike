@@ -44,7 +44,10 @@ namespace Roguelike.Karma.Actions
 
         public override bool IsInValidRange()
         {
-            AcquireTarget(false);
+            if (Actor.CurrentTarget == null)
+            {
+                AcquireTarget(false);
+            }
             return base.IsInValidRange();
         }
 
@@ -60,19 +63,11 @@ namespace Roguelike.Karma.Actions
                     if (targetDir != null && targetDir != Direction.NONE)
                     {
                         Actor.QueueTurnAndBumpAttack(targetDir);
-                        //MyGame.Karma.AddImmediate(Actor);
                         return true;
-                        //if (Actor.QueueBumpAttack(targetDir))
-                        //{
-                        //    MyGame.Karma.AddAfterLast(Actor.KarmaActionSpeed, Actor);
-                        //    return true;
-                        //}
                     }
                 }
             }
 
-            //MyGame.Karma.Add(0, Actor);
-            //MyGame.Karma.AddAfterLast(Actor.KarmaReactionSpeed, Actor);
             return false;
         }
 
@@ -80,7 +75,12 @@ namespace Roguelike.Karma.Actions
         {
             if (Actor.CurrentTarget != null)
             {
-                if (!Actor.IsDead && Actor.VisibleEnemies.Contains(Actor.CurrentTarget))
+                if (Actor.IsDead || Actor.CurrentTarget.IsDead)
+                {
+                    Actor.CurrentTarget = null;
+                    return;
+                }
+                if (Actor.VisibleEnemies.Contains(Actor.CurrentTarget))
                 {
                     // we still have eyes on our target
                     return;
@@ -90,7 +90,7 @@ namespace Roguelike.Karma.Actions
                     if (doTurn)
                     {
                         var dist = Distance.EUCLIDEAN.Calculate(Actor.Position, Actor.CurrentTarget.Position);
-                        if (dist < 4)
+                        if (dist < 5)
                         {
                             Direction targetDir = Direction.GetDirection(Actor.Position, Actor.CurrentTarget.Position);
                             if (targetDir != null && targetDir != Direction.NONE)
@@ -102,7 +102,7 @@ namespace Roguelike.Karma.Actions
                     else
                     {
                         // we can no longer see our current target
-                        Actor.CurrentTarget = null;
+                        //Actor.CurrentTarget = null;
                     }
                 }
             }

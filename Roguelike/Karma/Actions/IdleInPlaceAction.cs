@@ -37,7 +37,6 @@ namespace Roguelike.Karma.Actions
 
         public override bool Perform()
         {
-            //MyGame.Karma.AddAfterLast(1, Actor);
             return false;
         }
 

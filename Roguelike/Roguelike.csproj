@@ -39,7 +39,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\obj\DesktopGL\Content\fonts\" />
-    <Folder Include="Graphics\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GoRogue\GoRogue.csproj" />

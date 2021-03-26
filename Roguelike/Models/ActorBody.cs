@@ -255,12 +255,12 @@ namespace Roguelike.Models
     internal class Limb : ActorBodyPart
     {
         /// <summary>
-        /// NULL if THIS is TORSO, else the body part this this part connects to
+        /// NULL if THIS is TORSO, else the body part this part is connected by
         /// </summary>
         public Limb LimbParent { get; set; }
 
         /// <summary>
-        /// IMMEDIATELY-connected parts
+        /// IMMEDIATELY-connected child parts
         /// </summary>
         public List<Limb> LimbChildren { get; set; }
 
@@ -270,13 +270,18 @@ namespace Roguelike.Models
         /// </summary>
         public bool IsLifeSupporting { get; set; }
 
+        /// <summary>
+        /// EG projectiles that get stuck
+        /// </summary>
+        public List<Item> EmbeddedItems { get; set; }
+
         public Limb(string name, char glyph, bool isLifeSupporting, LimbSize size, Color foregroundColor) : base(name, foregroundColor, Color.Transparent, glyph)
         {
-            Name = name;
             LimbParent = null;
             LimbChildren = new List<Limb>();
             LimbSize = size;
             IsLifeSupporting = isLifeSupporting;
+            EmbeddedItems = new List<Item>();
 
             Health = MaxHealth = 100;
         }
@@ -329,22 +334,20 @@ namespace Roguelike.Models
 
     internal class Foot : Limb
     {
-        /// <summary>
-        /// Whether this foot is connected to 'ground'
-        /// </summary>
-        public bool IsOnGround { get; set; }
+        ///// <summary>
+        ///// Whether this foot is connected to 'ground'
+        ///// </summary>
+        //public bool IsOnGround { get; set; }
 
-        /// <summary>
-        /// Whether this foot is 'stable' on the ground, providing balance
-        /// </summary>
-        public bool IsStable { get; set; }
+        ///// <summary>
+        ///// Whether this foot is 'stable' on the ground, providing balance
+        ///// </summary>
+        //public bool IsStable { get; set; }
 
         public Foot(string name, Color foregroundColor) : base(name, 'f', false, LimbSize.HandFoot, foregroundColor)
         {
-            Name = name;
-
-            IsOnGround = true;
-            IsStable = true;
+            //IsOnGround = true;
+            //IsStable = true;
         }
     }
 

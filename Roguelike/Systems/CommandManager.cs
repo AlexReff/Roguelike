@@ -15,36 +15,25 @@ namespace Roguelike.Systems
 {
     class CommandManager
     {
-        //public bool IsPlayerTurn { get; set; }
         public bool IsGameOver { get; set; }
-
-        //private Stopwatch Timer;
-        //private double ms;
 
         public CommandManager()
         {
-            //IsPlayerTurn = true;
             IsGameOver = false;
-
-            //Timer = new Stopwatch();
-            //ms = 1000 / MyGame.GameSettings.FPSLimit;
         }
 
         public void GameOver()
         {
-            //MyGame.Scheduler.Stop();
-            //MyGame.Scheduler.Add(MyGame.World.Player);
             IsGameOver = true;
+        }
+
+        public void PlayerTurnStarted()
+        {
+            //
         }
 
         public void EndPlayerTurn()
         {
-            ////IsPlayerTurn = false;
-            ////MyGame.Karma.EndPlayerTurn();
-            //var player = MyGame.World.Player;
-            ////player.QueuedActions.Enqueue(new ResolveEndPlayerTurnAction(player));
-            //MyGame.Karma.AddAfterLast(0, player);
-            ////MyGame.Karma.DoTime();
             MyGame.Karma.EndPlayerTurn();
         }
 

@@ -60,6 +60,7 @@ namespace Roguelike.Entities
         {
             //Spells = SpellSkillManager.Instance.GetAllSpells();
             Moved += Player_Moved;
+            EquipDefaultLoadout();
         }
 
         private void Player_Moved(object sender, ItemMovedEventArgs<GoRogue.GameFramework.IGameObject> e)
@@ -75,6 +76,11 @@ namespace Roguelike.Entities
                     }
                 }
             }
+        }
+
+        private void EquipDefaultLoadout()
+        {
+            //
         }
 
         //public static Player DefaultPlayer(Coord position)

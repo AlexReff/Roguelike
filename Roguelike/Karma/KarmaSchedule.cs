@@ -10,6 +10,7 @@ namespace Roguelike.Karma
 {
     internal class KarmaSchedule
     {
+        private bool _isStopped;
         private long _time;
         private readonly SortedDictionary<long, List<Actor>> _scheduleables;
 
@@ -46,6 +47,10 @@ namespace Roguelike.Karma
         // Place it at the current time plus the object's Time property.
         public void Add(long timeOffset, Actor scheduleable)
         {
+            if (_isStopped)
+            {
+                return;
+            }
             //MyBasicEntity baseEntity = scheduleable as MyBasicEntity;
             long key = _time + timeOffset;
             
@@ -92,7 +97,15 @@ namespace Roguelike.Karma
 
         public void AddImmediate(Actor actor)
         {
-            _scheduleables[_scheduleables.Keys.First()].Insert(0, actor);
+            if (_isStopped)
+            {
+                return;
+            }
+            if (!_scheduleables.ContainsKey(CurrentTime))
+            {
+                _scheduleables.Add(CurrentTime, new List<Actor>());
+            }
+            _scheduleables[CurrentTime].Insert(0, actor);
         }
 
         /// <summary>
@@ -162,8 +175,9 @@ namespace Roguelike.Karma
         }
 
         // Reset the time and clear out the schedule
-        public void Reset()
+        public void Stop()
         {
+            _isStopped = true;
             _time = 0;
             _scheduleables.Clear();
         }

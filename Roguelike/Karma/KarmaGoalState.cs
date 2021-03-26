@@ -17,16 +17,17 @@ namespace Roguelike.Karma
 
         public bool SensesHostiles { get; set; }
         public bool AttackHostiles { get; set; }
+        public bool UnderAttack { get; set; }
 
         //world state
 
 
-        public KarmaCombinedState(IKarmaGoalState actorState, IKarmaWorldState worldState) : this(actorState.TargetPosition, actorState.AtTargetPosition, actorState.IdleInPlace, actorState.IdleInArea, actorState.AttackHostiles, actorState.SensesHostiles)
+        public KarmaCombinedState(IKarmaGoalState actorState, IKarmaWorldState worldState) : this(actorState.TargetPosition, actorState.AtTargetPosition, actorState.IdleInPlace, actorState.IdleInArea, actorState.AttackHostiles, actorState.SensesHostiles, actorState.UnderAttack)
         {
             //
         }
 
-        public KarmaCombinedState(Coord? targetPosition, bool atTargetPosition, bool idleInPlace, bool idleInArea, bool attackHostiles, bool sensesHostiles)
+        public KarmaCombinedState(Coord? targetPosition, bool atTargetPosition, bool idleInPlace, bool idleInArea, bool attackHostiles, bool sensesHostiles, bool underAttack)
         {
             this.TargetPosition = targetPosition;
             this.AtTargetPosition = atTargetPosition;
@@ -34,16 +35,18 @@ namespace Roguelike.Karma
             this.IdleInArea = idleInArea;
             this.AttackHostiles = attackHostiles;
             this.SensesHostiles = sensesHostiles;
+            this.UnderAttack = underAttack;
         }
 
         public KarmaCombinedState Clone()
         {
+            // create new structs/classes
             Coord? targetPos = null;
             if (TargetPosition.HasValue)
             {
                 targetPos = new Coord(TargetPosition.Value.X, TargetPosition.Value.Y);
             }
-            return new KarmaCombinedState(targetPos, AtTargetPosition, IdleInPlace, IdleInArea, AttackHostiles, SensesHostiles);
+            return new KarmaCombinedState(targetPos, AtTargetPosition, IdleInPlace, IdleInArea, AttackHostiles, SensesHostiles, UnderAttack);
         }
     }
 
@@ -53,6 +56,7 @@ namespace Roguelike.Karma
 
         // conditions
         public bool SensesHostiles { get; }
+        public bool UnderAttack { get; }
         public bool AtTargetPosition { get; }
 
         // goals
@@ -60,19 +64,6 @@ namespace Roguelike.Karma
         public bool IdleInArea { get; set; }
         public bool AttackHostiles { get; }
 
-        //public bool CanSeePlayer { get; set; }
-        //public bool AlertedToPlayer { get; set; }
-        //public bool NearPlayer { get; set; }
-        //public bool NextToPlayer { get; set; }
-        //public bool InAttackRangeOfPlayer { get; set; }
-        
-        //public bool Fleeing { get; set; }
-        //public bool IsSafeDistance { get; set; }
-
-        /*
-         * IsHungry
-         * IsTerrified
-         */
     }
 
     internal interface IKarmaWorldState
@@ -85,24 +76,4 @@ namespace Roguelike.Karma
         //potentially add 'faction' state at some point?
     }
 
-    //internal class KarmaGoalState : IKarmaGoalState
-    //{
-    //    public Coord? TargetPosition { get; set; }
-    //    public Coord? CurrentPosition { get; set; }
-    //    public bool AtTargetPosition { get { return TargetPosition != null && CurrentPosition != null && TargetPosition == CurrentPosition; } }
-    //    public bool IdleInPlace { get; set; }
-
-    //    //public bool CanSeePlayer { get; set; }
-    //    //public bool AlertedToPlayer { get; set; }
-    //    //public bool NearPlayer { get; set; }
-    //    //public bool NextToPlayer { get; set; }
-    //    //public bool InAttackRangeOfPlayer { get; set; }
-    //    //public bool Fleeing { get; set; }
-    //    //public bool IsSafeDistance { get; set; }
-
-    //    public KarmaGoalState()
-    //    {
-    //        //
-    //    }
-    //}
 }

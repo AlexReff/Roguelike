@@ -12,6 +12,12 @@ namespace Roguelike.Entities
 {
     internal partial class Actor
     {
+
+        private void Actor_Moved(object sender, ItemMovedEventArgs<GoRogue.GameFramework.IGameObject> e)
+        {
+            CalculateFOV();
+        }
+
         public Direction GetNextStepInPath(Coord pathCenter)
         {
             Coord? targetPos = null;

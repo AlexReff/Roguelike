@@ -15,9 +15,14 @@ namespace Roguelike.Entities
         /// </summary>
         public Queue<ActionUnit> ActionQueue { get; }
         public KarmaAction CurrentAction { get; set; }
+        public bool SensesHostiles { get { return VisibleEnemies.Count > 0; } }
+
+        //
+        public bool UnderAttack { get { return _lastAttackedTime.HasValue && MyGame.Karma.CurrentTime - _lastAttackedTime.Value < 50; } }
+        private long? _lastAttackedTime;
 
         /// <summary>
-        /// This bool will be set when an event happens to the actor before the actor could finish all queued actions
+        /// This bool will be set when an event happens to the actor before the actor could finish all queued actions. Currently disabled
         /// </summary>
         public bool InterruptQueuedActions { get; set; }
 
