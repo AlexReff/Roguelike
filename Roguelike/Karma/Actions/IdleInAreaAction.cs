@@ -56,14 +56,16 @@ namespace Roguelike.Karma.Actions
 
                     if (targetDir != null && targetDir != Direction.NONE)
                     {
-                        return Actor.CommandMove(targetDir);
+                        Actor.QueueActionTurnAndMove(targetDir);
+                        //MyGame.Karma.AddImmediate(Actor);
+                        return true;
                     }
 
                     validNeighbors.RemoveAt(randIdx);
                 }
             }
 
-            MyGame.Karma.Add(Actor);
+            //MyGame.Karma.AddAfterLast(Actor.KarmaReactionSpeed, Actor);
             return false;
         }
 

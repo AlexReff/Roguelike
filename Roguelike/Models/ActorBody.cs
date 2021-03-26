@@ -277,6 +277,8 @@ namespace Roguelike.Models
             LimbChildren = new List<Limb>();
             LimbSize = size;
             IsLifeSupporting = isLifeSupporting;
+
+            Health = MaxHealth = 100;
         }
 
         public Item CreateItemInstance(Coord pos)

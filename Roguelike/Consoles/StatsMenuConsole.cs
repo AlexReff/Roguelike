@@ -4,6 +4,7 @@ using Roguelike.Entities;
 using Roguelike.Models;
 using Roguelike.Systems;
 using SadConsole;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text;
@@ -124,8 +125,14 @@ namespace Roguelike.Consoles
                 Limb limb = limbs[i];
                 string hpStr = $"{limb.Health}/{limb.MaxHealth}";
                 //int healthBarWidth = OutputConsole.Width - hpStr.Length - 4;
-                //OutputConsole.Print(OutputConsole.Width - RightTextPadding - 1, HealthBar.Position.Y, hpStr, Color.White, Color.Black);
-                //OutputConsole.DrawBox(new Microsoft.Xna.Framework.Rectangle(HealthBar.Position.X, HealthBar.Position.Y, HealthBar.Width, HealthBar.Height), new Cell(Color.Transparent, BoxColor));
+                OutputConsole.Print(OutputConsole.Width - RightTextPadding - 1, i, hpStr, new Color(102, 0, 0), Color.Black);
+                var totalWidth = OutputConsole.Width - RightTextPadding - 4;
+                OutputConsole.DrawBox(new Microsoft.Xna.Framework.Rectangle(1, i, totalWidth, 1), new Cell(Color.Transparent, BoxColor));
+                if (limb.MaxHealth > 0 && limb.Health > 0)
+                {
+                    int hpWidth = (int)Math.Floor(limb.Health / limb.MaxHealth * totalWidth);
+                    OutputConsole.DrawBox(new Microsoft.Xna.Framework.Rectangle(1, i, hpWidth, 1), new Cell(new Color(102, 0, 0), new Color(102, 0, 0)));
+                }
             }
         }
 

@@ -21,6 +21,12 @@ namespace Roguelike.Karma.Actions
             return (Actor as NPC).TargetPosition;
         }
 
+        /// <summary>
+        /// This must return true as 'getting in range' is always valid
+        /// </summary>
+        /// <returns></returns>
+        public override bool IsInValidRange() => true;
+
         public override bool IsCompleted()
         {
             //measure distance to see if we are in range
@@ -42,16 +48,26 @@ namespace Roguelike.Karma.Actions
         {
             if (IsCompleted())
             {
-                return true;
+                //MyGame.Karma.AddAfterLast(1, Actor);
+                return false;
             }
 
             Direction targetDir = Actor.GetNextStepInPath(GetTargetPosition().Value);
 
             if (targetDir != null)
             {
-                return Actor.CommandMove(targetDir);
+                Actor.QueueActionTurnAndMove(targetDir);
+                //MyGame.Karma.AddImmediate(Actor);
+                return true;
+                //if (Actor.QueueActionTurnAndMove(targetDir))
+                //{
+                //    MyGame.Karma.AddAfterLast(Actor.KarmaMoveSpeed, Actor);
+                //    return true;
+                //}
             }
 
+            //MyGame.Karma.AddAfterLast(1, Actor);
+            //MyGame.Karma.Add(1, Actor);
             return false;
         }
     }

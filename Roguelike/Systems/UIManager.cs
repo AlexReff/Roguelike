@@ -103,7 +103,9 @@ namespace Roguelike.Systems
                             //    //player successfully performed movement or action
                             //    MyGame.CommandManager.EndPlayerTurn();
                             //}
-                            MyGame.CommandManager.MovePlayer(moveDirection);
+                            MyGame.CommandManager.Input_PlayerMoveBump(moveDirection);
+
+                            // tell processKeyboard that the input was processed
                             return true;
                         }
                         // PLAYER MOVEMENT END

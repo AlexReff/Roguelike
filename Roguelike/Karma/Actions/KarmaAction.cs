@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Roguelike.Karma.Actions
 {
+    /// <summary>
+    /// KarmaAction Perform() must Queue ActionUnits
+    /// </summary>
     internal abstract class KarmaAction
     {
         public Actor Actor { get; }
@@ -21,10 +24,10 @@ namespace Roguelike.Karma.Actions
         public Dictionary<string, object> Effects { get; }
 
         /// <summary>
-        /// Perform the current action for the given actor.
-        /// IMPORTANT: Perform must also Karma-Schedule the actor (or call actions that do so)
+        /// Perform queues one or more ActionUnit on the Actor.
+        /// These units will be sequentially completed until returning to this action (if IsCompleted==false)
         /// </summary>
-        /// <returns>Returns TRUE if </returns>
+        /// <returns>TRUE if at least one ActionUnit was queued, FALSE if nothing happens</returns>
         public abstract bool Perform();
 
         /// <summary>

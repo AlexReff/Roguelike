@@ -2,6 +2,7 @@
 using Roguelike.Interfaces;
 using Roguelike.Karma;
 using Roguelike.Karma.Actions;
+using Roguelike.Systems;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -43,6 +44,7 @@ namespace Roguelike.Karma
         private IKarmaWorldState _worldState;
 
         public bool IsPlayerTurn { get; set; }
+        public bool IsStopped { get; set; }
 
         public KarmaMaster()
         {
@@ -53,7 +55,7 @@ namespace Roguelike.Karma
 
         public void DoTime()
         {
-            while (!IsPlayerTurn)
+            while (!IsPlayerTurn && !IsStopped)
             {
                 Actor scheduleable = _schedule.Get();
 
@@ -65,14 +67,14 @@ namespace Roguelike.Karma
                     continue;
                 }
 
-                // continue with any queued actions
-                if (scheduleable.QueuedActions.Count > 0)
+                // process action units
+                if (scheduleable.ActionQueue.Count > 0)
                 {
-                    var action = scheduleable.QueuedActions.Peek();
+                    var action = scheduleable.ActionQueue.Peek();
                     if (scheduleable.InterruptQueuedActions && action.Interruptable)
                     {
                         // unless something happened...
-                        scheduleable.QueuedActions.Clear();
+                        scheduleable.ActionQueue.Clear();
                         scheduleable.InterruptQueuedActions = false;
                         RemoveAll(scheduleable);
                     }
@@ -81,16 +83,18 @@ namespace Roguelike.Karma
                         action.Perform();
                         if (action.IsComplete)
                         {
-                            scheduleable.QueuedActions.Dequeue();
+                            scheduleable.ActionQueue.Dequeue();
+                            Add(scheduleable);
                         }
                         else
                         {
-                            AddAfterLast(scheduleable.KarmaReactionSpeed, scheduleable);
+                            Add(action.GetDelay(), scheduleable);
                         }
                         continue;
                     }
                 }
 
+                // pause for player input (no action units left)
                 if (scheduleable is Player)
                 {
                     IsPlayerTurn = true;
@@ -105,6 +109,8 @@ namespace Roguelike.Karma
                      */
 
                     NPC npc = scheduleable as NPC;
+
+                    // complete or invalidate existing action
                     if (npc.CurrentAction != null)
                     {
                         if (npc.CurrentAction.IsCompleted())
@@ -115,13 +121,14 @@ namespace Roguelike.Karma
                         }
                         else if (!npc.CurrentAction.IsValid())
                         {
-                            // invalidate/remove the invalid action
+                            // invalidate+remove the invalid action
                             npc.CurrentAction.Invalidate();
                             npc.CurrentAction.Reset();
                             npc.CurrentAction = null;
                         }
                     }
 
+                    // no action active, get a new one
                     if (npc.CurrentAction == null)
                     {
                         // check to see if we already have a plan for this npc
@@ -157,21 +164,8 @@ namespace Roguelike.Karma
                     // check to see if the action is valid
                     if (npc.CurrentAction != null && npc.CurrentAction.IsValid())
                     {
-                        // check to see if we are in range
-                        if (npc.CurrentAction.IsInValidRange())
+                        if (!npc.CurrentAction.IsInValidRange())
                         {
-                            // we have a valid, in-range action! do it!
-                            npc.CurrentAction.Perform();
-                            continue;
-                        }
-                        else
-                        {
-                            // we are out of range! we must move towards the target
-                            // add the npc's current action back to the front of the plan
-                            // set a getInRange action as the current action
-                            // TODO: refactor this logic to instead navigate towards the closest spot in range, instead of a generic pathfind to the center
-                        
-                            // insert the current action to the front of the plan's queue
                             var npcAction = npc.CurrentAction;
                             var newQueue = new Queue<KarmaAction>(new[] { npcAction });
                             npc.TargetPosition = npcAction.GetTargetPosition();
@@ -179,7 +173,7 @@ namespace Roguelike.Karma
                             if (_plans.ContainsKey(npc.ID))
                             {
                                 var existing = _plans[npc.ID];
-                            
+
                                 foreach (var e in existing)
                                 {
                                     newQueue.Enqueue(e);
@@ -192,18 +186,30 @@ namespace Roguelike.Karma
                             }
 
                             npc.CurrentAction = new GetInRangeAction(npc, npcAction.GetRange());
-                            npc.CurrentAction.Perform();
+                        }
+
+                        // we have a valid, in-range action! do it!
+                        if (npc.CurrentAction.Perform())
+                        {
+                            // an action has been queued, do it!
+                            MyGame.Karma.AddImmediate(scheduleable);
                             continue;
                         }
                     }
-                    else
+
+                    // we were not able to get or perform a valid action
+                    // add the npc back to the schedule, it may work next time
+                    if (npc.CurrentAction == null)
                     {
-                        // we were not able to get a valid action
-                        // add the npc back to the schedule, maybe it will work next time
-                        MyGame.Karma.Add(npc.KarmaReactionSpeed, npc);
+                        DebugManager.Instance.AddMessage($"Unable to get an action for NPC {npc.Name}:{npc.ID}");
+                    }
+                    else if (!npc.CurrentAction.Name.StartsWith("Idle"))
+                    {
+                        DebugManager.Instance.AddMessage($"Unable to perform an action for NPC {npc.Name}:{npc.ID}, Action: {npc.CurrentAction.Name}");
                     }
 
-                    //DoTime();
+                    npc.State = ActorState.Idle;
+                    MyGame.Karma.Add(npc);
                 }
             }
         }
@@ -215,7 +221,7 @@ namespace Roguelike.Karma
 
         public void Remove(Actor actor)
         {
-            _schedule.Remove(actor);
+            _schedule.RemoveFirst(actor);
         }
 
         public void Add(long time, Actor actor)
@@ -223,14 +229,30 @@ namespace Roguelike.Karma
             _schedule.Add(time, actor);
         }
 
-        public void AddAfterLast(long time, Actor actor)
+        //public void AddAfterLast(long time, Actor actor)
+        //{
+        //    _schedule.AddAfterLast(time, actor);
+        //}
+
+        //public void AddAfterLast(Actor actor)
+        //{
+        //    _schedule.AddAfterLast(actor.KarmaReactionSpeed, actor);
+        //}
+
+        public void AddImmediate(Actor actor)
         {
-            _schedule.AddAfterLast(time, actor);
+            _schedule.AddImmediate(actor);
         }
 
         public bool IsActorScheduled(Actor actor)
         {
             return _schedule.IsActorScheduled(actor);
+        }
+
+        public void Stop()
+        {
+            IsStopped = true;
+            _schedule.Reset();
         }
 
         public void EndPlayerTurn()

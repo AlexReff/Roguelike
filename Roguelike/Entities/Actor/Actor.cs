@@ -81,7 +81,7 @@ namespace Roguelike.Entities
             State = ActorState.Idle;
 
             CurrentLevel = 1;
-            QueuedActions = new Queue<MultiStageAction>();
+            ActionQueue = new Queue<ActionUnit>();
             InterruptQueuedActions = false;
 
             VisibleActors = new HashSet<Actor>();
@@ -141,6 +141,7 @@ namespace Roguelike.Entities
 
             if (this is Player)
             {
+                MyGame.Karma.Stop();
                 EventManager.Instance.InvokeActorDied(this);
 
                 DebugManager.Instance.AddMessage("");

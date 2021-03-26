@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Roguelike.Systems;
 using Roguelike.Models;
+using Roguelike.Entities.Items;
 
 namespace Roguelike.Entities
 {
@@ -22,8 +23,8 @@ namespace Roguelike.Entities
             10, //will
             10, //int
             10, //vitae
-            10, //actionSpeed
-            10, //moveSpeed
+            1, //actionSpeed
+            2, //moveSpeed
             14, //awareness
             4, //innerFovAwareness
             true, //hasVision
@@ -58,39 +59,55 @@ namespace Roguelike.Entities
                 MyGame.GameSettings.PlayerCharacterGlyphColor, Color.Transparent, CHAR_PLAYER, position, (int)MapLayer.PLAYER, isWalkable: true, isTransparent: true)
         {
             //Spells = SpellSkillManager.Instance.GetAllSpells();
+            Moved += Player_Moved;
         }
 
-        public static Player DefaultPlayer(Coord position)
+        private void Player_Moved(object sender, ItemMovedEventArgs<GoRogue.GameFramework.IGameObject> e)
         {
-            Player result = new Player(position);
-            result.Name = "Player";
-            //result.Spells = SpellSkillManager.Instance.GetAllSpells();
-            result.FacingDirection = Direction.UP;
-
-            result.VisionDirection = XYZRelativeDirection.Forward;
-            result.HasVision = true;
-            result.Awareness = 14;
-            result.FOVViewAngle = 160;
-            result.InnerFOVAwareness = 4;
-
-            result.MaxHealth = 120;
-            result.Health = 120;
-            result.Mana = 60;
-
-            result.MoveSpeed = 10;
-            result.ActionSpeed = 10;
-
-            result.Strength = 10;
-            result.Stamina = 10;
-            result.Agility = 10;
-            result.Intelligence = 10;
-            result.Willpower = 10;
-            result.Vitae = 10;
-
-            result.Body = ActorBody.HumanoidBody(MyGame.GameSettings.PlayerCharacterGlyphColor);
-            result.Body.Parent = result;
-
-            return result;
+            if (MyGame.GameSettings.GoldAutoPickup)
+            {
+                var gold = CurrentMap.GetEntitiesAt<Currency>(e.NewPosition);
+                if (gold != null && gold.Any())
+                {
+                    foreach (var piece in gold)
+                    {
+                        PickupItem(piece);
+                    }
+                }
+            }
         }
+
+        //public static Player DefaultPlayer(Coord position)
+        //{
+        //    Player result = new Player(position);
+        //    result.Name = "Player";
+        //    //result.Spells = SpellSkillManager.Instance.GetAllSpells();
+        //    result.FacingDirection = Direction.UP;
+
+        //    result.VisionDirection = XYZRelativeDirection.Forward;
+        //    result.HasVision = true;
+        //    result.Awareness = 14;
+        //    result.FOVViewAngle = 160;
+        //    result.InnerFOVAwareness = 4;
+
+        //    result.MaxHealth = 120;
+        //    result.Health = 120;
+        //    result.Mana = 60;
+
+        //    result.MoveSpeed = 10;
+        //    result.ActionSpeed = 10;
+
+        //    result.Strength = 10;
+        //    result.Stamina = 10;
+        //    result.Agility = 10;
+        //    result.Intelligence = 10;
+        //    result.Willpower = 10;
+        //    result.Vitae = 10;
+
+        //    result.Body = ActorBody.HumanoidBody(MyGame.GameSettings.PlayerCharacterGlyphColor);
+        //    result.Body.Parent = result;
+
+        //    return result;
+        //}
     }
 }

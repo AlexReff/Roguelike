@@ -1,4 +1,5 @@
-﻿using Roguelike.Entities.Items;
+﻿using GoRogue;
+using Roguelike.Entities.Items;
 using Roguelike.JSON;
 using Roguelike.Karma.Actions;
 using Roguelike.Systems;
@@ -26,32 +27,32 @@ namespace Roguelike.Entities
             }
         }
 
-        public void StartBumpAttack(Actor target)
-        {
-            //get the default 'attack' and attempt to default-target hit the enemy
-            //var bestAttack = GetDefaultAttack(target);
-            //DoAttack(target, bestAttack);
+        //public void StartBumpAttack(Actor target)
+        //{
+        //    //get the default 'attack' and attempt to default-target hit the enemy
+        //    //var bestAttack = GetDefaultAttack(target);
+        //    //DoAttack(target, bestAttack);
 
-            //DoAttack(target);
-            QueueAttack(target);
-        }
+        //    //DoAttack(target);
+        //    QueueAttack(target);
+        //}
 
-        public void QueueAttack(Actor target)
-        {
-            //if (this is Player || target is Player || MyGame.World.Player.VisibleActors.Contains(target))
-            //{
-            //    PlayerMessageManager.Instance.AddMessage($"{Name} swings at {target.Name}({target.State})");
-            //}
-            State = ActorState.Attacking;
-            QueuedActions.Enqueue(new AttackBumpAction(this, target));
-            MyGame.Karma.AddAfterLast(KarmaActionSpeed, this);
+        //public void QueueAttack(Actor target)
+        //{
+        //    //if (this is Player || target is Player || MyGame.World.Player.VisibleActors.Contains(target))
+        //    //{
+        //    //    PlayerMessageManager.Instance.AddMessage($"{Name} swings at {target.Name}({target.State})");
+        //    //}
+        //    State = ActorState.Attacking;
+        //    ActionQueue.Enqueue(new AttackBumpAction(this, target));
+        //    //MyGame.Karma.AddAfterLast(KarmaActionSpeed, this);
 
-            //if (target is Player)
-            //{
-            //    MyGame.CommandManager.EndPlayerTurn();
-            //}
-            //TODO: 'attack swing speed': math based on weapon weight/size, str/agi
-        }
+        //    //if (target is Player)
+        //    //{
+        //    //    MyGame.CommandManager.EndPlayerTurn();
+        //    //}
+        //    //TODO: 'attack swing speed': math based on weapon weight/size, str/agi
+        //}
 
         /// <summary>
         /// Performs an attack. TODO: add attack data
@@ -63,11 +64,20 @@ namespace Roguelike.Entities
             //    PlayerMessageManager.Instance.AddMessage($"{Name} barely misses {target.Name}({target.State})");
             //}
 
+            // being attacked will interrupt certain stacked actions
             target.InterruptQueuedActions = true;
+
+            // TODO: do attack math things
+            long dmg = (long)(Helpers.RandomGenerator.NextDouble() * (Strength + Agility) * .8);
+            target.Health -= dmg;
+            if (target is Player || this is Player)
+            {
+                DebugManager.Instance.AddMessage($"{Name} attacks {target.Name} for {dmg}dmg");
+            }
+
             EventManager.Instance.InvokeActorAttacked(this, target);
             State = ActorState.Recovering;
-            
-            //MyGame.Karma.Add(this);
+            //return true;
         }
 
         ///// <summary>

@@ -13,7 +13,7 @@ namespace Roguelike.Entities
         /// Used for things like turn->move, or turn->attack.
         /// Generally, for actions that require one user input but generate successive sub-actions
         /// </summary>
-        public Queue<MultiStageAction> QueuedActions { get; }
+        public Queue<ActionUnit> ActionQueue { get; }
         public KarmaAction CurrentAction { get; set; }
 
         /// <summary>
@@ -57,79 +57,155 @@ namespace Roguelike.Entities
             }
         }
 
+        /// <summary>
+        /// Turn rate in ticks/45deg
+        /// 0 = instant turn.
+        /// 1 = 1 ticks / 45 deg turn, 2 ticks / 90 deg.
+        /// 2 = 2 ticks / 45 deg turn, 4 ticks / 90 deg.
+        /// </summary>
+        public long KarmaTurnSpeed
+        {
+            get
+            {
+                return 1;
+            }
+        }
+
         #region Commands
         // commands are directly from command mgr, user input
         // UI manager -> command manager -> Command$$$()
 
         /// <summary>
-        /// Master function for moving an actor
+        /// Queue's a turn and a move (no attack)
         /// </summary>
-        /// <returns>True if something happened, false if nothing happened</returns>
-        public bool CommandMove(Direction direction)
+        public void QueueActionTurnAndMove(Direction direction)
         {
-            InterruptQueuedActions = false;
-            // if needed, this will turn the actor (scheduling)
-            // then schedule the move action as needed
-            CommandFaceDirection(direction);
+            ActionQueue.Enqueue(new TurnAction(this, direction));
+            ActionQueue.Enqueue(new MoveDirectionAction(this, direction));
 
-            Coord target = Position + direction;
-            if (!CurrentMap.WalkabilityView[target])
-            {
-                // can't walk to this position
-                return false;
-            }
+            ////InterruptQueuedActions = false;
 
-            var actor = CurrentMap.GetEntityAt<Actor>(target);
-            if (actor != null)
-            {
-                if (IsHostileTo(actor))
-                {
-                    //Command Attack
-                    return CommandBumpAttack(direction);
-                }
-            }
+            //// if needed, this will turn the actor (scheduling)
+            //// then schedule the move action as needed
+            //CommandFaceDirection(direction);
 
-            // spot is walkable and no hostile in place
+            //Coord target = Position + direction;
+            //if (!CurrentMap.WalkabilityView[target])
+            //{
+            //    // can't walk to this position
+            //    return false;
+            //}
 
-            // do the move
-            StartMove(direction);
-            //DoMove(direction);
-            return true;
+            //var actor = CurrentMap.GetEntityAt<Actor>(target);
+            //if (actor != null)
+            //{
+            //    if (IsHostileTo(actor))
+            //    {
+            //        //Command Attack
+            //        return QueueBumpAttack(direction);
+            //    }
+            //}
+
+            //// spot is walkable and no hostile in place
+
+            //// do the move
+            //StartMove(direction);
+            ////DoMove(direction);
+            //return true;
         }
 
+        //<returns>True if a turn has been scheduled, false if no turn required or no action scheduled</returns>
         /// <summary>
-        /// Command a turn
+        /// Adds a 'turn' action to the queue
         /// </summary>
-        /// <returns></returns>
-        public bool CommandFaceDirection(Direction direction)
+        public void QueueTurn(Direction dir)
         {
-            return StartTurn(direction);
+            ActionQueue.Enqueue(new TurnAction(this, dir));
+
+
+            //if (FacingDirection == dir)
+            //{
+            //    // already facing this direction
+            //    State = ActorState.Idle;
+            //    return false;
+            //}
+
+            //State = ActorState.Turning;
+            // TurnAction will repeat until at the target direction
+            //ActionQueue.Enqueue(new TurnAction(this, dir));
+            //MyGame.Karma.AddAfterLast(1, this);
+
+            //var clockwise = new List<Direction>() { FacingDirection + 1 };
+            //var counterCw = new List<Direction>() { FacingDirection - 1 };
+
+            //List<Direction> turnSteps;
+
+            //while (true)
+            //{
+            //    if (clockwise[clockwise.Count - 1] == dir)
+            //    {
+            //        turnSteps = clockwise;
+            //        break;
+            //    }
+            //    else if (counterCw[counterCw.Count - 1] == dir)
+            //    {
+            //        turnSteps = counterCw;
+            //        break;
+            //    }
+            //    clockwise.Add(clockwise[clockwise.Count - 1] + 1);
+            //    counterCw.Add(counterCw[counterCw.Count - 1] - 1);
+            //}
+
+            //foreach (var turn in turnSteps)
+            //{
+            //    QueuedActions.Enqueue(new TurnAction(this, turn));
+            //    MyGame.Karma.AddAfterLast(1, this);
+            //}
+
+            //return true;
         }
+
+        ///// <summary>
+        ///// Command a turn
+        ///// </summary>
+        ///// <returns></returns>
+        //public bool CommandFaceDirection(Direction direction)
+        //{
+        //    return QueueTurn(direction);
+        //}
 
         /// <summary>
         /// Command an attack
         /// </summary>
         /// <returns>True if a bump attack was attempted, false if nothing happened</returns>
-        public bool CommandBumpAttack(Direction direction)
+        public void QueueTurnAndBumpAttack(Direction direction)
         {
+            QueueTurn(direction);
+            QueueBumpAttack(direction);
+
             // do the attack
-            Coord target = Position + direction;
+            //Coord target = Position + direction;
             //FacingDirection = direction;
 
-            Actor otherActor = CurrentMap.GetEntityAt<Actor>(target);
+            //Actor otherActor = CurrentMap.GetEntityAt<Actor>(target);
 
-            if (otherActor != null)
-            {
-                // if an enemy is in the way, kill it!
-                // could be refactored to move around or through the enemy if there is a 'higher priority' move or attack order (in future versions)
-                if (this.IsHostileTo(otherActor))
-                {
-                    StartBumpAttack(otherActor);
-                    return true;
-                }
-            }
+            //if (otherActor != null)
+            //{
+            //    // if an enemy is in the way, kill it!
+            //    // could be refactored to move around or through the enemy if there is a 'higher priority' move or attack order (in future versions)
+            //    if (this.IsHostileTo(otherActor))
+            //    {
+            //        StartBumpAttack(otherActor);
+            //        return true;
+            //    }
+            //}
 
-            return false;
+            //return false;
+        }
+
+        public void QueueBumpAttack(Direction dir)
+        {
+            ActionQueue.Enqueue(new AttackBumpAction(this, dir));
         }
 
         #endregion Commands

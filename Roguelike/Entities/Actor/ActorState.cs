@@ -30,19 +30,19 @@ namespace Roguelike.Entities
             }
         }
 
-        public void Wait(long ticks = 1)
-        {
-            MyGame.Karma.Add(ticks, this);
-        }
+        //public void Wait(long ticks = 1)
+        //{
+        //    MyGame.Karma.Add(ticks, this);
+        //}
 
-        public void WaitHalfSeconds(long halfSeconds = 1)
-        {
-            Wait(6 * halfSeconds);
-        }
+        //public void WaitHalfSeconds(long halfSeconds = 1)
+        //{
+        //    Wait(6 * halfSeconds);
+        //}
 
-        public void WaitSeconds(long seconds = 1)
-        {
-            WaitHalfSeconds(seconds * 2);
-        }
+        //public void WaitSeconds(long seconds = 1)
+        //{
+        //    WaitHalfSeconds(seconds * 2);
+        //}
     }
 }

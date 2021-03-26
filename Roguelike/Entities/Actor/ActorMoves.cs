@@ -84,50 +84,6 @@ namespace Roguelike.Entities
         //    //}
         //}
 
-        /// <returns>True if a turn has been scheduled, false if no turn required or no action scheduled</returns>
-        public bool StartTurn(Direction dir)
-        {
-            if (FacingDirection == dir)
-            {
-                // already facing this direction
-                State = ActorState.Idle;
-                return false;
-            }
-
-            State = ActorState.Turning;
-            // TurnAction will repeat until at the target direction
-            QueuedActions.Enqueue(new TurnAction(this, dir));
-            MyGame.Karma.AddAfterLast(1, this);
-
-            //var clockwise = new List<Direction>() { FacingDirection + 1 };
-            //var counterCw = new List<Direction>() { FacingDirection - 1 };
-
-            //List<Direction> turnSteps;
-
-            //while (true)
-            //{
-            //    if (clockwise[clockwise.Count - 1] == dir)
-            //    {
-            //        turnSteps = clockwise;
-            //        break;
-            //    }
-            //    else if (counterCw[counterCw.Count - 1] == dir)
-            //    {
-            //        turnSteps = counterCw;
-            //        break;
-            //    }
-            //    clockwise.Add(clockwise[clockwise.Count - 1] + 1);
-            //    counterCw.Add(counterCw[counterCw.Count - 1] - 1);
-            //}
-
-            //foreach (var turn in turnSteps)
-            //{
-            //    QueuedActions.Enqueue(new TurnAction(this, turn));
-            //    MyGame.Karma.AddAfterLast(1, this);
-            //}
-
-            return true;
-        }
 
         //private int GetTurnDirectionTickDelay(Direction start, Direction end)
         //{
@@ -136,16 +92,17 @@ namespace Roguelike.Entities
         //    return diff;
         //}
 
-        ///// <summary>
-        ///// Moves the actor in the given direction. No validity checks
-        ///// </summary>
-        public void StartMove(Direction direction)
-        {
-            // QueuedActions.Enqueue(new ResolveMoveAction(this, direction));
-            State = ActorState.Moving;
-            QueuedActions.Enqueue(new MoveDirectionAction(this, direction));
-            MyGame.Karma.AddAfterLast(KarmaMoveSpeed, this);
-        }
+        /////// <summary>
+        /////// Moves the actor in the given direction. No validity checks
+        /////// </summary>
+        //public void StartMove(Direction direction)
+        //{
+        //    // QueuedActions.Enqueue(new ResolveMoveAction(this, direction));
+        //    State = ActorState.Moving;
+        //    ActionQueue.Enqueue(new MoveDirectionAction(this, direction));
+        //    //MyGame.Karma.AddAfterLast(KarmaMoveSpeed, this);
+        //}
+
         //public void StartMove(Direction direction)
         //{
         //    //if (RequestTurnToDirection(direction))
@@ -169,8 +126,23 @@ namespace Roguelike.Entities
         //    MyGame.Karma.AddAfterLast(KarmaMoveSpeed, this);
         //}
 
+        public bool CanMove(Direction direction)
+        {
+            var pos = Position + direction;
+            if (CurrentMap.WalkabilityView[pos])
+            {
+                var actor = CurrentMap.GetEntityAt<Actor>(pos);
+                if (actor == null || !IsHostileTo(actor))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>
-        /// Player Input -> CommandMove -> StartMove (Sets move state) -> ResolveMove -> DoMove
+        /// Moves the actor in the direction. No validity checking.
         /// </summary>
         public void DoMove(Direction direction)
         {

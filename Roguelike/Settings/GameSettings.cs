@@ -14,6 +14,13 @@ namespace Roguelike.Settings
 
         public string GameFont = "FlyingMage";
 
+        public readonly int ZoneSize = 64; // width/height in TILES
+        public readonly int RegionSize = 32; // width/height in ZONES
+        public readonly int WorldWidth = 24; // width in REGIONS
+        public readonly int WorldHeight = 32; // height in REGIONS
+
+        public int ZoneRenderRange = 2; // aoe of zones to render
+
         public int FPSLimit = 60;
 
         /// <summary>

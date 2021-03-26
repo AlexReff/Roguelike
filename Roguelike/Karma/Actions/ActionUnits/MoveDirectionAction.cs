@@ -6,9 +6,10 @@ using System.Text;
 
 namespace Roguelike.Karma.Actions
 {
-    internal class MoveDirectionAction : MultiStageAction
+    internal class MoveDirectionAction : ActionUnit
     {
         private bool _started;
+        private Coord _pos;
         private Direction _dir;
 
         public MoveDirectionAction(Actor actor, Direction dir) : base(actor)
@@ -16,6 +17,7 @@ namespace Roguelike.Karma.Actions
             _started = false;
             IsComplete = false;
             _dir = dir;
+            _pos = actor.Position + dir;
         }
 
         public override long GetDelay()
@@ -27,16 +29,17 @@ namespace Roguelike.Karma.Actions
         {
             if (!_started)
             {
+                // begin 'walking'
                 Actor.State = ActorState.Moving;
-                //MyGame.Karma.AddAfterLast(Actor.KarmaMoveSpeed, Actor);
                 _started = true;
             }
             else
             {
-                Actor.DoMove(_dir);
-                Actor.State = ActorState.Idle;
+                if (Actor.CanMove(_dir))
+                {
+                    Actor.DoMove(_dir);
+                }
 
-                MyGame.Karma.AddAfterLast(1, Actor);
                 IsComplete = true;
             }
         }

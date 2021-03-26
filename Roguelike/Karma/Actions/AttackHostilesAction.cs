@@ -17,7 +17,7 @@ namespace Roguelike.Karma.Actions
 
         public override Coord? GetTargetPosition()
         {
-            AcquireTarget();
+            AcquireTarget(false);
             if (Actor is NPC)
             {
                 return (Actor as NPC).CurrentTarget?.Position;
@@ -42,9 +42,15 @@ namespace Roguelike.Karma.Actions
             //return base.GetRange();
         }
 
+        public override bool IsInValidRange()
+        {
+            AcquireTarget(false);
+            return base.IsInValidRange();
+        }
+
         public override bool Perform()
         {
-            AcquireTarget();
+            AcquireTarget(true);
 
             if (Actor.CurrentTarget != null)
             {
@@ -53,15 +59,20 @@ namespace Roguelike.Karma.Actions
                     Direction targetDir = Direction.GetDirection(Actor.Position, Actor.CurrentTarget.Position);
                     if (targetDir != null && targetDir != Direction.NONE)
                     {
-                        if (Actor.CommandBumpAttack(targetDir))
-                        {
-                            return true;
-                        }
+                        Actor.QueueTurnAndBumpAttack(targetDir);
+                        //MyGame.Karma.AddImmediate(Actor);
+                        return true;
+                        //if (Actor.QueueBumpAttack(targetDir))
+                        //{
+                        //    MyGame.Karma.AddAfterLast(Actor.KarmaActionSpeed, Actor);
+                        //    return true;
+                        //}
                     }
                 }
             }
 
-            MyGame.Karma.Add(0, Actor);
+            //MyGame.Karma.Add(0, Actor);
+            //MyGame.Karma.AddAfterLast(Actor.KarmaReactionSpeed, Actor);
             return false;
         }
 
@@ -79,43 +90,49 @@ namespace Roguelike.Karma.Actions
                     if (doTurn)
                     {
                         var dist = Distance.EUCLIDEAN.Calculate(Actor.Position, Actor.CurrentTarget.Position);
-                        if (dist < 2)
+                        if (dist < 4)
                         {
                             Direction targetDir = Direction.GetDirection(Actor.Position, Actor.CurrentTarget.Position);
                             if (targetDir != null && targetDir != Direction.NONE)
                             {
-                                Actor.StartTurn(targetDir);
+                                Actor.QueueTurn(targetDir);
                             }
                         }
                     }
-                    // we can no longer see our current target
-                    Actor.CurrentTarget = null;
+                    else
+                    {
+                        // we can no longer see our current target
+                        Actor.CurrentTarget = null;
+                    }
                 }
             }
 
-            // find a nearby target
-            if (Actor.VisibleEnemies.Count > 0)
+            if (Actor.CurrentTarget == null)
             {
-                var frontEnemy = Actor.CurrentMap.GetEntityAt<Actor>(Actor.Position + Actor.FacingDirection);
-                if (frontEnemy != null && Actor.IsHostileTo(frontEnemy))
+                // find a nearby target
+                if (Actor.VisibleEnemies.Count > 0)
                 {
-                    Actor.CurrentTarget = frontEnemy;
-                    return;
-                }
-
-                Actor closestActor = null;
-                double closestDist = double.MaxValue;
-                foreach (var enemy in Actor.VisibleEnemies)
-                {
-                    var dist = Distance.EUCLIDEAN.Calculate(Actor.Position, enemy.Position);
-                    if (dist < closestDist)
+                    var frontEnemy = Actor.CurrentMap.GetEntityAt<Actor>(Actor.Position + Actor.FacingDirection);
+                    if (frontEnemy != null && Actor.IsHostileTo(frontEnemy))
                     {
-                        closestDist = dist;
-                        closestActor = enemy;
+                        Actor.CurrentTarget = frontEnemy;
+                        return;
                     }
-                }
 
-                Actor.CurrentTarget = closestActor;
+                    Actor closestActor = null;
+                    double closestDist = double.MaxValue;
+                    foreach (var enemy in Actor.VisibleEnemies)
+                    {
+                        var dist = Distance.EUCLIDEAN.Calculate(Actor.Position, enemy.Position);
+                        if (dist < closestDist)
+                        {
+                            closestDist = dist;
+                            closestActor = enemy;
+                        }
+                    }
+
+                    Actor.CurrentTarget = closestActor;
+                }
             }
         }
     }

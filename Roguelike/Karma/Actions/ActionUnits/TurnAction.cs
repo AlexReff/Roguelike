@@ -6,73 +6,104 @@ using System.Linq;
 
 namespace Roguelike.Karma.Actions
 {
-    internal class TurnAction : MultiStageAction
+    internal class TurnAction : ActionUnit
     {
         private Direction _dir;
         private Queue<Direction> _steps;
+        private bool _started;
 
         public TurnAction(Actor actor, Direction dir) : base(actor)
         {
             _dir = dir;
             _steps = new Queue<Direction>();
 
-            if (actor.FacingDirection == dir)
-            {
-                // already facing this direction
-                actor.State = ActorState.Idle;
-                IsComplete = true;
-                return;
-            }
+            //if (actor.FacingDirection == dir)
+            //{
+            //    // already facing this direction
+            //    //actor.State = ActorState.Idle;
+            //    IsComplete = true;
+            //    return;
+            //}
 
-            var clockwise = new List<Direction>() { actor.FacingDirection + 1 };
-            var counterCw = new List<Direction>() { actor.FacingDirection - 1 };
+            //var clockwise = new List<Direction>() { actor.FacingDirection + 1 };
+            //var counterCw = new List<Direction>() { actor.FacingDirection - 1 };
 
-            List<Direction> turnSteps;
+            //List<Direction> turnSteps;
 
-            while (true)
-            {
-                if (clockwise[clockwise.Count - 1] == dir)
-                {
-                    turnSteps = clockwise;
-                    break;
-                }
-                else if (counterCw[counterCw.Count - 1] == dir)
-                {
-                    turnSteps = counterCw;
-                    break;
-                }
-                clockwise.Add(clockwise[clockwise.Count - 1] + 1);
-                counterCw.Add(counterCw[counterCw.Count - 1] - 1);
-            }
+            //while (true)
+            //{
+            //    if (clockwise[clockwise.Count - 1] == dir)
+            //    {
+            //        turnSteps = clockwise;
+            //        break;
+            //    }
+            //    else if (counterCw[counterCw.Count - 1] == dir)
+            //    {
+            //        turnSteps = counterCw;
+            //        break;
+            //    }
+            //    clockwise.Add(clockwise[clockwise.Count - 1] + 1);
+            //    counterCw.Add(counterCw[counterCw.Count - 1] - 1);
+            //}
 
-            _steps = new Queue<Direction>(turnSteps);
+            //_steps = new Queue<Direction>(turnSteps);
         }
 
-        public override long GetDelay()
-        {
-            return 1;
-        }
+        public override long GetDelay() => Actor.KarmaTurnSpeed;
 
         public override void Perform()
         {
-            if (Actor.FacingDirection == _dir || _steps.Count == 0)
+            if (Actor.FacingDirection == _dir)
             {
-                MyGame.Karma.AddAfterLast(1, Actor);
                 IsComplete = true;
+                //Actor.State = ActorState.Idle;
+                return;
+            }
+
+            if (!_started)
+            {
+                var clockwise = new List<Direction>() { Actor.FacingDirection + 1 };
+                var counterCw = new List<Direction>() { Actor.FacingDirection - 1 };
+
+                List<Direction> turnSteps;
+
+                while (true)
+                {
+                    if (clockwise[clockwise.Count - 1] == _dir)
+                    {
+                        turnSteps = clockwise;
+                        break;
+                    }
+                    else if (counterCw[counterCw.Count - 1] == _dir)
+                    {
+                        turnSteps = counterCw;
+                        break;
+                    }
+                    clockwise.Add(clockwise[clockwise.Count - 1] + 1);
+                    counterCw.Add(counterCw[counterCw.Count - 1] - 1);
+                }
+
+                _steps = new Queue<Direction>(turnSteps);
+
+                _started = true;
+            }
+
+            if (_steps.Count == 0)
+            {
+                IsComplete = true;
+                //Actor.State = ActorState.Idle;
                 return;
             }
 
             Actor.State = ActorState.Turning;
-            var thisStep = _steps.Dequeue();
-            Actor.FacingDirection = thisStep;
+            Actor.FacingDirection = _steps.Dequeue();
 
             if (Actor.FacingDirection == _dir || _steps.Count == 0)
             {
-                MyGame.Karma.AddAfterLast(1, Actor);
                 IsComplete = true;
+                //Actor.State = ActorState.Idle;
                 return;
             }
-            //Actor.QueuedActions.Enqueue(this);
         }
     }
 }
