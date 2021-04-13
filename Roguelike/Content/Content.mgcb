@@ -112,3 +112,27 @@
 #begin fonts/Tigrex3d.png
 /copy:fonts/Tigrex3d.png
 
+#begin json/bloodline.json
+/copy:json/bloodline.json
+
+#begin json/cthulhu.json
+/copy:json/cthulhu.json
+
+#begin json/cultist.json
+/copy:json/cultist.json
+
+#begin json/goblin.json
+/copy:json/goblin.json
+
+#begin json/necromancer.json
+/copy:json/necromancer.json
+
+#begin json/vampire.json
+/copy:json/vampire.json
+
+#begin json/vampire_trigger.json
+/copy:json/vampire_trigger.json
+
+#begin save/empty.txt
+/copy:save/empty.txt
+

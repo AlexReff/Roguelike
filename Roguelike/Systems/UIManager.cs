@@ -15,6 +15,7 @@ namespace Roguelike.Systems
         MainScreen,
         MainGame,
         CharacterCreation,
+        WorldGen,
     }
 
     class UIManager : ContainerConsole
@@ -34,19 +35,33 @@ namespace Roguelike.Systems
         public Console CurrentScreen { get; private set; }
 
         public GameConsole GameScreen { get; private set; }
+        public WorldGenConsole WorldGenScreen { get; private set; }
+
+        //public Stack<Console> Screens { get; private set; }
 
         public UIManager()
         {
-            GameScreen = new GameConsole(MyGame.GameSettings.GameWidth, MyGame.GameSettings.GameHeight + (MyGame.GameSettings.EnableDebugOutput ? MyGame.GameSettings.DebugHeight : 0), SadConsole.Global.FontDefault);
-            Children.Add(GameScreen);
+            //UseKeyboard = true;
 
-            CurrentState = UIManagerState.MainGame;
-            CurrentScreen = GameScreen;
+            var fullWidth = MyGame.GameSettings.GameWidth;
+            var fullHeight = MyGame.GameSettings.GameHeight + (MyGame.GameSettings.EnableDebugOutput ? MyGame.GameSettings.DebugHeight : 0);
+            
+            GameScreen = new GameConsole(fullWidth, fullHeight, SadConsole.Global.FontDefault);
 
+            //Children.Add(GameScreen);
+            //CurrentState = UIManagerState.MainGame;
+            //CurrentScreen = GameScreen;
+
+            WorldGenScreen = new WorldGenConsole(fullWidth, fullHeight, Color.Black, Color.White);
+
+            //WorldGenScreen.UseKeyboard = true;
+            Children.Add(WorldGenScreen);
+            CurrentState = UIManagerState.WorldGen;
+            CurrentScreen = WorldGenScreen;
+
+            // set this as the current screen
             Parent = SadConsole.Global.CurrentScreen;
-
             IsFocused = true;
-            IsVisible = true;
         }
         
         public void SetGameMap(GameMap map)
@@ -74,6 +89,11 @@ namespace Roguelike.Systems
             {
                 case UIManagerState.MainScreen:
                 case UIManagerState.CharacterCreation:
+                case UIManagerState.WorldGen:
+                    if (WorldGenScreen.ProcessKeyboard(info))
+                    {
+                        return true;
+                    }
                     break;
                 case UIManagerState.MainGame:
                 default:

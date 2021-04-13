@@ -23,8 +23,8 @@ namespace Roguelike.Entities
             10, //will
             10, //int
             10, //vitae
-            1, //actionSpeed
-            2, //moveSpeed
+            20, //actionSpeed
+            20, //moveSpeed
             14, //awareness
             4, //innerFovAwareness
             true, //hasVision

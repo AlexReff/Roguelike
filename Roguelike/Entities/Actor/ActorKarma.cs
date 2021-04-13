@@ -1,4 +1,5 @@
 ﻿using GoRogue;
+using Roguelike.Karma;
 using Roguelike.Karma.Actions;
 using System;
 using System.Collections.Generic;
@@ -15,11 +16,9 @@ namespace Roguelike.Entities
         /// </summary>
         public Queue<ActionUnit> ActionQueue { get; }
         public KarmaAction CurrentAction { get; set; }
-        public bool SensesHostiles { get { return VisibleEnemies.Count > 0; } }
+        public bool SensesHostiles { get; set; }
 
         //
-        public bool UnderAttack { get { return _lastAttackedTime.HasValue && MyGame.Karma.CurrentTime - _lastAttackedTime.Value < 50; } }
-        private long? _lastAttackedTime;
 
         /// <summary>
         /// This bool will be set when an event happens to the actor before the actor could finish all queued actions. Currently disabled
@@ -34,7 +33,8 @@ namespace Roguelike.Entities
         {
             get
             {
-                return (long)Math.Floor(ActionSpeed * 2);
+                //return (long)Math.Floor(ActionSpeed);
+                return (long)Math.Floor((22 / (2 * ActionSpeed + 15) - .07) * KarmaSchedule.TicksPerSecond);
             }
         }
 
@@ -46,7 +46,24 @@ namespace Roguelike.Entities
         {
             get
             {
-                return (long)Math.Floor(MoveSpeed * 6);
+                //for coordinates (1, 1.5), (10, 1), (100, .1), functions are...
+                // 1.69444 − 0.437946 ln ( 0.369299 x + 1.18961 )
+                // 2.125 - .625x^(0.255273)
+                /*
+                 * 30/(x+16) - .15 = TicksPerSecond
+                 */
+                switch (MoveRate)
+                {
+                    case ActorMoveRate.Crouching:
+                        return (long)Math.Floor((35 / (MoveSpeed + 20) - .15) * KarmaSchedule.TicksPerSecond * 1.4);
+                    case ActorMoveRate.Jogging:
+                        return (long)Math.Floor((20 / (MoveSpeed + 12) - .12) * KarmaSchedule.TicksPerSecond);
+                    case ActorMoveRate.Sprinting:
+                        return (long)Math.Floor((18 / (MoveSpeed + 13) - .14) * KarmaSchedule.TicksPerSecond);
+                    case ActorMoveRate.Walking:
+                    default:
+                        return (long)Math.Floor((30 / (MoveSpeed + 16) - .15) * KarmaSchedule.TicksPerSecond);
+                }
             }
         }
 
@@ -58,7 +75,7 @@ namespace Roguelike.Entities
         {
             get
             {
-                return (long)Math.Floor(ActionSpeed * 3);
+                return (long)Math.Floor((20 / (ActionSpeed + 11) - .14) * KarmaSchedule.TicksPerSecond);
             }
         }
 
@@ -77,9 +94,6 @@ namespace Roguelike.Entities
         }
 
         #region Commands
-        // commands are directly from command mgr, user input
-        // UI manager -> command manager -> Command$$$()
-
         /// <summary>
         /// Queue's a turn and a move (no attack)
         /// </summary>
@@ -87,130 +101,31 @@ namespace Roguelike.Entities
         {
             ActionQueue.Enqueue(new TurnAction(this, direction));
             ActionQueue.Enqueue(new MoveDirectionAction(this, direction));
-
-            ////InterruptQueuedActions = false;
-
-            //// if needed, this will turn the actor (scheduling)
-            //// then schedule the move action as needed
-            //CommandFaceDirection(direction);
-
-            //Coord target = Position + direction;
-            //if (!CurrentMap.WalkabilityView[target])
-            //{
-            //    // can't walk to this position
-            //    return false;
-            //}
-
-            //var actor = CurrentMap.GetEntityAt<Actor>(target);
-            //if (actor != null)
-            //{
-            //    if (IsHostileTo(actor))
-            //    {
-            //        //Command Attack
-            //        return QueueBumpAttack(direction);
-            //    }
-            //}
-
-            //// spot is walkable and no hostile in place
-
-            //// do the move
-            //StartMove(direction);
-            ////DoMove(direction);
-            //return true;
         }
 
-        //<returns>True if a turn has been scheduled, false if no turn required or no action scheduled</returns>
-        /// <summary>
-        /// Adds a 'turn' action to the queue
-        /// </summary>
         public void QueueTurn(Direction dir)
         {
             ActionQueue.Enqueue(new TurnAction(this, dir));
-
-
-            //if (FacingDirection == dir)
-            //{
-            //    // already facing this direction
-            //    State = ActorState.Idle;
-            //    return false;
-            //}
-
-            //State = ActorState.Turning;
-            // TurnAction will repeat until at the target direction
-            //ActionQueue.Enqueue(new TurnAction(this, dir));
-            //MyGame.Karma.AddAfterLast(1, this);
-
-            //var clockwise = new List<Direction>() { FacingDirection + 1 };
-            //var counterCw = new List<Direction>() { FacingDirection - 1 };
-
-            //List<Direction> turnSteps;
-
-            //while (true)
-            //{
-            //    if (clockwise[clockwise.Count - 1] == dir)
-            //    {
-            //        turnSteps = clockwise;
-            //        break;
-            //    }
-            //    else if (counterCw[counterCw.Count - 1] == dir)
-            //    {
-            //        turnSteps = counterCw;
-            //        break;
-            //    }
-            //    clockwise.Add(clockwise[clockwise.Count - 1] + 1);
-            //    counterCw.Add(counterCw[counterCw.Count - 1] - 1);
-            //}
-
-            //foreach (var turn in turnSteps)
-            //{
-            //    QueuedActions.Enqueue(new TurnAction(this, turn));
-            //    MyGame.Karma.AddAfterLast(1, this);
-            //}
-
-            //return true;
-        }
-
-        ///// <summary>
-        ///// Command a turn
-        ///// </summary>
-        ///// <returns></returns>
-        //public bool CommandFaceDirection(Direction direction)
-        //{
-        //    return QueueTurn(direction);
-        //}
-
-        /// <summary>
-        /// Command an attack
-        /// </summary>
-        /// <returns>True if a bump attack was attempted, false if nothing happened</returns>
-        public void QueueTurnAndBumpAttack(Direction direction)
-        {
-            QueueTurn(direction);
-            QueueBumpAttack(direction);
-
-            // do the attack
-            //Coord target = Position + direction;
-            //FacingDirection = direction;
-
-            //Actor otherActor = CurrentMap.GetEntityAt<Actor>(target);
-
-            //if (otherActor != null)
-            //{
-            //    // if an enemy is in the way, kill it!
-            //    // could be refactored to move around or through the enemy if there is a 'higher priority' move or attack order (in future versions)
-            //    if (this.IsHostileTo(otherActor))
-            //    {
-            //        StartBumpAttack(otherActor);
-            //        return true;
-            //    }
-            //}
-
-            //return false;
         }
 
         public void QueueBumpAttack(Direction dir)
         {
             ActionQueue.Enqueue(new AttackBumpAction(this, dir));
+        }
+
+        public void QueueTurnAndBumpAttack(Direction direction)
+        {
+            //// see if there is a hostile target, and set it.
+            //// when the bump attack starts, check if we have a target,
+            //// if we have a target, but there is no target, cancel and return control
+            //var pos = Position + direction;
+            //var hostile = CurrentMap.GetEntityAt<Actor>(pos);
+            //if (hostile != null && IsHostileTo(hostile))
+            //{
+            //    CurrentTarget = hostile;
+            //}
+            QueueTurn(direction);
+            QueueBumpAttack(direction);
         }
 
         #endregion Commands

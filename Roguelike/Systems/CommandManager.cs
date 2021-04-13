@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework;
 using Roguelike.Entities;
 using Roguelike.Entities.Items;
-using Roguelike.Interfaces;
 using Roguelike.Karma.Actions;
 using Roguelike.Models;
 using System;
@@ -20,6 +19,11 @@ namespace Roguelike.Systems
         public CommandManager()
         {
             IsGameOver = false;
+        }
+
+        public void Exit()
+        {
+            SadConsole.Game.Instance.Exit();
         }
 
         public void GameOver()

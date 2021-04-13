@@ -170,13 +170,25 @@
 					"ID": "crystal",
 					"Name": "Crystal",
 					"Descriptor": "crystalline",
-					"Density": 1,
+					"Density": 3,
 					"Hardness": 14,
 					"HeatRateOfChange": 8,
 					"MeltingPoint": -1,
 					"IgnitePoint": -1,
 					"BoilingPoint": -1,
 					"Value": 20
+				},
+				{
+					"ID": "glass",
+					"Name": "Glass",
+					"Descriptor": "glass",
+					"Density": 2,
+					"Hardness": 11,
+					"HeatRateOfChange": 8,
+					"MeltingPoint": -1,
+					"IgnitePoint": -1,
+					"BoilingPoint": -1,
+					"Value": 8
 				}
 			],
 			"separators": [],
@@ -443,8 +455,8 @@
 					"Willpower": 14,
 					"Intelligence": 10,
 					"Vitae": 30,
-					"ActionSpeed": 2,
-					"MoveSpeed": 1,
+					"ActionSpeed": 15,
+					"MoveSpeed": 12,
 					"Awareness": 5,
 					"InnerFovAwareness": 2,
 					"HasVision": true,
@@ -468,8 +480,8 @@
 					"Willpower": 5,
 					"Intelligence": 4,
 					"Vitae": 0,
-					"ActionSpeed": 0.9,
-					"MoveSpeed": 0.8,
+					"ActionSpeed": 35,
+					"MoveSpeed": 16,
 					"Awareness": 3,
 					"InnerFovAwareness": 3,
 					"HasVision": true,
@@ -725,6 +737,35 @@
 					"display": null
 				}
 			]
+		},
+		{
+			"name": "Ref_DamageType",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "DamageType",
+					"display": null
+				}
+			],
+			"lines": [
+				{
+					"DamageType": "Piercing"
+				},
+				{
+					"DamageType": "Slashing"
+				},
+				{
+					"DamageType": "Blunt"
+				},
+				{
+					"DamageType": "Projectile"
+				},
+				{
+					"DamageType": "Fire"
+				}
+			],
+			"separators": [],
+			"props": {}
 		}
 	],
 	"customTypes": [],

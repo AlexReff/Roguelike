@@ -14,8 +14,6 @@ namespace Roguelike.Karma.Actions
 
         public MoveDirectionAction(Actor actor, Direction dir) : base(actor)
         {
-            _started = false;
-            IsComplete = false;
             _dir = dir;
             _pos = actor.Position + dir;
         }
@@ -27,6 +25,11 @@ namespace Roguelike.Karma.Actions
 
         public override void Perform()
         {
+            if (!Actor.CanMove(_dir))
+            {
+                BecameInvalid = true;
+                return;
+            }
             if (!_started)
             {
                 // begin 'walking'
@@ -35,11 +38,7 @@ namespace Roguelike.Karma.Actions
             }
             else
             {
-                if (Actor.CanMove(_dir))
-                {
-                    Actor.DoMove(_dir);
-                }
-
+                Actor.DoMove(_dir);
                 IsComplete = true;
             }
         }

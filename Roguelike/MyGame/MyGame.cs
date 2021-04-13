@@ -38,6 +38,8 @@ namespace Roguelike
 
         protected override void Initialize()
         {
+            base.Initialize();
+
             // Setup the engine and create the main window.
             SadConsole.Game.Create($"{Content.RootDirectory}\\Fonts\\{GameSettings.GameFont}.font", GameSettings.GameWidth, GameSettings.GameHeight + (MyGame.GameSettings.EnableDebugOutput ? MyGame.GameSettings.DebugHeight : 0));
             //SadConsole.Game.Create(GameWidth, GameHeight, InitGame);
@@ -47,14 +49,10 @@ namespace Roguelike
 
             SadConsole.Game.OnDestroy = Destroyed;
 
-            base.Initialize();
-
             // Start the game.
             SadConsole.Game.Instance.Run();
             
             // Code here will not run until the game window closes.
-            
-            SadConsole.Game.Instance.Dispose();
         }
 
         protected override void LoadContent()
@@ -94,6 +92,7 @@ namespace Roguelike
 
         private void Destroyed()
         {
+            SadConsole.Game.Instance.Dispose();
             this.Exit();
         }
     }

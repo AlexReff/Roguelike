@@ -38,6 +38,7 @@
     <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Content\save\" />
     <Folder Include="Content\obj\DesktopGL\Content\fonts\" />
   </ItemGroup>
   <ItemGroup>

@@ -10,8 +10,17 @@ using System.Text;
 
 namespace Roguelike.Entities
 {
+    internal enum ActorMoveRate
+    {
+        Crouching,
+        Walking,
+        Jogging,
+        Sprinting,
+    }
+
     internal partial class Actor
     {
+        public ActorMoveRate MoveRate { get; set; }
 
         private void Actor_Moved(object sender, ItemMovedEventArgs<GoRogue.GameFramework.IGameObject> e)
         {

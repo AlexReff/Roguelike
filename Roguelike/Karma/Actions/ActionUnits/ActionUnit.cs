@@ -31,6 +31,10 @@ namespace Roguelike.Karma.Actions
         /// Must be accurate after Perform(); (Either getter property or set in Perform)
         /// </summary>
         public bool IsComplete { get; set; }
+        /// <summary>
+        /// Set to true if an action did nothing, and this actor needs to be immediately reprocessed
+        /// </summary>
+        public bool BecameInvalid { get; set; }
 
         /// <summary>
         /// This is executed when this action is the 'real time' current action, and can be treated as 'live'

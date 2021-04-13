@@ -21,9 +21,6 @@ namespace Roguelike.Consoles
 
         public PlayerMessageConsole(int width, int height, Color backgroundColor, Color borderColor) : base(width, height)
         {
-            Width = width;
-            Height = height;
-            IsVisible = true;
             BackgroundColor = backgroundColor;
             BorderColor = borderColor;
 

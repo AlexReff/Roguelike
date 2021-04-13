@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Roguelike.Entities;
 using Roguelike.Models;
 using SadConsole;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -39,6 +40,117 @@ namespace Roguelike
             }
 
             return list;
+        }
+
+
+        public static float[,] GenerateSquareGradient(int width, int height)
+        {
+            int halfWidth = width / 2;
+            int halfHeight = height / 2;
+            float[,] gradient = new float[width,height];
+
+            for (int i = 0; i < width; i++)
+            {
+                //gradient[i] = new float[height];
+
+                for (int j = 0; j < height; j++)
+                {
+                    int x = i;
+                    int y = j;
+
+                    float val;
+
+                    x = x > halfWidth ? width - x : x;
+                    y = y > halfHeight ? height - y : y;
+
+                    int smaller = x < y ? x : y;
+                    val = smaller / (float)halfWidth;
+
+                    //colorValue *= colorValue * colorValue;
+                    val += val;
+                    if (val > 1)
+                    {
+                        val = 1;
+                    }
+                    val = 1 - val;
+                    gradient[i,j] = val; //new Color(colorValue, colorValue, colorValue);
+                }
+            }
+
+            return gradient;
+
+            //int width = 500;
+            //int height = 500;
+            //int halfWidth = width / 2;
+            //int halfHeight = height / 2;
+
+            //Color[][] gradient = new Color[width][];
+
+            //for (int i = 0; i < width; i++)
+            //{
+            //    gradient[i] = new Color[height];
+
+            //    for (int j = 0; j < height; j++)
+            //    {
+            //        int x = i;
+            //        int y = j;
+
+            //        float colorValue;
+
+            //        x = x > halfWidth ? width - x : x;
+            //        y = y > halfHeight ? height - y : y;
+
+            //        int smaller = x < y ? x : y;
+            //        colorValue = smaller / (float)halfWidth;
+
+            //        colorValue = 1 - colorValue;
+            //        colorValue *= colorValue * colorValue;
+            //        gradient[i][j] = new Color(colorValue, colorValue, colorValue);
+            //    }
+            //}
+
+            //return gradient;
+        }
+
+        public static float[,] GenerateCustomGradient(int width, int height)
+        {
+            //int halfWidth = width / 2;
+            //int halfHeight = height / 2;
+            float[,] gradient = new float[width,height];
+
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    int x = i;
+                    int y = j;
+
+                    float val;
+
+                    val = ((float)Math.Sin(((float)x / (float)width) * Math.PI)) * ((float)Math.Sin(((float)y / (float)height) * Math.PI));
+                    //val = ((float)Math.Sin(((float)x / (float)height) * Math.PI)) * ((float)Math.Sin(((float)y / (float)width) * Math.PI));
+                    //f(x,y) = ((float)Math.Sin(((float)x/(float)WIDTH) * Math.PI) ) * ((float)Math.Sin(((float)y / (float)WIDTH) * Math.PI) )
+
+                    gradient[i, j] = val;
+
+                    //x = x > halfWidth ? width - x : x;
+                    //y = y > halfHeight ? height - y : y;
+
+                    //int smaller = x < y ? x : y;
+                    //val = smaller / (float)halfWidth;
+
+                    ////colorValue *= colorValue * colorValue;
+                    //val += val;
+                    //if (val > 1)
+                    //{
+                    //    val = 1;
+                    //}
+                    //val = 1 - val;
+                    //gradient[i,j] = val; //new Color(colorValue, colorValue, colorValue);
+                }
+            }
+
+            return gradient;
         }
 
         public static List<Coord> GetNeighbors(this Coord center)
@@ -76,7 +188,7 @@ namespace Roguelike
             return enUsText.ToTitleCase(input);
         }
 
-        public static void DrawBorderBgTitle(this Console console, Microsoft.Xna.Framework.Rectangle area, string title, Color backgroundColor, Color borderColor)
+        public static void DrawBorderBgTitle(this SadConsole.Console console, Microsoft.Xna.Framework.Rectangle area, string title, Color backgroundColor, Color borderColor)
         {
             console.Fill(area, borderColor, backgroundColor, 0, 0);
 

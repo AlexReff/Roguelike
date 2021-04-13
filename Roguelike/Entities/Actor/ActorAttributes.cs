@@ -6,8 +6,16 @@ using System.Text;
 
 namespace Roguelike.Entities
 {
+    internal enum ActorGender
+    {
+        Male,
+        Female,
+    }
+
     internal partial class Actor
     {
+        public ActorGender Gender { get; set; }
+
         //attributes
         public int Strength { get; set; }
         public int Agility { get; set; }
@@ -18,17 +26,7 @@ namespace Roguelike.Entities
 
 
 
-
-        //
         public Dictionary<WeaponFamilyEnum, double> WeaponSkills { get; set; }
-        //public double HandAxeSkill { get; set; }
-        //public double GreatAxeSkill { get; set; }
-        //public double LongSwordSkill { get; set; }
-        //public double ShortSwordSkill { get; set; }
-        //public double DaggerSkill { get; set; }
-        //public double ArcherySkill { get; set; }
-        //public double CrossbowSkill { get; set; }
-        //public double PikeSkill { get; set; }
 
 
         //lesser attributes

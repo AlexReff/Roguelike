@@ -53,12 +53,23 @@ namespace Roguelike.Entities
         {
             VisibleEnemies.Clear();
 
+            if (UnderAttack)
+            {
+                SensesHostiles = true;
+            }
+
             foreach (var actor in VisibleActors)
             {
                 if (IsHostileTo(actor))
                 {
+                    SensesHostiles = true;
                     VisibleEnemies.Add(actor);
                 }
+            }
+
+            if (VisibleEnemies.Count == 0 && !UnderAttack)
+            {
+                SensesHostiles = false;
             }
         }
 

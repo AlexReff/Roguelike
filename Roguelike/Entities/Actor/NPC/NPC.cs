@@ -1,11 +1,8 @@
 ﻿using GoRogue;
 using Microsoft.Xna.Framework;
-using Roguelike.Behaviors;
-using Roguelike.Interfaces;
 using Roguelike.Models;
 using Roguelike.Karma;
 using Roguelike.Karma.Actions;
-using Roguelike.Karma.Goals;
 using System;
 using System.Collections.Generic;
 using System.Text;

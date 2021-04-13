@@ -17,13 +17,22 @@ namespace Roguelike.Consoles
         /// </summary>
         public static readonly int AdditionalWidth = 1;
 
+        private Console DrawConsole;
+
         private Point LastMouseOverPos;
 
-        public CharMapOutputConsole(int width, int height) : base(width + AdditionalWidth, height + AdditionalHeight/*, SadConsole.Global.Fonts["CP850"].GetFont(Font.FontSizes.One)*/)
+        public CharMapOutputConsole(int width, int height) : base(width + AdditionalWidth, height + AdditionalHeight)
         {
+            DrawConsole = new Console(width, height);
+            //DrawConsole = new Console(width, height, SadConsole.Global.Fonts["Guybrush"].GetFont(Font.FontSizes.One));
+            //DrawConsole = new Console(width, height, SadConsole.Global.Fonts["CP850"].GetFont(Font.FontSizes.One));
+            Children.Add(DrawConsole);
+            //DrawConsole.FillWithRandomGarbage();
+
+            //Font = SadConsole.Global.Fonts["CP850"].GetFont(Font.FontSizes.One);
             PopulateCharacterMapConsole();
 
-            MouseMove += Handle_MouseMove;
+            DrawConsole.MouseMove += Handle_MouseMove;
         }
 
         private void Handle_MouseMove(object sender, SadConsole.Input.MouseEventArgs e)
@@ -39,8 +48,8 @@ namespace Roguelike.Consoles
             if (e.MouseState.IsOnConsole)
             {
                 var pos = e.MouseState.CellPosition;
-                if (pos.X > 0 && pos.X < Width
-                    && pos.Y > 0 && pos.Y < Height - 1)
+                if (pos.X > 0 && pos.X < DrawConsole.Width
+                    && pos.Y > 0 && pos.Y < DrawConsole.Height - 1)
                 {
                     int thisIndx = GetIndexAtPos(pos.X, pos.Y);
                     var thisChar = (char)thisIndx;
@@ -51,11 +60,11 @@ namespace Roguelike.Consoles
                     string output = $"{thisChar} {paddedIndx} ({strX},{strY})";
 
                     var strMiddle = (output.Length / 2.0);
-                    var consoleMiddle = (Width / 2.0);
+                    var consoleMiddle = (DrawConsole.Width / 2.0);
                     int targetMiddle = (int)System.Math.Floor(consoleMiddle - strMiddle);
 
-                    DrawLine(new Point(0, Height - 1), new Point(Width - 1, Height - 1), Color.Black, Color.Black);
-                    Print(targetMiddle, Height - 1, output, Color.White, Color.Black);
+                    DrawConsole.DrawLine(new Point(0, DrawConsole.Height - 1), new Point(DrawConsole.Width - 1, DrawConsole.Height - 1), Color.Black, Color.Black);
+                    DrawConsole.Print(targetMiddle, DrawConsole.Height - 1, output, Color.White, Color.Black);
 
                     DebugManager.Instance.AddMessage(output);
                 }
@@ -65,24 +74,24 @@ namespace Roguelike.Consoles
         private void PopulateCharacterMapConsole()
         {
             //Draw a black line over the top of the legend (colors in 0,0 spot)
-            DrawLine(new Point(0, 0), new Point(Width - 1, 0), Color.Black, Color.Black);
+            DrawConsole.DrawLine(new Point(0, 0), new Point(Width - 1, 0), Color.Black, Color.Black);
 
             //Draw a black line over the mouseover text area
-            DrawLine(new Point(0, Height - 1), new Point(Width - 1, Height - 1), Color.Black, Color.Black);
+            DrawConsole.DrawLine(new Point(0, DrawConsole.Height - 1), new Point(DrawConsole.Width - 1, DrawConsole.Height - 1), Color.Black, Color.Black);
 
-            for (int x = 0; x < Width - AdditionalWidth; x++)
+            for (int x = 0; x < DrawConsole.Width - AdditionalWidth; x++)
             {
                 //Convert to Hexadecimal since we can't output 2 numbers in a single space in SadConsole
                 string thisChar = System.Convert.ToByte(x).ToString("x");
-                Print(x + 1, 0, thisChar, Color.White, Color.Black);
-                Print(0, x + 1, thisChar, Color.White, Color.Black);
+                DrawConsole.Print(x + 1, 0, thisChar, Color.White, Color.Black);
+                DrawConsole.Print(0, x + 1, thisChar, Color.White, Color.Black);
             }
 
-            for (int x = 0; x < Width - AdditionalWidth; x++)
+            for (int x = 0; x < DrawConsole.Width - AdditionalWidth; x++)
             {
-                for (int y = 0; y < Height - AdditionalHeight; y++)
+                for (int y = 0; y < DrawConsole.Height - AdditionalHeight; y++)
                 {
-                    Print(x + 1, y + 1, GetCharAtPos(x + 1, y + 1).ToString(), Color.White, Color.Black);
+                    DrawConsole.Print(x + 1, y + 1, GetCharAtPos(x + 1, y + 1).ToString(), Color.White, Color.Black);
                 }
             }
         }
@@ -96,7 +105,7 @@ namespace Roguelike.Consoles
         public int GetIndexAtPos(int x, int y)
         {
             //Legend takes up the 0,0 row/column, so -1 to get accurate index
-            return (y - 1) * (Width - AdditionalWidth) + (x - 1);
+            return (y - 1) * (DrawConsole.Width - AdditionalWidth) + (x - 1);
         }
     }
 }

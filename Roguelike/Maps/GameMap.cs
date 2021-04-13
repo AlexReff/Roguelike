@@ -9,7 +9,6 @@ using Microsoft.Xna.Framework;
 using Roguelike.Consoles;
 using Roguelike.Entities;
 using Roguelike.Entities.Items;
-using Roguelike.Interfaces;
 using Roguelike.JSON;
 using Roguelike.Maps;
 using Roguelike.Models;

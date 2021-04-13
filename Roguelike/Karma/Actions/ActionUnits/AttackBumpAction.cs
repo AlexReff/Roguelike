@@ -11,16 +11,26 @@ namespace Roguelike.Karma.Actions
         private Direction _dir;
         private bool _started;
         private Coord _targetPos;
+        private Actor _actionCreatedTarget;
 
         public AttackBumpAction(Actor attacker, Direction dir) : base(attacker)
         {
             _dir = dir;
             _targetPos = attacker.Position + dir;
+            _actionCreatedTarget = attacker.CurrentMap.GetEntityAt<Actor>(_targetPos);
         }
 
         public override long GetDelay()
         {
             // delay between starting an attack and the attack landing
+            if (!_started)
+            {
+                return Actor.KarmaReactionSpeed;
+            }
+            if (Actor.State == ActorState.Moving)
+            {
+                return Actor.KarmaMoveSpeed;
+            }
             return Actor.KarmaActionSpeed;
         }
 
@@ -28,6 +38,12 @@ namespace Roguelike.Karma.Actions
         {
             // check to make sure the target still exists
             Actor target = Actor.CurrentMap.GetEntityAt<Actor>(_targetPos);
+            if (_actionCreatedTarget != null && (target == null || target.ID != _actionCreatedTarget.ID))
+            {
+                // we lost whatever target we had...
+                BecameInvalid = true;
+                return;
+            }
 
             if (target != null && Actor.IsHostileTo(target))
             {
@@ -41,13 +57,13 @@ namespace Roguelike.Karma.Actions
                 else if (Actor.State == ActorState.Moving)
                 {
                     // we were trying to move, now there's an enemy!
-                    IsComplete = true;
+                    BecameInvalid = true;
                 }
                 else
                 {
                     // resolve the attack
-                    Actor.ResolveAttack(target);
-                    Actor.State = ActorState.Recovering;
+                    var attack = Actor.ResolveAttack(target);
+                    target.ResolveDefense(Actor, attack);
                     IsComplete = true;
                 }
             }
@@ -63,7 +79,7 @@ namespace Roguelike.Karma.Actions
                 else if (Actor.State == ActorState.Attacking)
                 {
                     // we were trying to attack, but the enemy is no longer there!
-                    IsComplete = true;
+                    BecameInvalid = true;
                 }
                 else
                 {
@@ -75,30 +91,6 @@ namespace Roguelike.Karma.Actions
                     IsComplete = true;
                 }
             }
-            
-            //if (target == null || !Actor.IsHostileTo(target))
-            //{
-            //    // no valid target, bail out of this action
-            //    IsComplete = true;
-            //    return;
-            //}
-
-            //if (!_started)
-            //{
-            //    // start the attack
-            //    Actor.State = ActorState.Attacking;
-            //    _started = true;
-            //}
-            //else
-            //{
-            //    // TODO: math to determine if this attack is interrupted or completes
-            //    //if (Actor.InterruptQueuedActions && mathResult) { IsComplete = true; return; }
-
-            //    // resolve the attack
-            //    Actor.ResolveAttack(target);
-            //    Actor.State = ActorState.Recovering;
-            //    IsComplete = true;
-            //}
         }
     }
 }

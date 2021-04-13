@@ -1,5 +1,4 @@
 ﻿using Roguelike.Entities;
-using Roguelike.Interfaces;
 using Roguelike.Karma;
 using Roguelike.Karma.Actions;
 using Roguelike.Systems;
@@ -11,7 +10,7 @@ using System.Text;
 /*
  * goals will be added in priority order
  * 
- * we will start with 12 ticks / second
+ * we will start with 24 ticks / second
  * we will need to be able to schedule actions
  * 
  * 
@@ -81,7 +80,12 @@ namespace Roguelike.Karma
                     //else
                     //{
                     action.Perform();
-                    if (action.IsComplete)
+                    if (action.BecameInvalid)
+                    {
+                        scheduleable.ActionQueue.Dequeue();
+                        Add(1, scheduleable);
+                    }
+                    else if (action.IsComplete)
                     {
                         scheduleable.ActionQueue.Dequeue();
                         Add(scheduleable);
@@ -91,7 +95,6 @@ namespace Roguelike.Karma
                         Add(action.GetDelay(), scheduleable);
                     }
                     continue;
-                    //}
                 }
 
                 // pause for player input (no action units left)
@@ -132,6 +135,10 @@ namespace Roguelike.Karma
                     // no action active, get a new one
                     if (npc.CurrentAction == null)
                     {
+                        //if (npc.UnderAttack)
+                        //{
+                        //    // we have been attacked but don't have a target, try to fight back!
+                        //}
                         // check to see if we already have a plan for this npc
                         if (_plans.ContainsKey(npc.ID) && _plans[npc.ID].Count > 0)
                         {

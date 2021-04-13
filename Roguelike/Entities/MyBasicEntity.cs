@@ -1,6 +1,5 @@
 ﻿using GoRogue;
 using Microsoft.Xna.Framework;
-using Roguelike.Interfaces;
 using SadConsole;
 using System;
 using System.Collections.Generic;

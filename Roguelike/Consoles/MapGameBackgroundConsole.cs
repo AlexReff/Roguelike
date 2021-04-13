@@ -14,7 +14,6 @@ namespace Roguelike.Consoles
 
         public MapGameBackgroundConsole(int width, int height, Color backgroundColor, Color? borderColor) : base(width, height)
         {
-            IsVisible = true;
             BackgroundColor = backgroundColor;
             BorderColor = borderColor ?? Color.Transparent;
 

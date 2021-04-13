@@ -2,7 +2,6 @@
 using GoRogue.Pathing;
 using Microsoft.Xna.Framework;
 using Roguelike.Entities.Items;
-using Roguelike.Interfaces;
 using Roguelike.JSON;
 using Roguelike.Karma.Actions;
 using Roguelike.Models;
@@ -111,6 +110,7 @@ namespace Roguelike.Entities
             FOVViewAngle = fovViewAngle;
             VisionDirection = VisionDirection;
 
+            MoveRate = ActorMoveRate.Walking;
             Faction = faction;
 
             switch (bodyType)

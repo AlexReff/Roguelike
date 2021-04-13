@@ -1,5 +1,4 @@
 ﻿using Roguelike.Entities;
-using Roguelike.Interfaces;
 using Roguelike.Systems;
 using System;
 using System.Collections.Generic;
@@ -13,6 +12,11 @@ namespace Roguelike.Karma
         private bool _isStopped;
         private long _time;
         private readonly SortedDictionary<long, List<Actor>> _scheduleables;
+
+        public const int TicksPerSecond = 60;
+        public const int TicksPerMinute = TicksPerSecond * 60;
+        public const int TicksPerHour = TicksPerMinute * 60;
+        public const int TicksPerDay = TicksPerHour * 24;
 
         public long CurrentTime { get { return _time; } }
 
