@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Roguelike.Entities;
 using Roguelike.Entities.Items;
 using Roguelike.Karma;
+using Roguelike.Maps;
 using Roguelike.Systems;
 using SadConsole;
 using System;
@@ -20,6 +21,7 @@ namespace Roguelike
     /// </summary>
     class World
     {
+        public WorldMap WorldMap { get; set; }
         public GameMap CurrentMap { get; set; }
 
         public Player Player

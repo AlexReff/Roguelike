@@ -26,11 +26,11 @@ namespace Roguelike.Settings
         /// <summary>
         /// The width of the entire screen/window
         /// </summary>
-        public int GameWidth = 75;
+        public int GameWidth = 80;
         /// <summary>
         /// The height of the entire screen/window
         /// </summary>
-        public int GameHeight = 50;
+        public int GameHeight = 45;
 
         /// <summary>
         /// The width of the 'Game' screen sub-area

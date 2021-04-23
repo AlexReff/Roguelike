@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Roguelike.Systems
 {
-    class CommandManager
+    internal class CommandManager
     {
         public bool IsGameOver { get; set; }
 

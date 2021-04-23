@@ -17,10 +17,10 @@ namespace Roguelike.Maps
 
         public Point CityOne { get; set; }
 
-        public bool[,] Ocean { get; set; }
-        public bool[,] Land { get; set; }
-        public bool[,] Mountain { get; set; }
-        public bool[,] Lakes { get; set; }
+        //public HashSet<Point> Ocean { get; set; }
+        //public HashSet<Point> Land { get; set; }
+        //public HashSet<Point> Mountain { get; set; }
+        //public HashSet<Point> Lakes { get; set; }
 
         public float[,] HeightMap { get; set; }
         public float[,] TempMap { get; set; }
@@ -39,15 +39,24 @@ namespace Roguelike.Maps
             Width = width;
             Height = height;
 
-            Ocean = new bool[Width, Height];
-            Land = new bool[Width, Height];
-            Mountain = new bool[Width, Height];
-            Lakes = new bool[Width, Height];
+            //Ocean = new HashSet<Point>();
+            //Land = new HashSet<Point>();
+            //Mountain = new HashSet<Point>();
+            //Lakes = new HashSet<Point>();
 
             HeightMap = new float[Width, Height];
             TempMap = new float[Width, Height];
 
             Regions = new Region[Width, Height]; //new ArrayMap2D<Region>(Width, Height);
+
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    Regions[x, y] = new Region();
+                }
+            }
+
             Rivers = new List<River>();
 
             //for (int x = 0; x < Width; x++)
@@ -76,7 +85,7 @@ namespace Roguelike.Maps
             {
                 for (int y = 0; y < Height; y++)
                 {
-                    if (Ocean[x, y])
+                    if (Regions[x, y].RegionType == RegionType.Ocean)
                     {
                         continue;
                     }
@@ -116,7 +125,7 @@ namespace Roguelike.Maps
                     continue;
                 }
 
-                Ocean[islandRef.Key.X, islandRef.Key.Y] = true;
+                Regions[islandRef.Key.X, islandRef.Key.Y].RegionType = RegionType.Ocean;
             }
         }
 
@@ -127,7 +136,7 @@ namespace Roguelike.Maps
                 yield break;
             }
 
-            if (Ocean[point.X, point.Y])
+            if (Regions[point.X, point.Y].RegionType == RegionType.Ocean)
             {
                 yield break;
             }
@@ -195,7 +204,7 @@ namespace Roguelike.Maps
                 return;
             }
 
-            Ocean[x, y] = true;
+            Regions[x, y].RegionType = RegionType.Ocean;
 
             if (x + 1 < Width)
             {
@@ -228,7 +237,7 @@ namespace Roguelike.Maps
             {
                 for (int y = 0; y < Height; y++)
                 {
-                    if (Ocean[x, y] || Lakes[x, y])
+                    if (Regions[x, y].RegionType == RegionType.Ocean || Regions[x, y].RegionType == RegionType.Lake)
                     {
                         var yDiff = Math.Abs(y - start.Y);
                         var xDiff = Math.Abs(x - start.X);

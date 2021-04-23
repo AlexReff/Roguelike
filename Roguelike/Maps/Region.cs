@@ -24,33 +24,32 @@ namespace Roguelike.Maps
         public float HeightMap { get; set; }
         public float Temperature { get; set; }
 
-        public Region(bool isOcean, bool isMountain, bool isLand, float heightVal, float tempVal)
+        public Region()
         {
-            //Zones = new ArrayMap2D<Zone>(RegionWidth, RegionHeight);
             Zones = new Zone[RegionWidth, RegionHeight];
-
-            HeightMap = heightVal;
-            Temperature = tempVal;
-
-            if (isOcean)
-            {
-                RegionType = RegionType.Ocean;
-            }
-            else if (isMountain)
-            {
-                RegionType = RegionType.Mountain;
-            }
-            else if (isLand)
-            {
-                RegionType = RegionType.Land;
-            }
+            RegionType = RegionType.Ocean;
         }
+
+        //public Region(RegionType regionType, float heightVal, float tempVal)
+        //{
+        //    //Zones = new ArrayMap2D<Zone>(RegionWidth, RegionHeight);
+        //    Zones = new Zone[RegionWidth, RegionHeight];
+
+        //    HeightMap = heightVal;
+        //    Temperature = tempVal;
+
+        //    RegionType = regionType;
+        //}
     }
 
     internal enum RegionType
     {
         Ocean,
+        Lake,
         Land,
         Mountain,
+        CityOne,
+        CityTwo,
+        CityThree,
     }
 }

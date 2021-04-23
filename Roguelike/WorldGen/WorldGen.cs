@@ -13,6 +13,7 @@ namespace Roguelike
     internal class WorldGen
     {
         private WorldMap map;
+        public WorldMap Map { get { return map; } }
 
         private const int SeedWordCount = 3;
 
@@ -27,10 +28,14 @@ namespace Roguelike
         private const float heightMapFactor = .11f;
 
         // first-pass heightmap cutoff points
+        private const float fpCutoffOcean = .1f;
         private const float fpCutoffLake = .1f;
         //private const float fpCutoffPeak = .58f;
         private const float fpCutoffPeak = .8f;
         private const float fpCutoffSand = .15f;
+
+        private const float cityOneTempMin = 297;
+        private const float cityOneTempMax = 303;
 
         // render cutoff points
         private const float rndrCutoffOcean = fpCutoffLake;
@@ -39,6 +44,9 @@ namespace Roguelike
 
         private const float tempMin = 250;
         private const float tempMax = 320;
+
+        private readonly Color GroundBrownColor = new Color(135, 62, 35);
+        private readonly Color GroundGreenColor = Color.DarkGreen;
 
         public string MasterSeed { get; private set; }
         public Dictionary<RNGPools, MyRandom> RNG { get; private set; }
@@ -49,15 +57,13 @@ namespace Roguelike
 
             GenerateSeed();
 
-            //_rand.Reset(MasterSeed.GetHashCode());
-
             PopulateRNG();
-
         }
 
         public void ProcessMap(SadConsole.Console console)
         {
             FillConsole(console);
+
             var width = console.Width;
             var height = console.Height;
 
@@ -98,39 +104,84 @@ namespace Roguelike
                 }
             }
 
-            // designate ocean spaces
-            map.CarveOcean();
-
-            // we now have an ocean map
-            noise.Seed = terrainRng.Next().GetHashCode();
-            map.HeightMap = noise.Calc2D(width, height, heightMapFactor);
-
-            //noise.Seed = terrainRng.Next().GetHashCode();
-            //var hm2 = noise.Calc2D(width, height, heightMapFactor);
+            // designate lake and land
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    float heightParsed = map.HeightMap[x, y] / 255;
-                    //float multParsed = hm2[x, y] / 255;
+                    float hMapVal = map.HeightMap[x, y] / 255;
 
-                    //heightParsed *= multParsed;
-
-                    if (heightParsed <= fpCutoffLake)
+                    // designate land & lake
+                    if (hMapVal > fpCutoffOcean)
                     {
-                        //map.HeightMap[x, y] = 0;
-                        map.Lakes[x, y] = true;
-                    }
-                    else if (map.HeightMap[x, y] < fpCutoffPeak)
-                    {
-                        map.Land[x, y] = true;
+                        map.Regions[x, y].RegionType = RegionType.Land;
                     }
                     else
                     {
-                        map.Mountain[x, y] = true;
+                        map.Regions[x, y].RegionType = RegionType.Lake;
                     }
                 }
             }
+
+            // turns ocean 'lake's into ocean
+            // designate ocean spaces
+            map.CarveOcean();
+
+            // remove lakes - will be created later
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    if (map.Regions[x, y].RegionType == RegionType.Lake)
+                    {
+                        map.Regions[x, y].RegionType = RegionType.Land;
+                    }
+                }
+            }
+
+            // we now have an ocean map
+
+            // now designate correct(?) heightmap
+            noise.Seed = terrainRng.Next().GetHashCode();
+            map.HeightMap = noise.Calc2D(width, height, heightMapFactor);
+
+            ////noise.Seed = terrainRng.Next().GetHashCode();
+            ////var hm2 = noise.Calc2D(width, height, heightMapFactor);
+            //for (int x = 0; x < width; x++)
+            //{
+            //    for (int y = 0; y < height; y++)
+            //    {
+            //        float heightParsed = map.HeightMap[x, y] / 255;
+            //        //float multParsed = hm2[x, y] / 255;
+
+            //        if (heightParsed > fpCutoffPeak)
+            //        {
+            //            if (map.Regions[x, y].RegionType != RegionType.Ocean)
+            //            {
+            //                map.Regions[x, y].RegionType = RegionType.Mountain;
+            //            }
+            //        }
+
+            //        //heightParsed *= multParsed;
+
+            //        //if (heightParsed <= fpCutoffLake)
+            //        //{
+            //        //    //map.HeightMap[x, y] = 0;
+            //        //    //map.Lakes[x, y] = true;
+            //        //    map.Regions[x, y].RegionType = RegionType.Lake;
+            //        //}
+            //        //else if (map.HeightMap[x, y] < fpCutoffPeak)
+            //        //{
+            //        //    //map.Land[x, y] = true;
+            //        //    map.Regions[x, y].RegionType = RegionType.Land;
+            //        //}
+            //        //else
+            //        //{
+            //        //    //map.Mountain[x, y] = true;
+            //        //    map.Regions[x, y].RegionType = RegionType.Mountain;
+            //        //}
+            //    }
+            //}
 
             //int numRivers = 0;
             //int failedTries = 0;
@@ -211,47 +262,111 @@ namespace Roguelike
             }
 
             // we now have a temperature gradient and a height map
-            // find a west-coast space to place the 'first' starting city
 
+            // find a west-coast space to place the 'first' starting city
             List<Point> validSpawnPoints = new List<Point>();
-            for (int y = 0; y < height; y++)
+            for (int y = height * 3 / 4; y < height * 4 / 5; y++)
             {
-                for (int x = 1; x < width / 2; x++)
+                for (int x = 1; x < width / 3; x++)
                 {
                     // if this is an ocean spot,
                     // or if there is not an ocean spot to the left,
                     // skip this spot
-                    if (map.Ocean[x, y] || !map.Ocean[x - 1, y])
+                    if (map.Regions[x, y].RegionType == RegionType.Ocean || map.Regions[x - 1, y].RegionType != RegionType.Ocean)
                     {
                         continue;
                     }
 
-                    float floatVal = map.TempMap[x, y] / 255;
-
-                    var range = tempMax - tempMin;
-                    var temp = floatVal * range + tempMin;
-                    // we found the left-most point
-                    if (temp <= 303 && temp >= 300)
+                    // if there is not a land spot to the north, do not use this spot
+                    // this is due to the eastern/southern mountain range that must
+                    // accompany the starter town
+                    if (map.Regions[x, y - 1].RegionType == RegionType.Ocean)
                     {
-                        //valid point
+                        continue;
+                    }
+
+                    validSpawnPoints.Add(new Point(x, y));
+
+                    //float floatVal = map.TempMap[x, y] / 255;
+
+                    //var range = tempMax - tempMin;
+                    //var temp = floatVal * range + tempMin;
+                    //// we found the left-most point
+                    //if (temp <= cityOneTempMax && temp >= cityOneTempMin)
+                    //{
+                    //    //valid point
+                    //    validSpawnPoints.Add(new Point(x, y));
+                    //}
+                }
+            }
+
+            // no valid spawn point, search higher on the coast
+            if (!validSpawnPoints.Any())
+            {
+                for (int y = height * 4 / 5; y > height / 2; y--)
+                {
+                    for (int x = 1; x < width / 4; x++)
+                    {
+                        // if this is an ocean spot,
+                        // or if there is not an ocean spot to the left,
+                        // skip this spot
+                        if (map.Regions[x, y].RegionType == RegionType.Ocean || map.Regions[x - 1, y].RegionType != RegionType.Ocean)
+                        {
+                            continue;
+                        }
+
+                        // if there is not a land spot to the north, do not use this spot
+                        // this is due to the eastern/southern mountain range that must
+                        // accompany the starter town
+                        if (map.Regions[x, y - 1].RegionType == RegionType.Ocean)
+                        {
+                            continue;
+                        }
+
                         validSpawnPoints.Add(new Point(x, y));
                     }
                 }
             }
-
+            
             if (!validSpawnPoints.Any())
             {
-                var wtf = "";
-                //throw new Exception("Unable to locate any west coast tiles in valid temp range");
+                throw new Exception("Unable to locate any valid tiles for City 1");
             }
             else
             {
                 var randSpawn = terrainRng.Next(0, validSpawnPoints.Count - 1);
                 map.CityOne = validSpawnPoints[randSpawn];
+
+                // we need to generate a coast-following-mountain-range
+                // this will help regulate temperature in the 'primary' city
+                // making it more desirable, and safer
+                Point belowStarterCity = new Point(map.CityOne.X, map.CityOne.Y + 1);
+                map.Regions[belowStarterCity.X, belowStarterCity.Y].RegionType = RegionType.Mountain;
+
+                //carve the mountains below the city leading to the ocean
+                Point leftMost = new Point(belowStarterCity.X - 1, belowStarterCity.Y);
+                while (leftMost.X >= 0
+                    && map.Regions[leftMost.X, leftMost.Y].RegionType != RegionType.Ocean
+                    && map.Regions[leftMost.X, leftMost.Y - 1].RegionType != RegionType.Ocean
+                    )
+                {
+                    map.Regions[leftMost.X, leftMost.Y].RegionType = RegionType.Mountain;
+                    leftMost = new Point(leftMost.X - 1, leftMost.Y);
+                }
+
+                //note: leftMost is now on the ocean tile, not the last land tile
+
+                Point rightStarterCity = new Point(map.CityOne.X + 1, map.CityOne.Y);
+                //Point aboveRightStarter = new Point(rightStarterCity.X, rightStarterCity.Y - 1);
+                Point belowRightStarter = new Point(rightStarterCity.X, rightStarterCity.Y + 1);
+
+                map.Regions[rightStarterCity.X, rightStarterCity.Y].RegionType = RegionType.Mountain;
+                //map.Regions[aboveRightStarter.X, aboveRightStarter.Y].RegionType = RegionType.Mountain;
+                map.Regions[belowRightStarter.X, belowRightStarter.Y].RegionType = RegionType.Mountain;
             }
 
-            //Draw(console);
-            DrawDebug(console);
+            Draw(console);
+            //DrawDebug(console);
             //DrawTemp(console);
         }
 
@@ -281,7 +396,6 @@ namespace Roguelike
                 }
                 for (int x = 0; x < width; x++)
                 {
-                    //goes from maxtemp -> mintemp as y increases
                     temps[x, y] = temp;
                 }
             }
@@ -300,7 +414,7 @@ namespace Roguelike
             {
                 var idx = _rand.Next(0, allWords.Count - 1);
                 var word = allWords[idx];
-                if (!string.IsNullOrEmpty(word))
+                if (!string.IsNullOrEmpty(word) && !words.Contains(word))
                 {
                     words.Add(word);
                 }
@@ -309,6 +423,22 @@ namespace Roguelike
             MasterSeed = string.Join(" ", words);
 
             return MasterSeed;
+        }
+
+        private void DrawMountain(SadConsole.Console console, int x, int y)
+        {
+            char val = (char)30;
+            Color fgColor = GroundBrownColor;
+            //Color fgColor = baseColor;
+            //if (alpha < .9f)
+            //{
+            //    fgColor = new Color(baseColor.R, baseColor.G, baseColor.B, alpha);
+            //}
+            //alpha == > mountainCutoff, so we need to scale it by subtracting the cutoff, then 
+            //var newAlpha = (alpha - rndrCutoffPeak) * (1 / (1 - rndrCutoffPeak));
+            
+            Color bgColor = GroundGreenColor; //new Color(80, 70, 40);
+            console.Print(x, y, val.ToString(), fgColor, bgColor);
         }
 
         private void DrawMountain(SadConsole.Console console, int x, int y, float alpha)
@@ -338,6 +468,57 @@ namespace Roguelike
             //Color fgColor = new Color(baseColor.R, baseColor.G, baseColor.B, newAlpha);
             Color bgColor = new Color(80, 70, 40);
             console.Print(x, y, val.ToString(), fgColor, bgColor);
+        }
+
+        private void DrawGround(SadConsole.Console console)
+        {
+            var noise = new SimplexNoise(RNG[RNGPools.Drawing].Next().GetHashCode());
+            var field = noise.Calc2D(console.Width, console.Height, .15f);
+            var bubbleField = noise.Calc2D(console.Width, console.Height, .2f);
+
+            for (int x = 0; x < console.Width; x++)
+            {
+                for (int y = 0; y < console.Height; y++)
+                {
+                    if (map.Regions[x, y].RegionType == RegionType.Land)
+                    {
+                        char val = (char)219;
+                        Color bgColor = GroundGreenColor;
+                        Color baseColor = GroundBrownColor;
+                        
+                        //0.0-1.0
+                        float fVal = field[x, y] / 255;
+                        fVal = (fVal * 2 / 3);
+
+                        //if (RNG[RNGPools.Drawing].NextBoolean())
+                        //{
+                        var nFVal = bubbleField[x, y] / 255;
+                        if (nFVal > .7)
+                        {
+                            val = (char)129;
+                        }
+                        else if (nFVal > .4)
+                        {
+                            val = (char)37;
+                        }
+                        else
+                        {
+                            val = (char)39;
+                        }
+                        //}
+                        //else
+                        //{
+                        //    //Color temp = bgColor;
+                        //    //bgColor = baseColor;
+                        //    //baseColor = temp;
+                        //}
+
+                        Color fgColor = new Color(baseColor.R, baseColor.G, baseColor.B, (int)(fVal * 255));
+
+                        console.Print(x, y, val.ToString(), fgColor, bgColor);
+                    }
+                }
+            }
         }
 
         private void DrawGround(SadConsole.Console console, int x, int y, float alpha)
@@ -374,13 +555,49 @@ namespace Roguelike
             console.Print(x, y, val.ToString(), fgColor, bgColor);
         }
 
-        private void DrawOcean(SadConsole.Console console, int x, int y)
+        private void DrawOcean(SadConsole.Console console)
         {
-            char val = (char)219;
-            Color baseColor = Color.DeepSkyBlue;
-            Color fgColor = new Color(baseColor.R, baseColor.G, baseColor.B, 1f);
-            Color bgColor = new Color(80, 70, 40);
-            console.Print(x, y, val.ToString(), fgColor, bgColor);
+            var noise = new SimplexNoise(RNG[RNGPools.Drawing].Next().GetHashCode());
+            var field = noise.Calc2D(console.Width, console.Height, .15f);
+            var bubbleField = noise.Calc2D(console.Width, console.Height, .2f);
+
+            for (int x = 0; x < console.Width; x++)
+            {
+                for (int y = 0; y < console.Height; y++)
+                {
+                    if (map.Regions[x, y].RegionType == RegionType.Ocean)
+                    {
+                        //char val = (char)156;
+                        char val = (char)32;
+                        if (RNG[RNGPools.Drawing].NextBoolean())
+                        {
+                            var nFVal = bubbleField[x, y] / 255;
+                            if (nFVal > .66)
+                            {
+                                val = (char)248;
+                            }
+                            else if (nFVal > .33)
+                            {
+                                val = (char)249;
+                            }
+                            else
+                            {
+                                val = (char)250;
+                            }
+                        }
+                        Color bgColor = Color.MidnightBlue;
+                        Color baseColor = Color.White;
+
+                        //0.0-1.0
+                        float fVal = field[x, y] / 255;
+                        fVal = (fVal / 2) + .1f;
+
+                        Color fgColor = new Color(baseColor.R, baseColor.G, baseColor.B, fVal);
+
+                        console.Print(x, y, val.ToString(), fgColor, bgColor);
+                    }
+                }
+            }
         }
 
         private void FillConsole(SadConsole.Console console)
@@ -395,6 +612,9 @@ namespace Roguelike
 
         public void Draw(SadConsole.Console console)
         {
+            DrawOcean(console);
+            DrawGround(console);
+
             // draw the result to the screen
             for (int x = 0; x < console.Width; x++)
             {
@@ -405,11 +625,76 @@ namespace Roguelike
                     {
                         continue;
                     }
-                    if (map.Ocean[x, y])
+                    switch (map.Regions[x, y].RegionType)
                     {
-                        DrawOcean(console, x, y);
+                        case RegionType.Lake:
+                            DrawLake(console, x, y);
+                            break;
+                        case RegionType.Mountain:
+                            DrawMountain(console, x, y);
+                            break;
+                        case RegionType.Land:
+                            // draw patterned ground
+                            // DrawGround(console);
+
+                            //float floatVal = map.HeightMap[x, y] / 255;
+                            //if (floatVal < rndrCutoffSand)
+                            //{
+                            //    DrawSand(console, x, y, floatVal);
+                            //}
+                            //else if (floatVal > rndrCutoffPeak)
+                            //{
+                            //    DrawMountain(console, x, y, floatVal);
+                            //}
+                            //else
+                            //{
+                            //    DrawGround(console, x, y, floatVal);
+                            //}
+                            break;
+                        case RegionType.Ocean:
+                        case RegionType.CityOne:
+                        case RegionType.CityTwo:
+                        case RegionType.CityThree:
+                        default:
+                            continue;
                     }
-                    else if (map.Lakes[x, y])
+                }
+            }
+
+            DrawCities(console);
+
+            //if (map.Rivers.Any())
+            //{
+            //    foreach (var river in map.Rivers)
+            //    {
+            //        foreach (var step in river.Steps)
+            //        {
+            //            DrawRiver(console, step.X, step.Y);
+            //        }
+            //    }
+            //}
+        }
+
+        public void DrawOld(SadConsole.Console console)
+        {
+            DrawOcean(console);
+
+            // draw the result to the screen
+            for (int x = 0; x < console.Width; x++)
+            {
+                for (int y = 0; y < console.Height; y++)
+                {
+                    Point thisPt = new Point(x, y);
+                    if (map.CityOne == thisPt)
+                    {
+                        continue;
+                    }
+                    if (map.Regions[x, y].RegionType == RegionType.Ocean)
+                    {
+                        //DrawOcean(console, x, y);
+                        continue;
+                    }
+                    else if (map.Regions[x, y].RegionType == RegionType.Lake)
                     {
                         DrawLake(console, x, y);
                     }
@@ -438,6 +723,7 @@ namespace Roguelike
             //{
             //    foreach (var river in map.Rivers)
             //    {
+
             //        foreach (var step in river.Steps)
             //        {
             //            DrawRiver(console, step.X, step.Y);
@@ -452,24 +738,26 @@ namespace Roguelike
             {
                 return;
             }
-            char val = (char)219;
-            Color baseColor = Color.Red;
+            char val = (char)197;
+            Color baseColor = Color.White;
             //Color fgColor = new Color(baseColor.R, baseColor.G, baseColor.B, 1);
             //Color bgColor = new Color(80, 70, 40);
-            Color bgColor = Color.Black;
+            Color bgColor = Color.Red;
             console.Print(map.CityOne.X, map.CityOne.Y, val.ToString(), baseColor, bgColor);
         }
 
         public void DrawDebug(SadConsole.Console console)
         {
+            DrawOcean(console);
+
             // draw the result to the screen
             for (int x = 0; x < console.Width; x++)
             {
                 for (int y = 0; y < console.Height; y++)
                 {
-                    if (map.Ocean[x, y])
+                    if (map.Regions[x, y].RegionType == RegionType.Ocean)
                     {
-                        DrawOcean(console, x, y);
+                        //DrawOcean(console, x, y);
                         continue;
                     }
                     var point = new Point(x, y);
@@ -477,13 +765,30 @@ namespace Roguelike
                     {
                         continue;
                     }
+
                     float floatVal = map.HeightMap[x, y] / 255;
 
+                    // float floatVal = map.HeightMap[x, y] / 255;
+
                     char val = (char)219;
-                    Color baseColor = Color.White;
-                    Color fgColor = new Color(baseColor.R, baseColor.G, baseColor.B, floatVal);
-                    //Color bgColor = new Color(80, 70, 40);
-                    Color bgColor = Color.Black;
+
+                    // instead of white on black, make rainbow!
+                    Color fgColor = Helpers.HSL2RGB(floatVal, 0.5, 0.5);
+                    Color bgColor = Color.White;
+
+                    // label possible temperature spawn points
+                    // debugging
+                    float tempVal = map.TempMap[x, y] / 255;
+                    var range = tempMax - tempMin;
+                    var temp = tempVal * range + tempMin;
+                    if (x > 0 && temp <= cityOneTempMax && temp >= cityOneTempMin)
+                    {
+                        if (map.Regions[x - 1, y].RegionType == RegionType.Ocean)
+                        {
+                            fgColor = Color.Green;
+                        }
+                    }
+
                     console.Print(x, y, val.ToString(), fgColor, bgColor);
                 }
             }
@@ -766,5 +1071,6 @@ namespace Roguelike
     {
         Master,
         Terrain,
+        Drawing,
     }
 }

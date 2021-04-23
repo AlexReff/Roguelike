@@ -41,27 +41,40 @@ namespace Roguelike.Systems
 
         public UIManager()
         {
-            //UseKeyboard = true;
-
             var fullWidth = MyGame.GameSettings.GameWidth;
             var fullHeight = MyGame.GameSettings.GameHeight + (MyGame.GameSettings.EnableDebugOutput ? MyGame.GameSettings.DebugHeight : 0);
             
             GameScreen = new GameConsole(fullWidth, fullHeight, SadConsole.Global.FontDefault);
 
-            //Children.Add(GameScreen);
-            //CurrentState = UIManagerState.MainGame;
-            //CurrentScreen = GameScreen;
-
             WorldGenScreen = new WorldGenConsole(fullWidth, fullHeight, Color.Black, Color.White);
 
-            //WorldGenScreen.UseKeyboard = true;
-            Children.Add(WorldGenScreen);
-            CurrentState = UIManagerState.WorldGen;
-            CurrentScreen = WorldGenScreen;
+            SetCurrentUIScreen(UIManagerState.WorldGen);
 
             // set this as the current screen
             Parent = SadConsole.Global.CurrentScreen;
             IsFocused = true;
+        }
+
+        public void SetCurrentUIScreen(UIManagerState target)
+        {
+            Children.Clear();
+
+            switch (target)
+            {
+                case UIManagerState.WorldGen:
+                    Children.Add(WorldGenScreen);
+                    CurrentScreen = WorldGenScreen;
+                    break;
+                case UIManagerState.MainGame:
+                case UIManagerState.CharacterCreation:
+                case UIManagerState.MainScreen:
+                default:
+                    Children.Add(GameScreen);
+                    CurrentScreen = GameScreen;
+                    break;
+            }
+
+            CurrentState = target;
         }
         
         public void SetGameMap(GameMap map)

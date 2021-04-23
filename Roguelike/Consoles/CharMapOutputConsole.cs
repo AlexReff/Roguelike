@@ -79,7 +79,7 @@ namespace Roguelike.Consoles
             //Draw a black line over the mouseover text area
             DrawConsole.DrawLine(new Point(0, DrawConsole.Height - 1), new Point(DrawConsole.Width - 1, DrawConsole.Height - 1), Color.Black, Color.Black);
 
-            for (int x = 0; x < DrawConsole.Width - AdditionalWidth; x++)
+            for (int x = 0; x < DrawConsole.Width; x++)
             {
                 //Convert to Hexadecimal since we can't output 2 numbers in a single space in SadConsole
                 string thisChar = System.Convert.ToByte(x).ToString("x");
@@ -87,9 +87,9 @@ namespace Roguelike.Consoles
                 DrawConsole.Print(0, x + 1, thisChar, Color.White, Color.Black);
             }
 
-            for (int x = 0; x < DrawConsole.Width - AdditionalWidth; x++)
+            for (int x = 0; x < DrawConsole.Width; x++)
             {
-                for (int y = 0; y < DrawConsole.Height - AdditionalHeight; y++)
+                for (int y = 0; y < DrawConsole.Height - 2; y++)
                 {
                     DrawConsole.Print(x + 1, y + 1, GetCharAtPos(x + 1, y + 1).ToString(), Color.White, Color.Black);
                 }
